@@ -1,6 +1,6 @@
 # Complete Guide to Creating Claude Plugins (Skills)
 
-> **Source note:** This document is derived from a full audit of the Superpowers codebase (v5.0.7), including all 14 core skills, plugin configuration files, hook system, Anthropic's official skill authoring best practices, contributor guidelines, and the complete PR template. The referenced YouTube video (youtu.be/TX91PdBn_IA) was inaccessible during authoring (HTTP 403); all content comes from the project source.
+> **Source note:** This document is derived from a full audit of the Superpowers codebase (v5.0.7), including all 14 core skills, plugin configuration files, hook system, Anthropic's official skill authoring best practices, contributor guidelines, and the complete PR template. The referenced YouTube video (youtu.be/TX91PdBn_IA) was inaccessible during authoring (HTTP 403); all content comes from the project source. A second reference document (`AI_PIPELINES_LLM.md`) describing a complementary pipeline-orchestration architecture was also incorporated; see [Section 13](#13-superpowers-vs-ai-pipelines--architectural-comparison).
 
 ---
 
@@ -18,6 +18,7 @@
 10. [Gaps, Edge Cases, and Anti-Patterns](#10-gaps-edge-cases-and-anti-patterns)
 11. [Testing Skills](#11-testing-skills)
 12. [Contributing — PR Standards](#12-contributing--pr-standards)
+13. [Superpowers vs AI Pipelines — Architectural Comparison](#13-superpowers-vs-ai-pipelines--architectural-comparison)
 
 ---
 
@@ -1006,3 +1007,215 @@ Both fields together with the YAML delimiters must remain under 1024 characters.
   → writing-skills
     → test-driven-development (applied to documentation)
 ```
+
+---
+
+## 13. Superpowers vs AI Pipelines — Architectural Comparison
+
+This section compares Superpowers (this project) against the `AI_PIPELINES_LLM.md` reference, a complementary architecture for multi-agent pipeline orchestration. Understanding where they differ — and where they converge — is essential for building systems that use both.
+
+### The Fundamental Difference in One Sentence
+
+**Superpowers shapes how a single agent behaves inside a session. AI Pipelines defines how multiple agents are constructed, deployed, and connected across a system.**
+
+They operate at different layers of the stack. Using one does not exclude the other.
+
+---
+
+### Side-by-Side Comparison
+
+| Dimension | Superpowers (this project) | AI Pipelines (`AI_PIPELINES_LLM.md`) |
+|---|---|---|
+| **Primary unit** | Skill (markdown guide invoked by an agent) | Agent (YAML-defined worker with tools, model, effort) |
+| **Agent definition** | None — agents are ad-hoc subagent dispatches | Formal schema: `.claude/agents/<name>.md` with YAML frontmatter |
+| **What shapes behavior** | Skills invoked at runtime by the agent itself | Agent frontmatter (tools, model, effort, hooks, isolation) |
+| **Orchestration model** | One session-level agent invokes skills and dispatches subagents | Explicit pipeline patterns (Sequential, Parallel Fan-Out, Iterative Loop, Human-Gated, Spec-Driven) |
+| **Subagent spawning** | Within skills (e.g., SDD dispatches implementer + reviewers) | `SUB_AGENT_SPAWNING: FALSE` — only the parent/orchestrator spawns |
+| **State management** | Git + plan files in `docs/superpowers/plans/` | `pipeline-state.json` in `tmp/` directories, structured JSON |
+| **Model selection** | Agent judgment per task (cheapest capable model) | `SONNET_ONLY` — scale via `effort: low/medium/high/xhigh/max` |
+| **Token management** | Skill token budgets (bootstrap < 150 words, skills < 500 lines) | Full cache discipline (STATIC_FIRST, NO_TOOL_CHURN, breakpoints, TTL ordering) |
+| **Platform scope** | Cross-platform: Claude Code, Cursor, Codex, OpenCode, Copilot, Gemini | Claude Code-first (`.claude/agents/`, `settings.json`, specific model IDs) |
+| **Session bootstrap** | Hook injects `using-superpowers` at session start | No bootstrap skill — agents loaded directly via `skills:` frontmatter |
+| **Skill discovery** | Dynamic: agent reads description and decides at runtime | Two modes: session-level metadata-only OR `skills:` frontmatter = full content at startup |
+| **Prompt caching** | Not explicitly addressed | Fully specified: STATIC_FIRST, no tool churn, no dynamic timestamps, cache breakpoints |
+| **Memory** | Not explicitly controlled | `AUTO_MEMORY: DISABLED` — explicit `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1` |
+| **Path management** | No formal protocol | `{OUT}` and `{REF}` as absolute shell env vars; no hardcoded paths in agents |
+| **Tool auditing** | Not specified | `PostToolUse` orchestrator tracks usage; auto-prunes tools unused across 3 iterations |
+| **Output bounding** | Not specified | `BOUND_STDOUT: TRUE`, `SCOPE_FILE_READS: TRUE`, `PASS_PATHS_NOT_CONTENT: TRUE` |
+| **Dependency policy** | Zero external dependencies (hard requirement) | No stated constraint |
+| **Per-invocation processing** | The skill itself contains the workflow | 4D Processing Wrapper (Deconstruct→Diagnose→Develop→Deliver) runs internally on every agent turn |
+
+---
+
+### Where They Converge (Shared Standards)
+
+Both systems independently arrive at the same conclusions on several points, which means these are reliable cross-industry standards:
+
+**Progressive disclosure (identical spec):**
+- SKILL.md / agent body ≤ 500 lines
+- Reference files one level deep from the main file (never nested)
+- Reference files > 100 lines must include a table-of-contents at the top
+- Metadata pre-loads; body loads on invocation; reference files load on read
+
+**Description discipline:**
+- `name` ≤ 64 characters, letters + hyphens only
+- `description` ≤ 1024 characters
+- Third person only — first/second person breaks POV consistency in the system prompt
+- Both fields load on every session start — every extra sentence costs tokens on every message
+
+**Write/review isolation:**
+- Superpowers: implementer subagent ≠ reviewer subagent (two-stage review)
+- AI Pipelines: `WRITE_REVIEW_ISOLATION: TRUE` — writing agent ≠ reviewing agent
+- Both systems independently enforce the same principle: the agent that creates cannot objectively verify its own work
+
+**Fresh context per task:**
+- Superpowers: fresh subagent per task in SDD to prevent context pollution
+- AI Pipelines: `PIPELINE_PHASE_ISOLATION: TRUE` — Tester, Analyzer, Healer are separate instances
+- Same rationale: isolated context produces cleaner, more reliable results
+
+---
+
+### Key Conceptual Differences Explained
+
+#### 1. Skills as Runtime Guides vs. Agent Infrastructure
+
+In Superpowers, a skill is a markdown document the running agent reads and follows. The agent decides at runtime whether to invoke it. Skills shape _process_ — how to do TDD, how to debug, how to brainstorm.
+
+In AI Pipelines, a skill preloaded via `skills:` frontmatter injects the skill's _full content_ at agent startup — different from the session-level metadata-only discovery. Skills here are closer to preloaded context than to runtime guides.
+
+**Practical consequence:** A Superpowers skill designed for session-level invocation will be over-loaded if placed in a pipeline agent's `skills:` frontmatter. Conversely, a pipeline reference skill (no SKILL.md body, only a `references/` directory) would never be discovered by the Superpowers bootstrap.
+
+#### 2. Orchestration Explicitness
+
+Superpowers orchestration is _implicit_ — it emerges from skill invocations. The brainstorming skill specifies a 9-step checklist; the SDD skill contains a dispatch loop; the agent follows both in sequence. There is no formal pipeline DSL.
+
+AI Pipelines orchestration is _explicit_ — pipeline patterns (1-5) are named, formal, and reusable. The orchestrator knows it is running Pattern 3 (Iterative Loop) or Pattern 5 (Spec-Driven Development). State is tracked in a structured JSON file.
+
+**When explicit matters:** Long-running pipelines with many phases, checkpoints, human gates, and recovery logic need the explicitness of AI Pipelines. Interactive development sessions with a human in the loop benefit from Superpowers' implicit, workflow-shaped behavior.
+
+#### 3. The 4D Processing Wrapper Has No Superpowers Equivalent
+
+AI Pipelines defines a per-invocation processing method: **Deconstruct → Diagnose → Develop → Deliver**. This runs internally on every agent turn (surfaced only on "show 4D"). It forces agents to extract intent, identify failure modes, match strategy, and lead with conclusion on every response.
+
+Superpowers has no equivalent. The closest analogue is `brainstorming` (which similarly explores intent, constraints, and approaches before acting), but brainstorming is a one-time workflow step rather than a per-turn internal process.
+
+#### 4. The ANT Swarm Principle vs. Subagent-Driven Development
+
+AI Pipelines: `ANT_SWARM_PRINCIPLE: TRUE` — many small-context agents are preferred over single large-context agents. The goal is to minimize each agent's context to the minimum needed.
+
+Superpowers SDD: fresh subagent per task, but the orchestrating agent holds the plan and curates exactly what each subagent needs. The emphasis is on isolation and precision of context, not necessarily minimizing it.
+
+Both reject the "one massive agent" approach, but from different angles: AI Pipelines worries about context window limits; Superpowers worries about context pollution between tasks.
+
+#### 5. Model Selection Philosophy
+
+AI Pipelines: `SONNET_ONLY` — never configure Opus. Scale depth via `effort: low | medium | high | xhigh | max` on the model, not by switching models. This prevents pipeline cost explosion and ensures consistent behavior.
+
+Superpowers: use the least powerful model that can handle each role. Mechanical single-file tasks → cheap/fast model. Integration judgment → standard model. Architecture and review → most capable. This is explicitly multi-model.
+
+**Synthesis:** If you are building a pipeline that will run many times automatically, SONNET_ONLY + effort scaling is safer and cheaper. If you are in an interactive session making judgment calls about individual tasks, the Superpowers model-selection heuristic is more appropriate.
+
+#### 6. Prompt Cache Discipline
+
+AI Pipelines has an explicit, detailed cache strategy:
+- `STATIC_FIRST`: system prompt, skills, tools at start; dynamic content last
+- `NO_TOOL_CHURN`: never add/remove/reorder tools mid-session
+- `SKILLS_LIST_STABLE`: changing skills list invalidates cache
+- `NO_DYNAMIC_TIMESTAMPS`: timestamps in static content shatter prefix matching
+- Up to 4 cache breakpoints; 1h TTL for long loops, 5m for short
+- Thinking blocks CAN be cached in previous assistant turns
+
+Superpowers does not address caching. This is a gap: Superpowers skills can inadvertently cause cache invalidation if the session-start hook produces variable output (e.g., different timestamps).
+
+**Implication for plugin authors:** If you are authoring skills that will be used in high-throughput pipeline contexts, follow the AI Pipelines cache discipline even if Superpowers doesn't require it:
+- Keep the `using-superpowers` output stable across identical sessions
+- Don't include session-specific metadata in skill content
+- Ensure the `session-start` hook output is deterministic
+
+#### 7. Worktree Lifecycle in Pipelines
+
+AI Pipelines adds a requirement Superpowers doesn't explicitly state: `WORKTREE_MERGE_REQUIRED: TRUE` — if `isolation: worktree` is used, the orchestrator MUST explicitly commit and merge successful changes before worktree destruction.
+
+Superpowers' `finishing-a-development-branch` handles this for options 1 (merge locally) and 4 (discard), but the pipeline requirement makes it explicit for automated contexts where a worktree might be destroyed by infrastructure before the agent gets to option selection.
+
+**Gap:** Superpowers does not define behavior for externally-destroyed worktrees. If a pipeline tears down a worktree container after a timeout, uncommitted work is silently lost. Pipeline users should ensure work is committed (or at minimum, stashed) before worktree destruction occurs.
+
+---
+
+### Decision Guide: Which to Use When
+
+```
+Building a system...
+  │
+  ├── with a human in the loop, single session?
+  │     → Superpowers (behavior-shaping for interactive development)
+  │
+  ├── automated, multi-phase, runs without human intervention?
+  │     → AI Pipelines (explicit orchestration, structured state, cache discipline)
+  │
+  ├── both (interactive development that produces pipeline artifacts)?
+  │     → Superpowers for the session workflow
+  │     → AI Pipelines conventions for the agents the session produces
+  │
+  ├── teaching an agent workflow discipline (TDD, debugging, verification)?
+  │     → Superpowers skills
+  │
+  ├── architecting a multi-agent system (fan-out, iterative loops, gates)?
+  │     → AI Pipelines patterns
+  │
+  └── both — a disciplined agent that also runs pipelines?
+        → Use Superpowers' `using-git-worktrees`, `brainstorming`, TDD skills
+          for the development phase, then AI Pipelines patterns for the
+          automation the development produces
+```
+
+---
+
+### Standards That Apply to Both Systems
+
+These rules are safe to apply in any context — they are confirmed by both architectures independently:
+
+1. **Description = triggering conditions only, no workflow summary** — both systems penalize descriptions that summarize process
+2. **Third-person descriptions** — both explicitly require this for system prompt injection consistency
+3. **≤ 500 lines for main skill/agent body** — both state this limit
+4. **References one level deep, ToC if > 100 lines** — both require this
+5. **Writing agent ≠ reviewing agent** — both enforce isolation
+6. **Fresh context per task** — both reject shared-context multi-task agents
+7. **No hardcoded paths** — both require parameterized or dynamic path resolution
+8. **Metadata loads at startup; body loads on invocation; references load on read** — both implement progressive disclosure identically
+9. **One excellent example, not multi-language** — both prefer depth over breadth in examples
+10. **Avoid deeply nested references** — both warn against 2+ level chains causing partial reads
+
+---
+
+### Gaps in Each System (From the Other's Perspective)
+
+**Superpowers gaps exposed by AI Pipelines:**
+
+| Gap | AI Pipelines solution |
+|---|---|
+| No prompt cache discipline | STATIC_FIRST, NO_TOOL_CHURN, cache breakpoints, TTL ordering |
+| No formal pipeline patterns | 6 named patterns (Sequential, Parallel, Loop, Human-Gated, Spec-Driven, 4D) |
+| No auto-memory control | `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1` — explicit token reclaim |
+| No tool utilization auditing | PostToolUse hook auto-prunes unused tools after 3 iterations |
+| No output bounding | BOUND_STDOUT, SCOPE_FILE_READS, PASS_PATHS_NOT_CONTENT |
+| No path variable protocol | `{OUT}` and `{REF}` as absolute shell env vars |
+| No per-invocation request processing | 4D method (Deconstruct→Diagnose→Develop→Deliver) |
+| No formal state machine | `pipeline-state.json` with structured JSON in `tmp/` |
+| Worktree destruction not guaranteed | `WORKTREE_MERGE_REQUIRED: TRUE` |
+| No model ID currency guarantee | Pipeline explicitly names current model IDs and prohibits retired ones |
+
+**AI Pipelines gaps exposed by Superpowers:**
+
+| Gap | Superpowers solution |
+|---|---|
+| No session bootstrap / skill discipline | `using-superpowers` hook injection + Red Flags table |
+| No TDD enforcement | `test-driven-development` iron law + rationalization table |
+| No root-cause-first debugging | `systematic-debugging` 4-phase process |
+| No verification-before-claims gate | `verification-before-completion` with explicit evidence requirement |
+| No design-before-code gate | `brainstorming` hard gate — no code before approved spec |
+| No spec compliance review | SDD two-stage review: spec compliance before code quality |
+| No worktree safety verification | `using-git-worktrees` checks `.gitignore` before creating |
+| Platform abstraction (Claude Code only) | Works on 6+ platforms via platform-specific hooks |
+| No PR quality standards | CLAUDE.md contributor guidelines with 94% rejection rate context |
+| Skills not tested before deployment | `writing-skills` TDD-for-documentation methodology |
