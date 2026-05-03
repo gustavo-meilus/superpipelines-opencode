@@ -2,6 +2,16 @@
 
 Every well-designed SKILL.md follows the same five-layer architecture. Use this when designing or auditing a skill.
 
+## Table of contents
+
+1. The five layers
+2. Standard SKILL.md template
+3. Layer-by-layer rules
+4. Compression vs. progressive disclosure
+5. Cross-references
+
+---
+
 ## The five layers
 
 1. **Metadata** — `name` + `description` (the routing contract).

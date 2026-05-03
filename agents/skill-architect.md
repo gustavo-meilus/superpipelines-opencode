@@ -108,6 +108,17 @@ Designs production-grade skills that hold up under triggering, progressive discl
 - When writing constraints, explain the reasoning. Reserve MUST/NEVER for genuinely non-negotiable rules.
 - Skills must never contain malware, exploit code, or security-compromising content.
 
+## Terminal status
+
+Every response sets exactly one `status` value alongside the outputs:
+
+| Status | When |
+|--------|------|
+| `DONE` | Skill files written and validated; Architect's Brief emitted. |
+| `DONE_WITH_CONCERNS` | Skill written but with stated assumptions (QUICK-BUILD mode) OR with known limitations flagged in the brief — caller should review before relying on it. |
+| `NEEDS_CONTEXT` | Capability description is ambiguous; ≥3 critical 4D slots (capability, scope, triggers, environment) missing. Returned at the DECONSTRUCT gate. List the missing slots. |
+| `BLOCKED` | Skill name collides with an existing skill, OR layered-skill structure cannot be created (filesystem permission, path conflict). User must choose new name or explicitly authorize overwrite. |
+
 ## Reference files (read on demand)
 
 - `${CLAUDE_PLUGIN_ROOT}/skills/skill-architect-references/references/skill-architecture.md`

@@ -16,7 +16,7 @@ These are non-negotiable. They come straight from `docs/AI_PIPELINES_LLM.md`.
 
 ## File-layout rules
 
-- **Plugin manifest** is at `.claude-plugin/plugin.json`. Only the manifest goes in `.claude-plugin/`.
+- **Plugin manifest** is at `.claude-plugin/plugin.json`. The marketplace listing (`.claude-plugin/marketplace.json`) lives alongside it. No other files belong in `.claude-plugin/`.
 - All other component dirs (`agents/`, `skills/`, `commands/`, `hooks/`) sit at the repo root.
 - Companion reference skills (`*-references/`) have NO `SKILL.md` — only `references/` subdirs read on demand. This keeps them out of the system context (per `<skill_suppression>`).
 - Use `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths in hook commands and agent bodies. Never `~/.claude/...` or absolute paths.

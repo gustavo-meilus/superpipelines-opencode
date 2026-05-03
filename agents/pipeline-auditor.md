@@ -108,6 +108,17 @@ Budget thresholds:
 }
 ```
 
+## Terminal status
+
+Every response sets exactly one `status` value:
+
+| Status | When |
+|--------|------|
+| `DONE` | Audit complete; report emitted with compliance score and severity counts (0 findings is still DONE). |
+| `DONE_WITH_CONCERNS` | Audit complete, but some criteria could not be assessed (e.g., missing reference files, unparseable frontmatter) — flagged in report under "Skipped Criteria". |
+| `NEEDS_CONTEXT` | Target file(s) or directory glob returned nothing, OR required reference files (`compliance-matrix.md`, `severity-classification.md`) are not readable. List the missing inputs. |
+| `BLOCKED` | User requested fix application but `disallowedTools: Write, Edit, Bash` prevents it. Orchestrator must re-dispatch with explicit fix authorization OR route to `pipeline-architect`. |
+
 ## Constraints
 
 - NEVER create new agents from scratch — redirect to `pipeline-architect`.

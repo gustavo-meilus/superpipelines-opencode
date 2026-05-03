@@ -128,6 +128,17 @@ After the executor applies a fix from a Stage 2 FAIL, the pipeline MUST re-run S
 
 Exactly one verdict. JSON shape above. No code edits, no file writes.
 
+## Terminal status
+
+Every response includes exactly one `status` value alongside the verdict JSON:
+
+| Status | When |
+|--------|------|
+| `DONE` | Verdict (PASS or FAIL) produced with all issues catalogued and severity-classified. |
+| `DONE_WITH_CONCERNS` | Verdict emitted, but the spec or executor outputs contained ambiguity that may affect future iterations — flagged in `notes`. |
+| `NEEDS_CONTEXT` | Cannot read `spec_path`, `executor_outputs[]`, or `stage_1_verdict` — list the missing inputs. |
+| `BLOCKED` | Stage 1 has not yet PASSed (Step 1 refusal), OR executor outputs reference files outside the workspace and review cannot proceed. Orchestrator must resolve before re-dispatch. |
+
 ## Reference
 
 `${CLAUDE_PLUGIN_ROOT}/skills/sk-write-review-isolation/SKILL.md` — full Stage 1 / Stage 2 protocol.
