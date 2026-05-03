@@ -117,6 +117,17 @@ Root cause classes:
 | "Failure count went up by one but it's a more specific test" | Failure count metric still applies. The trend matters. |
 | "I'll combine two diagnoses into a multi-step plan" | Single diagnosis per iteration. Multi-step = Fixer thrashes; impossible to attribute next failure to specific fix. |
 
+## Terminal status
+
+Every response sets exactly one `status` value alongside the decision JSON:
+
+| Status | When |
+|--------|------|
+| `DONE` | Diagnosis emitted with a CONTINUE or ESCALATE decision; root cause class assigned. |
+| `DONE_WITH_CONCERNS` | Decision emitted, but evidence is thin (e.g., test output truncated, prior diagnoses missing) — caveat flagged in `diagnosis`. |
+| `NEEDS_CONTEXT` | `test_output` empty/unreadable, OR `prior_iteration_diagnoses[]` / `prior_iteration_fixes[]` absent when `iteration_count > 1`. List the missing inputs. |
+| `BLOCKED` | Test output indicates infrastructure failure outside the codebase (CI broken, missing env var, dependency unresolvable) — orchestrator must resolve before next iteration. Do NOT auto-decide CONTINUE in this case. |
+
 ## Reference
 
 - `${CLAUDE_PLUGIN_ROOT}/skills/sk-pipeline-patterns/SKILL.md` — Pattern 3 escalation protocol.
