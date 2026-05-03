@@ -1,198 +1,131 @@
-# Superpowers
+# Superpipelines
 
-Superpowers is a complete software development methodology for your coding agents, built on top of a set of composable skills and some initial instructions that make sure your agent uses them.
+Superpipelines is a Claude Code plugin for designing, generating, and running multi-agent AI pipelines that follow the conventions in `docs/AI_PIPELINES_LLM.md` (Patterns 1–6, write/review isolation, worktree safety, spec-driven development, 4D processing wrapper).
 
-## How it works
+It ships:
 
-It starts from the moment you fire up your coding agent. As soon as it sees that you're building something, it *doesn't* just jump into trying to write code. Instead, it steps back and asks you what you're really trying to do. 
+- **Skills** that teach Claude how to design, audit, and orchestrate pipelines (preloaded shared methods, on-demand reference libraries, top-level workflow skills).
+- **Subagents** for pipeline architecture, single-task implementation, two-stage review, and iterative-loop diagnosis.
+- **Slash commands** that wire everything together.
+- **Multi-harness bootstrap** so the same skills run on Claude Code, Cursor, Codex, OpenCode, Copilot CLI, and Gemini CLI (with degraded surface where features are Claude-Code-only — see [Compatibility](#compatibility)).
 
-Once it's teased a spec out of the conversation, it shows it to you in chunks short enough to actually read and digest. 
+## What it does
 
-After you've signed off on the design, your agent puts together an implementation plan that's clear enough for an enthusiastic junior engineer with poor taste, no judgement, no project context, and an aversion to testing to follow. It emphasizes true red/green TDD, YAGNI (You Aren't Gonna Need It), and DRY. 
+Given a vague request like "build me a deploy pipeline for our service," Superpipelines:
 
-Next up, once you say "go", it launches a *subagent-driven-development* process, having agents work through each engineering task, inspecting and reviewing their work, and continuing forward. It's not uncommon for Claude to be able to work autonomously for a couple hours at a time without deviating from the plan you put together.
-
-There's a bunch more to it, but that's the core of the system. And because the skills trigger automatically, you don't need to do anything special. Your coding agent just has Superpowers.
-
-
-## Sponsorship
-
-If Superpowers has helped you do stuff that makes money and you are so inclined, I'd greatly appreciate it if you'd consider [sponsoring my opensource work](https://github.com/sponsors/obra).
-
-Thanks! 
-
-- Jesse
-
+1. Walks the user through the 4D Method (Deconstruct → Diagnose → Develop → Deliver) to produce a precise task definition.
+2. Drives Spec-Driven Development (`/specify` → `/plan` → `/tasks` → human gate → `/implement`).
+3. Selects an execution pattern (Sequential, Parallel Fan-Out, Iterative Loop, Human-Gated, SDD parallel) based on the task's information flow.
+4. Dispatches purpose-built subagents per task with **Stage 1 (spec compliance) → Stage 2 (code quality)** review isolation.
+5. Tracks state in `tmp/pipeline-state.json` with explicit recovery rules.
+6. Honors worktree safety, rationalization-resistance gates, and Sonnet-only model selection scaled by `effort` levels.
 
 ## Installation
 
-**Note:** Installation differs by platform. 
-
-### Claude Code Official Marketplace
-
-Superpowers is available via the [official Claude plugin marketplace](https://claude.com/plugins/superpowers)
-
-Install the plugin from Anthropic's official marketplace:
+### Claude Code
 
 ```bash
-/plugin install superpowers@claude-plugins-official
+/plugin marketplace add gustavo-meilus/superpipelines
+/plugin install superpipelines@superpipelines-marketplace
 ```
 
-### Claude Code (Superpowers Marketplace)
-
-The Superpowers marketplace provides Superpowers and some other related plugins for Claude Code.
-
-In Claude Code, register the marketplace first:
+Or directly from GitHub:
 
 ```bash
-/plugin marketplace add obra/superpowers-marketplace
+claude plugin install github:gustavo-meilus/superpipelines
 ```
 
-Then install the plugin from this marketplace:
+### Cursor
 
-```bash
-/plugin install superpowers@superpowers-marketplace
+```text
+/add-plugin superpipelines
 ```
 
-### OpenAI Codex CLI
-
-- Open plugin search interface
+### OpenAI Codex (CLI / App)
 
 ```bash
 /plugins
 ```
 
-Search for Superpowers
-
-```bash
-superpowers
-```
-
-Select `Install Plugin`
-
-### OpenAI Codex App
-
-- In the Codex app, click on Plugins in the sidebar.
-- You should see `Superpowers` in the Coding section. 
-- Click the `+` next to Superpowers and follow the prompts.
-
-
-### Cursor (via Plugin Marketplace)
-
-In Cursor Agent chat, install from marketplace:
-
-```text
-/add-plugin superpowers
-```
-
-or search for "superpowers" in the plugin marketplace.
+Then search for `superpipelines`.
 
 ### OpenCode
 
-Tell OpenCode:
-
+```text
+Fetch and follow instructions from https://raw.githubusercontent.com/gustavo-meilus/superpipelines/refs/heads/main/.opencode/INSTALL.md
 ```
-Fetch and follow instructions from https://raw.githubusercontent.com/obra/superpowers/refs/heads/main/.opencode/INSTALL.md
-```
-
-**Detailed docs:** [docs/README.opencode.md](docs/README.opencode.md)
 
 ### GitHub Copilot CLI
 
 ```bash
-copilot plugin marketplace add obra/superpowers-marketplace
-copilot plugin install superpowers@superpowers-marketplace
+copilot plugin marketplace add gustavo-meilus/superpipelines
+copilot plugin install superpipelines@superpipelines-marketplace
 ```
 
 ### Gemini CLI
 
 ```bash
-gemini extensions install https://github.com/obra/superpowers
+gemini extensions install https://github.com/gustavo-meilus/superpipelines
 ```
 
-To update:
+## Quick start
 
-```bash
-gemini extensions update superpowers
+Inside a project, ask:
+
+> "Design a pipeline that ingests CSVs, validates rows, and posts results to Slack."
+
+Superpipelines will:
+
+1. Trigger `creating-a-pipeline` (DECONSTRUCT/DIAGNOSE phases).
+2. Dispatch `pipeline-architect` to produce `spec.md`, `plan.md`, `tasks.md`.
+3. Gate at `<HARD-GATE>` for human approval before parallel implementation.
+4. On approval, drive `running-a-pipeline` to dispatch task workers + Stage 1/2 reviewers.
+
+Or run a slash command directly:
+
+| Command | What it does |
+|---------|--------------|
+| `/superpipelines:new-pipeline` | Design a new pipeline (architect-driven) |
+| `/superpipelines:run-pipeline` | Orchestrate `tasks.md` end-to-end |
+| `/superpipelines:audit-pipeline` | Audit pipeline/agent files against `AI_PIPELINES_LLM.md` |
+| `/superpipelines:new-agent` | Design a single subagent |
+| `/superpipelines:new-skill` | Design a single SKILL.md |
+
+## Compatibility
+
+| Component | Claude Code | Cursor | Codex CLI/App | OpenCode | Copilot CLI | Gemini CLI |
+|-----------|:-----------:|:------:|:-------------:|:--------:|:-----------:|:----------:|
+| Skills | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Subagents (`agents/`) | ✅ | — | — | — | — | — |
+| Slash commands | ✅ | natural-language fallback | NL | NL | NL | NL |
+| SessionStart hooks | ✅ | ✅ (Cursor format) | — | bootstrap file | — | extension manifest |
+
+On Tier-3 harnesses (Codex, Copilot, Gemini), `running-a-pipeline` falls back to an in-session role-play loop that preserves the status protocol (`DONE / DONE_WITH_CONCERNS / NEEDS_CONTEXT / BLOCKED`).
+
+## Repository layout
+
 ```
-
-## The Basic Workflow
-
-1. **brainstorming** - Activates before writing code. Refines rough ideas through questions, explores alternatives, presents design in sections for validation. Saves design document.
-
-2. **using-git-worktrees** - Activates after design approval. Creates isolated workspace on new branch, runs project setup, verifies clean test baseline.
-
-3. **writing-plans** - Activates with approved design. Breaks work into bite-sized tasks (2-5 minutes each). Every task has exact file paths, complete code, verification steps.
-
-4. **subagent-driven-development** or **executing-plans** - Activates with plan. Dispatches fresh subagent per task with two-stage review (spec compliance, then code quality), or executes in batches with human checkpoints.
-
-5. **test-driven-development** - Activates during implementation. Enforces RED-GREEN-REFACTOR: write failing test, watch it fail, write minimal code, watch it pass, commit. Deletes code written before tests.
-
-6. **requesting-code-review** - Activates between tasks. Reviews against plan, reports issues by severity. Critical issues block progress.
-
-7. **finishing-a-development-branch** - Activates when tasks complete. Verifies tests, presents options (merge/PR/keep/discard), cleans up worktree.
-
-**The agent checks for relevant skills before any task.** Mandatory workflows, not suggestions.
-
-## What's Inside
-
-### Skills Library
-
-**Testing**
-- **test-driven-development** - RED-GREEN-REFACTOR cycle (includes testing anti-patterns reference)
-
-**Debugging**
-- **systematic-debugging** - 4-phase root cause process (includes root-cause-tracing, defense-in-depth, condition-based-waiting techniques)
-- **verification-before-completion** - Ensure it's actually fixed
-
-**Collaboration** 
-- **brainstorming** - Socratic design refinement
-- **writing-plans** - Detailed implementation plans
-- **executing-plans** - Batch execution with checkpoints
-- **dispatching-parallel-agents** - Concurrent subagent workflows
-- **requesting-code-review** - Pre-review checklist
-- **receiving-code-review** - Responding to feedback
-- **using-git-worktrees** - Parallel development branches
-- **finishing-a-development-branch** - Merge/PR decision workflow
-- **subagent-driven-development** - Fast iteration with two-stage review (spec compliance, then code quality)
-
-**Meta**
-- **writing-skills** - Create new skills following best practices (includes testing methodology)
-- **using-superpowers** - Introduction to the skills system
-
-## Philosophy
-
-- **Test-Driven Development** - Write tests first, always
-- **Systematic over ad-hoc** - Process over guessing
-- **Complexity reduction** - Simplicity as primary goal
-- **Evidence over claims** - Verify before declaring success
-
-Read [the original release announcement](https://blog.fsck.com/2025/10/09/superpowers/).
-
-## Contributing
-
-The general contribution process for Superpowers is below. Keep in mind that we don't generally accept contributions of new skills and that any updates to skills must work across all of the coding agents we support.
-
-1. Fork the repository
-2. Switch to the 'dev' branch
-3. Create a branch for your work
-4. Follow the `writing-skills` skill for creating and testing new and modified skills
-5. Submit a PR, being sure to fill in the pull request template.
-
-See `skills/writing-skills/SKILL.md` for the complete guide.
-
-## Updating
-
-Superpowers updates are somewhat coding-agent dependent, but are often automatic.
+superpipelines/
+├── .claude-plugin/{plugin.json, marketplace.json}
+├── agents/                              # Subagent definitions (Claude Code)
+├── skills/
+│   ├── using-superpipelines/            # Bootstrap skill (loaded at session start)
+│   ├── creating-a-pipeline/             # User workflow: design pipeline + SDD
+│   ├── running-a-pipeline/              # User workflow: orchestrate tasks.md
+│   ├── sk-*/                            # Shared method skills (preloaded by agents)
+│   ├── *-references/                    # Companion reference libraries (no SKILL.md)
+│   └── ... kept legacy skills ...
+├── commands/                            # Slash command wrappers
+├── hooks/                               # SessionStart hook (CC + Cursor formats)
+├── docs/AI_PIPELINES_LLM.md             # Canonical reference (full)
+├── settings.json
+└── ...
+```
 
 ## License
 
-MIT License - see LICENSE file for details
+MIT — see `LICENSE`.
 
-## Community
+## Acknowledgements
 
-Superpowers is built by [Jesse Vincent](https://blog.fsck.com) and the rest of the folks at [Prime Radiant](https://primeradiant.com).
-
-- **Discord**: [Join us](https://discord.gg/35wsABTejz) for community support, questions, and sharing what you're building with Superpowers
-- **Issues**: https://github.com/obra/superpowers/issues
-- **Release announcements**: [Sign up](https://primeradiant.com/superpowers/) to get notified about new versions
+Built on top of pipeline conventions and skill-design patterns originally distilled from Anthropic's Skills Open Standard and the Superpowers project by Jesse Vincent.

@@ -1,6 +1,6 @@
 ---
 name: brainstorming
-description: "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation."
+description: Use before creative or design work — features, components, new behaviors, or pipeline briefs that need refinement before a spec exists. Loaded by creating-a-pipeline Phase 0 when the user's request is exploratory or under-specified.
 ---
 
 # Brainstorming Ideas Into Designs
