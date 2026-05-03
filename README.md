@@ -1,35 +1,74 @@
 # Superpipelines
 
-Superpipelines is a Claude Code plugin for designing, generating, and running multi-agent AI pipelines that follow the conventions in `docs/AI_PIPELINES_LLM.md` (Patterns 1–6, write/review isolation, worktree safety, spec-driven development, 4D processing wrapper).
+> **Multi-agent AI pipelines with guaranteed spec compliance, write/review isolation, and full crash recovery — across Claude Code, Cursor, Codex, OpenCode, Copilot CLI, and Gemini CLI.**
 
-It ships:
+---
 
-- **Skills** that teach Claude how to design, audit, and orchestrate pipelines (preloaded shared methods, on-demand reference libraries, top-level workflow skills).
-- **Subagents** for pipeline architecture, single-task implementation, two-stage review, and iterative-loop diagnosis.
-- **Slash commands** that wire everything together.
-- **Multi-harness bootstrap** so the same skills run on Claude Code, Cursor, Codex, OpenCode, Copilot CLI, and Gemini CLI (with degraded surface where features are Claude-Code-only — see [Compatibility](#compatibility)).
+Stop asking Claude to "build the whole thing." Start running pipelines.
 
-## What it does
+Superpipelines gives Claude a complete framework for decomposing complex tasks into coordinated subagents, reviewing every output against the spec before it merges, and resuming where it left off when things go sideways. It works the way real engineering teams work: separate authors, separate reviewers, explicit handoffs, and a human gate before anything irreversible happens.
 
-Given a vague request like "build me a deploy pipeline for our service," Superpipelines:
+---
 
-1. Walks the user through the 4D Method (Deconstruct → Diagnose → Develop → Deliver) to produce a precise task definition.
-2. Drives Spec-Driven Development (`/specify` → `/plan` → `/tasks` → human gate → `/implement`).
-3. Selects an execution pattern (Sequential, Parallel Fan-Out, Iterative Loop, Human-Gated, SDD parallel) based on the task's information flow.
-4. Dispatches purpose-built subagents per task with **Stage 1 (spec compliance) → Stage 2 (code quality)** review isolation.
-5. Tracks state in `tmp/pipeline-state.json` with explicit recovery rules.
-6. Honors worktree safety, rationalization-resistance gates, and Sonnet-only model selection scaled by `effort` levels.
+## What changes when you use this
+
+**Without Superpipelines:**
+- You describe a big task, Claude writes one giant response, and you hope it's right.
+- The same agent that wrote the code reviews it (and finds nothing wrong with its own work).
+- If the session dies mid-task, you start over.
+- "Let me just try one more iteration" leads to three hours of thrashing.
+
+**With Superpipelines:**
+- Claude deconstructs your task into a precise spec, a plan, and an itemized task list — then asks for your approval before writing a single line of code.
+- A dedicated reviewer agent (that never touches the implementation) validates every task against the spec before it's committed.
+- Pipeline state persists to `tmp/pipeline-state.json`. Crash, resume, continue.
+- Escalation triggers are hard-coded. When iteration caps hit, Claude stops and hands back to you — it cannot rationalize its way past the gates.
+
+---
+
+## How a pipeline runs
+
+```
+You: "Build a CSV ingestion pipeline that validates rows and posts results to Slack."
+```
+
+```
+1. DECONSTRUCT  — Claude asks the 5 clarifying questions that actually matter
+2. DIAGNOSE     — Gaps, ambiguities, and constraints are surfaced before any code
+3. DEVELOP      — pipeline-architect writes spec.md + plan.md + tasks.md
+4. HARD GATE    — You review the spec. Approve, revise, or reject.
+
+   ✅ Approved? Running-a-pipeline takes over.
+
+5. IMPLEMENT    — Workers execute each task in isolated git worktrees (parallel where safe)
+6. STAGE 1      — pipeline-spec-reviewer checks: Does it match the spec? Under-built = FAIL.
+7. STAGE 2      — pipeline-quality-reviewer checks: Is the code solid? (Only runs after Stage 1 passes.)
+8. COMMIT       — Passing tasks merge to the integration branch.
+9. DONE         — State marked completed. Worktrees cleaned. Summary surfaced.
+```
+
+The reviewer agents have `disallowedTools: Write, Edit, Bash`. They cannot modify what they review. This is enforced at the agent definition level, not by asking nicely.
+
+---
+
+## Patterns
+
+Superpipelines selects the right execution pattern for your task automatically:
+
+| Pattern | Shape | When |
+|---------|-------|------|
+| **1 — Sequential** | A → B → C | Ordered phases with hard data dependencies |
+| **2 — Parallel Fan-Out** | A → [B, C, D] → Merger | Independent branches that merge |
+| **3 — Iterative Loop** | Implement → Test → Diagnose → Fix (max 3×) | Test-driven repair with escalation cap |
+| **4 — Human-Gated** | Agent → Gate → Agent | High-stakes stages requiring approval |
+| **5 — Spec-Driven Dev** | Spec → Parallel tasks → 2-stage review | Full SDD with worktrees per task |
+| **6 — 4D Wrapper** | Deconstruct → Diagnose → Develop → Deliver | Wraps any pattern with structured intake |
+
+---
 
 ## Installation
 
 ### Claude Code
-
-```bash
-/plugin marketplace add gustavo-meilus/superpipelines
-/plugin install superpipelines@superpipelines-marketplace
-```
-
-Or directly from GitHub:
 
 ```bash
 claude plugin install github:gustavo-meilus/superpipelines
@@ -37,22 +76,21 @@ claude plugin install github:gustavo-meilus/superpipelines
 
 ### Cursor
 
-```text
+```
 /add-plugin superpipelines
 ```
 
-### OpenAI Codex (CLI / App)
-
-```bash
-/plugins
-```
-
-Then search for `superpipelines`.
-
 ### OpenCode
 
-```text
+Tell the agent:
+```
 Fetch and follow instructions from https://raw.githubusercontent.com/gustavo-meilus/superpipelines/refs/heads/main/.opencode/INSTALL.md
+```
+
+### Codex CLI / App
+
+```
+/plugins → search superpipelines
 ```
 
 ### GitHub Copilot CLI
@@ -68,64 +106,102 @@ copilot plugin install superpipelines@superpipelines-marketplace
 gemini extensions install https://github.com/gustavo-meilus/superpipelines
 ```
 
-## Quick start
+---
 
-Inside a project, ask:
+## Slash commands
 
-> "Design a pipeline that ingests CSVs, validates rows, and posts results to Slack."
-
-Superpipelines will:
-
-1. Trigger `creating-a-pipeline` (DECONSTRUCT/DIAGNOSE phases).
-2. Dispatch `pipeline-architect` to produce `spec.md`, `plan.md`, `tasks.md`.
-3. Gate at `<HARD-GATE>` for human approval before parallel implementation.
-4. On approval, drive `running-a-pipeline` to dispatch task workers + Stage 1/2 reviewers.
-
-Or run a slash command directly:
-
-| Command | What it does |
+| Command | What happens |
 |---------|--------------|
-| `/superpipelines:new-pipeline` | Design a new pipeline (architect-driven) |
-| `/superpipelines:run-pipeline` | Orchestrate `tasks.md` end-to-end |
-| `/superpipelines:audit-pipeline` | Audit pipeline/agent files against `AI_PIPELINES_LLM.md` |
-| `/superpipelines:new-agent` | Design a single subagent |
-| `/superpipelines:new-skill` | Design a single SKILL.md |
+| `/superpipelines:new-pipeline` | 4D intake → architect → spec/plan/tasks → human gate |
+| `/superpipelines:run-pipeline` | Orchestrate an existing `tasks.md` end-to-end |
+| `/superpipelines:audit-pipeline` | Audit agents/skills against `AI_PIPELINES_LLM.md` conventions |
+| `/superpipelines:new-agent` | Design a single subagent with `pipeline-architect` in AGENT mode |
+| `/superpipelines:new-skill` | Design a single `SKILL.md` with `skill-architect` |
+
+Natural-language equivalents work on all harnesses that don't support slash commands.
+
+---
 
 ## Compatibility
 
-| Component | Claude Code | Cursor | Codex CLI/App | OpenCode | Copilot CLI | Gemini CLI |
-|-----------|:-----------:|:------:|:-------------:|:--------:|:-----------:|:----------:|
-| Skills | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Subagents (`agents/`) | ✅ | — | — | — | — | — |
-| Slash commands | ✅ | natural-language fallback | NL | NL | NL | NL |
-| SessionStart hooks | ✅ | ✅ (Cursor format) | — | bootstrap file | — | extension manifest |
+| Feature | Claude Code | Cursor | Codex | OpenCode | Copilot CLI | Gemini CLI |
+|---------|:-----------:|:------:|:-----:|:--------:|:-----------:|:----------:|
+| Skills (all 6 patterns) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Subagents (true parallel) | ✅ | — | — | — | — | — |
+| 2-stage review isolation | ✅ | role-play | role-play | role-play | role-play | role-play |
+| Slash commands | ✅ | NL fallback | NL fallback | NL fallback | NL fallback | NL fallback |
+| SessionStart hook | ✅ | ✅ | — | bootstrap | — | extension |
+| Worktree isolation | ✅ | — | — | — | — | — |
 
-On Tier-3 harnesses (Codex, Copilot, Gemini), `running-a-pipeline` falls back to an in-session role-play loop that preserves the status protocol (`DONE / DONE_WITH_CONCERNS / NEEDS_CONTEXT / BLOCKED`).
+**Tier 1 (Claude Code):** Full subagent dispatch, true parallelism, worktree isolation, 2-stage review.  
+**Tier 2 (Cursor):** Skills + hooks, no native agents — role-play fallback preserves the full status protocol.  
+**Tier 3 (Codex, OpenCode, Copilot, Gemini):** Skills only — in-session role-play runs every pattern; state file still works.
+
+---
+
+## Design principles
+
+**Write/review isolation is structural, not advisory.** The agent that writes code has `Write, Edit, Bash` available. The reviewer does not. This isn't a guideline; it's enforced by `disallowedTools` in the agent definition.
+
+**Escalation gates cannot be rationalized away.** `<HARD-GATE>` markers stop the workflow dead. The pattern 3 iteration cap is hard-coded at 3. "One more iteration should fix it" is explicitly listed as a Red Flag — STOP in the orchestration skill.
+
+**State is always writable.** If the session dies, `tmp/pipeline-state.json` preserves exactly where you were. On resume, in-progress phases reset to `pending` and re-run cleanly. Completed phases are not re-executed.
+
+**Model selection is intentional.** Every agent runs on `claude-sonnet-4-6`. Scale comes from `effort: low | medium | high | xhigh | max` — not from switching to a larger model mid-pipeline.
+
+**Progressive disclosure keeps context lean.** Skills inject their bodies at session start. Reference docs (the long ones) are only loaded when invoked by name. Agent bodies stay ≤150 lines. The heavy content lives in `*-references/references/` and is read on demand.
+
+---
 
 ## Repository layout
 
 ```
 superpipelines/
-├── .claude-plugin/{plugin.json, marketplace.json}
-├── agents/                              # Subagent definitions (Claude Code)
+├── .claude-plugin/
+│   ├── plugin.json           # Plugin manifest
+│   └── marketplace.json      # Marketplace listing
+├── agents/
+│   ├── pipeline-architect    # Spec/plan/tasks generation (4 modes)
+│   ├── pipeline-auditor      # Convention compliance audit (read-only)
+│   ├── pipeline-task-executor     # Single-task implementation
+│   ├── pipeline-spec-reviewer     # Stage 1: spec compliance (no write tools)
+│   ├── pipeline-quality-reviewer  # Stage 2: code quality (no write tools)
+│   ├── pipeline-failure-analyzer  # Pattern 3 diagnosis + escalation
+│   └── skill-architect       # SKILL.md design (6 modes)
 ├── skills/
-│   ├── using-superpipelines/            # Bootstrap skill (loaded at session start)
-│   ├── creating-a-pipeline/             # User workflow: design pipeline + SDD
-│   ├── running-a-pipeline/              # User workflow: orchestrate tasks.md
-│   ├── sk-*/                            # Shared method skills (preloaded by agents)
-│   ├── *-references/                    # Companion reference libraries (no SKILL.md)
-│   └── ... kept legacy skills ...
-├── commands/                            # Slash command wrappers
-├── hooks/                               # SessionStart hook (CC + Cursor formats)
-├── docs/AI_PIPELINES_LLM.md             # Canonical reference (full)
-├── settings.json
-└── ...
+│   ├── using-superpipelines/       # Bootstrap: routing rules, capability tiers
+│   ├── creating-a-pipeline/        # Workflow: 4D intake → architect → human gate
+│   ├── running-a-pipeline/         # Workflow: orchestrate tasks.md end-to-end
+│   ├── sk-pipeline-patterns/       # Pattern selection matrix (preloaded)
+│   ├── sk-pipeline-state/          # State schema + recovery rules (preloaded)
+│   ├── sk-worktree-safety/         # 4-step worktree protocol (preloaded)
+│   ├── sk-write-review-isolation/  # Stage 1/2 schemas + Red Flags (preloaded)
+│   ├── sk-rationalization-resistance/  # HARD-GATE conventions (preloaded)
+│   ├── sk-4d-method/               # 4D processing wrapper
+│   ├── sk-spec-driven-development/ # SDD 6-phase workflow
+│   ├── sk-claude-code-conventions/ # Model IDs, frontmatter, pairing patterns
+│   ├── *-references/               # Deep reference libraries (on-demand, no SKILL.md)
+│   └── brainstorming/              # Legacy: kept for open-ended exploration
+├── commands/                 # Slash command wrappers
+├── hooks/
+│   └── session-start         # Byte-identical multi-harness payload
+├── docs/
+│   └── AI_PIPELINES_LLM.md   # Canonical pipeline conventions (full)
+└── settings.json             # autoMemoryEnabled: false, Bash(*) allow
 ```
+
+---
+
+## Contributing
+
+Issues and PRs welcome at [gustavo-meilus/superpipelines](https://github.com/gustavo-meilus/superpipelines).
+
+To add a new pattern or agent, run `/superpipelines:new-agent` or `/superpipelines:audit-pipeline` to validate your additions against the conventions before opening a PR.
+
+---
 
 ## License
 
-MIT — see `LICENSE`.
+MIT — see [`LICENSE`](./LICENSE).
 
-## Acknowledgements
-
-Built on top of pipeline conventions and skill-design patterns originally distilled from Anthropic's Skills Open Standard and the Superpowers project by Jesse Vincent.
+Built on pipeline conventions and skill-design patterns distilled from Anthropic's Skills Open Standard and the Superpowers project by Jesse Vincent.
