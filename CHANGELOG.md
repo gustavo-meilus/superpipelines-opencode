@@ -1,5 +1,24 @@
 # Changelog
 
+## Distribution
+
+Superpipelines is distributed via the GitHub-hosted marketplace at `gustavo-meilus/superpipelines`. Each entry below corresponds to a git tag of the same name on `main`.
+
+**Install (Claude Code):**
+
+```text
+/plugin marketplace add gustavo-meilus/superpipelines
+/plugin install superpipelines@superpipelines-marketplace
+```
+
+**Pin to a specific version:**
+
+```text
+/plugin install superpipelines@superpipelines-marketplace --version v1.0.0
+```
+
+For other harnesses (Cursor, Codex, OpenCode, Copilot CLI, Gemini CLI), see the install snippets in [`README.md`](./README.md#installation).
+
 ## 1.0.0 — Initial release
 
 Superpipelines is a fresh plugin built from the ground up to design and run multi-agent AI pipelines following `docs/AI_PIPELINES_LLM.md`.
