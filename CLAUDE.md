@@ -1,25 +1,29 @@
 # Superpipelines — Project Notes
 
-This repo is the source of the `superpipelines` Claude Code plugin. It packages skills and subagents that design and run multi-agent AI pipelines per `docs/AI_PIPELINES_LLM.md`.
+This repo is the source of the `superpipelines` Claude Code plugin. It packages skills and subagents that design and run multi-agent AI pipelines.
 
 ## Architecture invariants
 
-These are non-negotiable. They come straight from `docs/AI_PIPELINES_LLM.md`.
-
-- `SUB_AGENT_SPAWNING: FALSE` — Subagents never spawn children. Orchestration lives in top-level skills (`creating-a-pipeline`, `running-a-pipeline`) or the parent session.
+- `SUB_AGENT_SPAWNING: FALSE` — Subagents never spawn children. Orchestration lives in top-level skills (`creating-a-pipeline`, `running-a-pipeline`, step-management skills) or the parent session.
 - `WRITE_REVIEW_ISOLATION: TRUE` — The agent that writes code never reviews it. Stage 1 (spec compliance) gates Stage 2 (code quality).
-- `MODEL_SELECTION: SONNET_ONLY` — Every agent is `model: sonnet`. Scale via `effort: low | medium | high | xhigh | max`.
-- `PERMISSION_MODE: NULL` — Never use `permissionMode` in agent frontmatter. Permissions ship in `settings.json`.
-- `STATE_MANAGEMENT: STRUCTURED_JSON` — Pipeline state in `tmp/pipeline-state.json` (workspace-relative). No `memory: project`.
+- `MODEL_SELECTION: SONNET_ONLY` — Every pipeline agent defaults to `model: sonnet`. Non-sonnet models require explicit user opt-in at scope-selection time; document the opt-in in the Architect's Brief.
+- `PERMISSION_MODE: PER_AGENT` — Each generated pipeline agent may declare `permissionMode: default | acceptEdits | plan | bypassPermissions`. Never use `bypassPermissions` without explicit user justification documented in the agent body. Plugin-internal orchestration agents omit `permissionMode`.
+- `STATE_MANAGEMENT: STRUCTURED_JSON` — Pipeline state in `<scope-root>/superpipelines/temp/{pipelineName}/{runId}/pipeline-state.json`. `memory: local` is allowed for agent learned heuristics; `memory: project` is forbidden.
+- `MULTI_PIPELINE: TRUE` — Multiple named pipelines may coexist per workspace. Each is an isolated bundle with its own spec, agents, skills, and temp directory.
 - Agent body ≤150 lines. Depth lives in companion `<agent>-references/references/*.md`.
 - `skills:` frontmatter on agents preloads ONLY shared `sk-*` method skills. Never workflow skills, never companion refs.
 
 ## File-layout rules
 
 - **Plugin manifest** is at `.claude-plugin/plugin.json`. The marketplace listing (`.claude-plugin/marketplace.json`) lives alongside it. No other files belong in `.claude-plugin/`.
-- All other component dirs (`agents/`, `skills/`, `commands/`, `hooks/`) sit at the repo root.
+- Plugin source dirs (`agents/`, `skills/`, `commands/`, `hooks/`) sit at the repo root.
+- **Generated pipeline artifacts** live under a scope-dependent root resolved by `sk-pipeline-paths`:
+  - `project` scope: `<workspace>/.claude/` (committed to git)
+  - `local` scope: `<workspace>/.claude/` (gitignored — user's responsibility to add .gitignore entry)
+  - `user` scope: `~/.claude/` (global, per machine)
+  - Under the scope root: `skills/superpipelines/{P}/`, `agents/superpipelines/{P}/`, `superpipelines/pipelines/{P}/`, `superpipelines/temp/{P}/{runId}/`
 - Companion reference skills (`*-references/`) have NO `SKILL.md` — only `references/` subdirs read on demand. This keeps them out of the system context (per `<skill_suppression>`).
-- Use `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths in hook commands and agent bodies. Never `~/.claude/...` or absolute paths.
+- Use `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths in hook commands and agent bodies. Never `~/.claude/...` or absolute paths in plugin source.
 
 ## Authoring rules
 
@@ -39,4 +43,4 @@ These are non-negotiable. They come straight from `docs/AI_PIPELINES_LLM.md`.
 
 ## Today's date
 
-2026-05-02 — current model IDs: `claude-sonnet-4-6`, `claude-opus-4-7`, `claude-haiku-4-5-20251001`.
+2026-05-04 — current model IDs: `claude-sonnet-4-6`, `claude-opus-4-7`, `claude-haiku-4-5-20251001`.

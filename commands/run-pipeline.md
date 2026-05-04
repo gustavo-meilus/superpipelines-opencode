@@ -1,26 +1,22 @@
 ---
-description: Orchestrate an approved pipeline end-to-end — per-task dispatch, two-stage review, worktree safety, escalation
+description: List all pipelines in the current workspace (all scopes) and run the entry skill of the user-selected one
 argument-hint: [optional: --resume]
 ---
 
 # /superpipelines:run-pipeline
 
-Invoke the `running-a-pipeline` skill to execute the approved pipeline.
+Invoke the `running-a-pipeline` skill.
 
 Args: $ARGUMENTS
 
-Preconditions checked by the skill:
-
-- `tasks.md` exists in the workspace.
-- `tmp/pipeline-state.json` is in a safe state (not `escalated` or `failed`).
-
 The skill will:
 
-1. State preflight per `sk-pipeline-state` recovery rules.
-2. Worktree setup (if pattern requires) per `sk-worktree-safety` 4-step protocol.
-3. Extract task texts from `tasks.md` once at the orchestrator.
-4. Per task: dispatch `pipeline-task-executor` → Stage 1 (`pipeline-spec-reviewer`) → Stage 2 (`pipeline-quality-reviewer`).
-5. Pattern 3 only: `pipeline-failure-analyzer` between iterations; HARD-GATE at iteration 3.
-6. Reconcile state; invoke `finishing-a-development-branch` for merge / PR / cleanup.
+1. Read `registry.json` from all three scopes (`local`, `project`, `user`). Present a deduplicated list with scope labels.
+2. `AskUserQuestion` — which pipeline to run?
+3. If `--resume`: present available `runId`s from `temp/{P}/` for the chosen pipeline; ask which run to resume.
+4. Initialize run state in `<scope-root>/superpipelines/temp/{P}/{runId}/pipeline-state.json`.
+5. Invoke the chosen pipeline's entry skill (`run-{P}`), which orchestrates full execution.
+6. On terminal `DONE`: delete `<scope-root>/superpipelines/temp/{P}/{runId}/`.
+7. On `ESCALATED | FAILED | BLOCKED`: preserve the temp directory and print its absolute path.
 
-Do NOT skip Stage 1 before Stage 2. Do NOT auto-resume an escalated state.
+Do NOT auto-resume an `escalated` or `failed` state without explicit user confirmation.
