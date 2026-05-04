@@ -19,24 +19,15 @@ A plugin for designing and running multi-agent AI pipelines under the convention
 
 ## Instruction priority
 
-1. User's explicit instructions (CLAUDE.md / GEMINI.md / AGENTS.md / direct messages) — highest.
+1. User's explicit instructions (CLAUDE.md / direct messages) — highest.
 2. Superpipelines skills — override default behavior where they conflict.
 3. Default system prompt — lowest.
 
 If the user says "skip the spec phase," follow the user. The user is in control.
 
-## How to access skills on this harness
+## How to access skills
 
-| Harness | Mechanism |
-|---------|-----------|
-| Claude Code | `Skill` tool — invoke skill, follow its content. Never `Read` a SKILL.md directly. |
-| Cursor | `Skill` tool — same as Claude Code. |
-| Copilot CLI | `skill` tool — auto-discovers from installed plugins. |
-| Codex CLI/App | `skill` tool — same as Copilot CLI. |
-| OpenCode | Skills are bootstrap-loaded; reference by name. |
-| Gemini CLI | `activate_skill` tool — metadata loads at session start, body activates on demand. |
-
-For tool-name mapping on non-Claude-Code harnesses, see `references/cursor-tools.md`, `references/codex-tools.md`, `references/copilot-tools.md`, `references/gemini-tools.md`, `references/opencode-tools.md`.
+Use the `Skill` tool to invoke any skill by name. Follow the skill's content. Never `Read` a SKILL.md directly — body still loads but discovery and caching break.
 
 ## Routing rules — when to invoke which skill
 
@@ -53,16 +44,6 @@ For tool-name mapping on non-Claude-Code harnesses, see `references/cursor-tools
 | Choosing an execution pattern | load `sk-pipeline-patterns` |
 
 The detailed checklist is in `references/skill-routing.md`.
-
-## Capability tiers per harness
-
-| Tier | Harnesses | What works |
-|------|-----------|------------|
-| Tier 1 | Claude Code | Skills + subagents (`agents/`) + slash commands + hooks. Full pipeline orchestration with real subagent dispatch. |
-| Tier 2 | Cursor | Skills + slash via natural language + Cursor SessionStart hook. No subagents — `running-a-pipeline` falls back to in-session role-play. |
-| Tier 3 | Codex, OpenCode, Copilot CLI, Gemini | Skills only. Slash commands invoked via natural language. No hooks (bootstrap is via `AGENTS.md` / `GEMINI.md` / `.opencode/INSTALL.md`). `running-a-pipeline` runs all roles in one session, role-played, with the same status protocol. |
-
-On Tier 2/3, when the workflow says "dispatch subagent X," the active session role-plays X with a fresh mental context: read the agent's body from `agents/X.md`, follow its rules, emit one terminal status.
 
 ## The Rule
 

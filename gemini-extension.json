@@ -1,6 +1,0 @@
-{
-  "name": "superpipelines",
-  "description": "Design, generate, and run multi-agent AI pipelines (spec-driven, write/review-isolated, worktree-safe)",
-  "version": "1.0.0",
-  "contextFileName": "GEMINI.md"
-}

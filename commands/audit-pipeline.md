@@ -5,7 +5,7 @@ argument-hint: [path | glob]
 
 # /superpipelines:audit-pipeline
 
-Dispatch the `pipeline-auditor` subagent (Claude Code) or role-play it (Tier 2/3) on the target.
+Dispatch the `pipeline-auditor` subagent on the target.
 
 Target: $ARGUMENTS (defaults to `agents/*.md` and `skills/**/SKILL.md` if empty)
 

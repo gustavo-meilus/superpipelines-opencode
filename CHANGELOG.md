@@ -17,8 +17,6 @@ Superpipelines is distributed via the GitHub-hosted marketplace at `gustavo-meil
 /plugin install superpipelines@superpipelines-marketplace --version v1.0.0
 ```
 
-For other harnesses (Cursor, Codex, OpenCode, Copilot CLI, Gemini CLI), see the install snippets in [`README.md`](./README.md#installation).
-
 ## 1.0.0 — Initial release
 
 Superpipelines is a fresh plugin built from the ground up to design and run multi-agent AI pipelines following `docs/AI_PIPELINES_LLM.md`.
@@ -26,7 +24,7 @@ Superpipelines is a fresh plugin built from the ground up to design and run mult
 ### Added
 
 - Plugin manifest (`superpipelines` namespace) and marketplace entry.
-- Bootstrap skill `using-superpipelines` loaded via SessionStart on Claude Code and Cursor; per-harness bootstrap files for Codex (`AGENTS.md`), Gemini (`GEMINI.md`), and OpenCode (`.opencode/INSTALL.md`).
+- Bootstrap skill `using-superpipelines` loaded via SessionStart hook on Claude Code.
 - Shared method skills (preloaded by orchestrator agents): `sk-4d-method`, `sk-spec-driven-development`, `sk-claude-code-conventions`, `sk-pipeline-patterns`, `sk-pipeline-state`, `sk-worktree-safety`, `sk-write-review-isolation`, `sk-rationalization-resistance`.
 - User-invocable workflow skills: `creating-a-pipeline`, `running-a-pipeline`.
 - Subagents: `pipeline-architect`, `pipeline-auditor`, `skill-architect`, `pipeline-task-executor`, `pipeline-spec-reviewer`, `pipeline-quality-reviewer`, `pipeline-failure-analyzer`.

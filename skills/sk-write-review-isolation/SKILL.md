@@ -29,7 +29,7 @@ This order is not optional. Running Stage 2 on spec-noncompliant output is waste
 
 ## Stage 1 — Spec Compliance Review
 
-**Reviewer:** `pipeline-spec-reviewer` agent (Claude Code) or in-session role-play (Tier 2/3).
+**Reviewer:** `pipeline-spec-reviewer` agent.
 
 **Question answered:** Does the output match the spec exactly? Under-build AND over-build both fail.
 
@@ -64,7 +64,7 @@ This order is not optional. Running Stage 2 on spec-noncompliant output is waste
 
 ## Stage 2 — Code Quality Review
 
-**Reviewer:** `pipeline-quality-reviewer` agent (Claude Code) or in-session role-play.
+**Reviewer:** `pipeline-quality-reviewer` agent.
 
 **Question answered:** Is the output well-written, maintainable, idiomatic?
 

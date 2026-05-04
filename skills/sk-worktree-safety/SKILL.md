@@ -98,7 +98,7 @@ BRANCH=$(git branch --show-current)
 ```
 
 - `GIT_DIR != GIT_COMMON` → already in a linked worktree; skip Step 1 (creation).
-- `BRANCH` empty → detached HEAD; cannot branch/push from here. Sandbox-managed worktree (e.g., Codex App). Hand off to user via App controls.
+- `BRANCH` empty → detached HEAD; cannot branch/push from here. Hand off to user via external controls.
 
 ---
 

@@ -17,8 +17,7 @@ add a comment or reaction to the existing one instead.
 | Field | Value |
 |-------|-------|
 | Superpowers version | |
-| Harness (Claude Code, Cursor, etc.) | |
-| Harness version | |
+| Claude Code version | |
 | Model | |
 | OS + shell | |
 

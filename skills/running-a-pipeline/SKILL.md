@@ -129,16 +129,6 @@ When all tasks complete:
 4. `sk-worktree-safety` Step 4: COMMIT_BEFORE_DESTROY before any worktree removal.
 5. Tell user: pipeline complete; here's what was produced.
 
-## Multi-harness behavior
-
-| Harness | Behavior |
-|---------|----------|
-| Claude Code | Real `Task` dispatch to all agents. True parallelism in Pattern 2/2b/5. |
-| Cursor | `Task` available; same as Claude Code. |
-| Codex / OpenCode / Copilot CLI / Gemini | In-session role-play loop. Each role transition states the new role explicitly, re-reads the agent body from `agents/<name>.md`, performs the task under fresh mental context, emits the agent's terminal status. Stage 1 / Stage 2 isolation maintained as a discipline (separate mental sessions). |
-
-See `${CLAUDE_PLUGIN_ROOT}/skills/using-superpipelines/references/{cursor,codex,copilot,gemini,opencode}-tools.md`.
-
 ## Common mistakes
 
 - Skipping Phase 0 state preflight → overwrites in-progress pipeline or auto-resumes an escalated one.

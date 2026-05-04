@@ -1,6 +1,6 @@
 # Superpipelines — Project Notes
 
-This repo is the source of the `superpipelines` Claude Code plugin (and equivalents for Cursor, Codex, OpenCode, Copilot CLI, Gemini CLI). It packages skills and subagents that design and run multi-agent AI pipelines per `docs/AI_PIPELINES_LLM.md`.
+This repo is the source of the `superpipelines` Claude Code plugin. It packages skills and subagents that design and run multi-agent AI pipelines per `docs/AI_PIPELINES_LLM.md`.
 
 ## Architecture invariants
 
@@ -30,13 +30,6 @@ These are non-negotiable. They come straight from `docs/AI_PIPELINES_LLM.md`.
 - Cross-references use explicit markers (`**REQUIRED SUB-SKILL:**`, `**REQUIRED BACKGROUND:**`). Never `@path/to/file` — that force-loads.
 - Every agent emits exactly one terminal status: `DONE / DONE_WITH_CONCERNS / NEEDS_CONTEXT / BLOCKED`.
 - Discipline-enforcing skills must include a "Red Flags — STOP" section and a Rationalization Table.
-
-## Multi-harness rules
-
-- Skills are the only universally-portable component. Subagents are Claude Code only.
-- On Tier-3 harnesses (Codex, Copilot, Gemini), `running-a-pipeline` falls back to in-session role-play. Document this in the workflow skill body.
-- Tool-name mapping for non-Claude-Code harnesses lives in `skills/using-superpipelines/references/{cursor,codex,opencode,copilot,gemini}-tools.md`.
-- Bootstrap entry points: `hooks/session-start` (CC, Cursor), `AGENTS.md` (Codex), `GEMINI.md` (Gemini), `.opencode/INSTALL.md` (OpenCode), `gemini-extension.json` (Gemini extension manifest).
 
 ## Cache stability
 

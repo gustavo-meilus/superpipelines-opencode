@@ -92,7 +92,7 @@ See `references/anti-patterns.md` for the catalog (The Diver, Mega-Prompt, Conte
 
 ## Constraints
 
-- Never produce agents for non-Claude-Code harnesses — they don't support `agents/`. Skill-equivalent designs go to `skill-architect`.
+- Never produce agents for other platforms. Skill-equivalent designs go to `skill-architect`.
 - Always Read existing agents (Glob) before creating — avoid name collisions, discover reuse.
 - Default to simple architecture; complexity must be justified by the task's information flow.
 - State assumptions explicitly when filling gaps.
