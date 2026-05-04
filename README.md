@@ -1,6 +1,6 @@
 # Superpipelines
 
-> **Multi-agent AI pipelines with guaranteed spec compliance, write/review isolation, and full crash recovery — across Claude Code, Cursor, Codex, OpenCode, Copilot CLI, and Gemini CLI.**
+> **Multi-agent AI pipelines with guaranteed spec compliance, write/review isolation, and full crash recovery — for Claude Code.**
 
 ---
 
@@ -74,38 +74,6 @@ Superpipelines selects the right execution pattern for your task automatically:
 claude plugin install github:gustavo-meilus/superpipelines
 ```
 
-### Cursor
-
-```
-/add-plugin superpipelines
-```
-
-### OpenCode
-
-Tell the agent:
-```
-Fetch and follow instructions from https://raw.githubusercontent.com/gustavo-meilus/superpipelines/refs/heads/main/.opencode/INSTALL.md
-```
-
-### Codex CLI / App
-
-```
-/plugins → search superpipelines
-```
-
-### GitHub Copilot CLI
-
-```bash
-copilot plugin marketplace add gustavo-meilus/superpipelines
-copilot plugin install superpipelines@superpipelines-marketplace
-```
-
-### Gemini CLI
-
-```bash
-gemini extensions install https://github.com/gustavo-meilus/superpipelines
-```
-
 ---
 
 ## Slash commands
@@ -118,24 +86,7 @@ gemini extensions install https://github.com/gustavo-meilus/superpipelines
 | `/superpipelines:new-agent` | Design a single subagent with `pipeline-architect` in AGENT mode |
 | `/superpipelines:new-skill` | Design a single `SKILL.md` with `skill-architect` |
 
-Natural-language equivalents work on all harnesses that don't support slash commands.
-
 ---
-
-## Compatibility
-
-| Feature | Claude Code | Cursor | Codex | OpenCode | Copilot CLI | Gemini CLI |
-|---------|:-----------:|:------:|:-----:|:--------:|:-----------:|:----------:|
-| Skills (all 6 patterns) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Subagents (true parallel) | ✅ | — | — | — | — | — |
-| 2-stage review isolation | ✅ | role-play | role-play | role-play | role-play | role-play |
-| Slash commands | ✅ | NL fallback | NL fallback | NL fallback | NL fallback | NL fallback |
-| SessionStart hook | ✅ | ✅ | — | bootstrap | — | extension |
-| Worktree isolation | ✅ | — | — | — | — | — |
-
-**Tier 1 (Claude Code):** Full subagent dispatch, true parallelism, worktree isolation, 2-stage review.  
-**Tier 2 (Cursor):** Skills + hooks, no native agents — role-play fallback preserves the full status protocol.  
-**Tier 3 (Codex, OpenCode, Copilot, Gemini):** Skills only — in-session role-play runs every pattern; state file still works.
 
 ---
 
@@ -184,7 +135,7 @@ superpipelines/
 │   └── brainstorming/              # Legacy: kept for open-ended exploration
 ├── commands/                 # Slash command wrappers
 ├── hooks/
-│   └── session-start         # Byte-identical multi-harness payload
+│   └── session-start         # SessionStart hook — injects using-superpipelines at session start
 ├── docs/
 │   └── AI_PIPELINES_LLM.md   # Canonical pipeline conventions (full)
 └── settings.json             # autoMemoryEnabled: false, Bash(*) allow

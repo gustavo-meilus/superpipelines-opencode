@@ -7,8 +7,6 @@ Full frontmatter field reference for SKILL.md files. Subset of `sk-claude-code-c
 1. All supported fields
 2. Field reference
 3. Common patterns
-4. Multi-harness compatibility
-
 ---
 
 ## All supported fields
@@ -107,17 +105,5 @@ paths:
 ```
 
 Skill activates only when context includes a file matching the glob.
-
-## Multi-harness compatibility
-
-| Field | Claude Code | Cursor | Codex | OpenCode | Copilot CLI | Gemini |
-|-------|:-----------:|:------:|:-----:|:--------:|:-----------:|:------:|
-| `name`, `description` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `disable-model-invocation` | ✅ | ✅ | unknown | unknown | unknown | unknown |
-| `user-invocable` | ✅ | ✅ | unknown | unknown | unknown | unknown |
-| `allowed-tools` | ✅ | partial | varies | varies | varies | varies |
-| `context: fork` | ✅ | — | — | — | — | — |
-| `paths` | ✅ | partial | unknown | unknown | unknown | unknown |
-| `hooks` (in skill) | ✅ | — | — | — | — | — |
 
 When in doubt, ship the minimal set — `name`, `description`, optional `disable-model-invocation` and `user-invocable`.

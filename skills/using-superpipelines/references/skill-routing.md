@@ -14,7 +14,7 @@ When to invoke which superpipelines skill or agent. Source of truth for the rout
 | "Execute the plan" | `running-a-pipeline` |
 | "Resume the pipeline" | `running-a-pipeline` (reads `tmp/pipeline-state.json`) |
 
-## Subagent dispatch (Claude Code only — Tier 2/3 falls back to role-play)
+## Subagent dispatch
 
 | Trigger | Subagent |
 |---------|----------|
@@ -51,6 +51,6 @@ When to invoke which superpipelines skill or agent. Source of truth for the rout
 
 ## When NOT to invoke a skill
 
-- Trivial single-step tasks (rename, typo fix, config flip) — use the harness's default behavior.
+- Trivial single-step tasks (rename, typo fix, config flip) — execute directly without a skill.
 - Read-only Q&A about the codebase — use Read/Glob/Grep directly.
 - The user has explicitly said "skip the spec phase" or similar — user instruction wins.

@@ -57,7 +57,7 @@ State the chosen pattern and 1-sentence rationale before continuing.
 
 ### Phase 2 — Architect dispatch
 
-Dispatch `pipeline-architect` (Claude Code) or role-play it (Tier 2/3) with:
+Dispatch `pipeline-architect` with:
 
 - The refined brief from Phase 0.
 - The selected pattern from Phase 1.
@@ -110,16 +110,6 @@ Tell the user:
 > "Pipeline designed and approved. To execute, run: `/superpipelines:run-pipeline`"
 
 Or if user said "design and run", chain directly into `running-a-pipeline`.
-
-## Multi-harness behavior
-
-| Harness | Behavior |
-|---------|----------|
-| Claude Code | Real `Task` dispatch to `pipeline-architect`. |
-| Cursor | `Task` available; same as Claude Code. |
-| Codex / OpenCode / Copilot CLI / Gemini | In-session role-play: read `agents/pipeline-architect.md`, follow its rules under fresh mental context, emit terminal status. |
-
-See `${CLAUDE_PLUGIN_ROOT}/skills/using-superpipelines/references/{cursor,codex,copilot,gemini,opencode}-tools.md` for harness-specific tool mappings.
 
 ## Common mistakes
 

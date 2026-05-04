@@ -1,6 +1,6 @@
 # Dispatch Protocols — Pipeline-Runner Reference
 
-How `running-a-pipeline` dispatches workers and reviewers per pattern. Maps the canonical patterns from `sk-pipeline-patterns` to concrete `Task` calls (Claude Code) or in-session role-play (Tier 2/3).
+How `running-a-pipeline` dispatches workers and reviewers per pattern. Maps the canonical patterns from `sk-pipeline-patterns` to concrete `Task` calls.
 
 ## Table of contents
 
@@ -10,8 +10,7 @@ How `running-a-pipeline` dispatches workers and reviewers per pattern. Maps the 
 4. Pattern 3 — Iterative Loop
 5. Pattern 4 — Human-Gated
 6. Pattern 5 — Spec-Driven Development
-7. Tier 2/3 in-session role-play
-8. Status protocol handling
+7. Status protocol handling
 
 ---
 
@@ -124,18 +123,6 @@ for each task in tasks.md (respecting dependencies):
 # Phase 6 — reconcile
 update pipeline-state.json with all task outcomes
 ```
-
-## Tier 2/3 in-session role-play
-
-When `Task` is unavailable, role-play each step:
-
-1. State explicitly which agent role is being assumed: "Now adopting `pipeline-task-executor` role for T-1."
-2. Read `agents/<name>.md` to refresh the role's rules.
-3. Perform the task under the role's constraints.
-4. Emit the agent's terminal status verbatim.
-5. State explicitly when transitioning to a new role: "Switching to `pipeline-spec-reviewer` role for Stage 1 review of T-1."
-
-Each role transition is a fresh mental context — re-read the spec, do not lean on what was just written.
 
 ## Status protocol handling
 

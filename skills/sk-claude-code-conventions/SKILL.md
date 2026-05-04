@@ -195,7 +195,7 @@ Anti-patterns:
 | `${CLAUDE_PLUGIN_DATA}` | `~/.claude/plugins/data/{plugin-id}/` (persists across updates) | Installed deps, caches, persistent state |
 | `${user_config.KEY}` | User-provided config from `userConfig` manifest field | API keys, endpoints |
 
-Never use `~/.claude/...` for plugin-relative paths — that breaks portability across harnesses.
+Never use `~/.claude/...` for plugin-relative paths — always use `${CLAUDE_PLUGIN_ROOT}`.
 
 ## Cross-references
 

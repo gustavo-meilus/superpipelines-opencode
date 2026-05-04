@@ -1,5 +1,9 @@
 # Superpowers Release Notes
 
+> **Platform support notice (2026-05-04):** As of this date, superpipelines supports only Claude Code. References to Cursor, Codex, OpenCode, Copilot CLI, and Gemini CLI in entries below are historical. Those integration files have been removed from the repository.
+
+---
+
 ## v5.0.7 (2026-03-31)
 
 ### GitHub Copilot CLI Support
