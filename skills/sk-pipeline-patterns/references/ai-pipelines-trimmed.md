@@ -1,6 +1,6 @@
 # AI Pipelines — Trimmed Runtime Reference
 
-> Trimmed copy of `docs/AI_PIPELINES_LLM.md` for runtime use by pipeline skills and agents. Cross-refs to `sk-claude-code-conventions` and `sk-*` skills carry the depth that this file omits.
+> Canonical runtime reference for pipeline conventions. Cross-refs to `sk-claude-code-conventions` and `sk-*` skills carry the depth that this file omits.
 
 ## Table of contents
 
@@ -121,11 +121,14 @@ See `sk-worktree-safety` for detection signals, per-pattern requirements, and Re
 
 ## 6. Pipeline state schema
 
-Path: `tmp/pipeline-state.json` (workspace-relative, NOT plugin-relative — plugin dirs wipe on update).
+Path: `<scope-root>/superpipelines/temp/{P}/{runId}/pipeline-state.json` (scope-resolved by `sk-pipeline-paths`, NOT plugin-relative — plugin dirs wipe on update).
 
 ```json
 {
   "pipeline_id": "<uuid>",
+  "pipeline_name": "<P>",
+  "scope_root": "<resolved scope root>",
+  "run_id": "<uuid>",
   "started_at": "<iso8601>",
   "pattern": "1 | 2 | 2b | 3 | 4 | 5",
   "status": "running | completed | escalated | failed",
@@ -137,7 +140,7 @@ Path: `tmp/pipeline-state.json` (workspace-relative, NOT plugin-relative — plu
 }
 ```
 
-Atomic writes: write to `tmp/pipeline-state.json.tmp`, then `mv` to final path.
+Atomic writes: write to `pipeline-state.json.tmp`, then `mv` to final path.
 
 Recovery rules:
 
@@ -166,8 +169,8 @@ See `sk-rationalization-resistance` for tag conventions and authoring rules.
 ## 8. Strict conventions essentials
 
 - `MODEL_SELECTION: SONNET_ONLY` — every pipeline agent is `model: sonnet`. Scale via `effort: low | medium | high | xhigh | max`.
-- `PERMISSION_MODE: NULL` — never use `permissionMode` in agent frontmatter. Permissions ship in plugin `settings.json` (`Bash(*)` allows all bash variants; remove redundant per-agent PreToolUse hooks).
-- `STATE_MANAGEMENT: STRUCTURED_JSON` — `tmp/pipeline-state.json` only. No `memory: project` or `memory: local`.
+- `PERMISSION_MODE: PER_AGENT` — each pipeline agent may declare `permissionMode: default | acceptEdits | plan | bypassPermissions`. Never use `bypassPermissions` without explicit user justification documented in the agent body.
+- `STATE_MANAGEMENT: STRUCTURED_JSON` — `<scope-root>/superpipelines/temp/{P}/{runId}/pipeline-state.json` only. No `memory: project`. `memory: local` is allowed for agents that persist learned heuristics.
 - `AUTO_MEMORY: DISABLED` — `autoMemoryEnabled: false` in settings; `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1` env var. Reclaims 658+ tokens.
 - `BOUND_STDOUT: TRUE` — pipe long outputs through `tail -80` etc. before passing back.
 - `SCOPE_FILE_READS: TRUE` — Read specific line ranges over full files when possible.
@@ -180,7 +183,7 @@ See `sk-rationalization-resistance` for tag conventions and authoring rules.
 
 ## 9. Cross-references
 
-- `docs/AI_PIPELINES_LLM.md` — full canonical source.
+- `sk-pipeline-patterns` — pattern selection skill that loads this file.
 - `sk-4d-method` — Pattern 6 wrapper details.
 - `sk-spec-driven-development` — Pattern 5 details + artifact templates.
 - `sk-pipeline-state` — schema + recovery rules.

@@ -11,7 +11,7 @@ Reference template embedded in pipeline agent skills frontmatter. Runs INSIDE ev
 
 The 4D Method: **Deconstruct → Diagnose → Develop → Deliver**.
 
-Compatibility: Claude 4.6 (Sonnet/Opus/Haiku), Claude 4.7 Opus. Aligned with `docs/AI_PIPELINES_LLM.md` Pattern 6.
+Compatibility: Claude 4.6 (Sonnet/Opus/Haiku), Claude 4.7 Opus. Aligned with `sk-pipeline-patterns` Pattern 6.
 
 ---
 
@@ -102,6 +102,6 @@ Goal: a well-designed response can still fail if it's messy or ignores the user'
 
 ## Cross-references
 
-- **Pattern 6** in `docs/AI_PIPELINES_LLM.md` — canonical definition.
+- **Pattern 6** in `sk-pipeline-patterns` — canonical definition.
 - `sk-spec-driven-development` — when 4D surfaces a multi-step feature, hand off to SDD.
 - `sk-claude-code-conventions` — model selection and effort scaling per phase.

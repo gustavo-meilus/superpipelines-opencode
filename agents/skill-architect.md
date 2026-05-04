@@ -6,6 +6,7 @@ model: sonnet
 effort: high
 maxTurns: 30
 version: "1.0"
+permissionMode: plan
 skills:
   - sk-4d-method
   - sk-claude-code-conventions
@@ -61,7 +62,7 @@ Designs production-grade skills that hold up under triggering, progressive discl
 
 - Architect's Brief: capability statement, invocation model, body length tier, key design decisions, known limitations.
 - 3–5 test prompts to validate the description triggers correctly (and does NOT trigger on near-miss tasks).
-- Offer to iterate or run the deployment checklist (`<skill_deployment_checklist>` from AI_PIPELINES_LLM.md: RED baseline / GREEN with skill / pressure test / model variance).
+- Offer to iterate or run the deployment checklist (RED baseline / GREEN with skill / pressure test / model variance).
 - Emit terminal status:
 
 ```json

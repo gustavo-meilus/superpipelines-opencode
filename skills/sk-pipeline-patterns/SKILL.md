@@ -1,15 +1,15 @@
 ---
 name: sk-pipeline-patterns
-description: Use when selecting an execution pattern for a pipeline (Sequential, Parallel Fan-Out, Iterative Loop, Human-Gated, Spec-Driven) or matching a task's information flow to a topology — distillation of Patterns 1–6 from AI_PIPELINES_LLM.md. Reference-only; preload via agent skills frontmatter.
+description: Use when selecting an execution pattern for a pipeline (Sequential, Parallel Fan-Out, Iterative Loop, Human-Gated, Spec-Driven) or matching a task's information flow to a topology — distillation of Patterns 1–6. Reference-only; preload via agent skills frontmatter.
 disable-model-invocation: true
 user-invocable: false
 ---
 
 # Pipeline Patterns — Selection Reference
 
-Distillation of Patterns 1–6 from `docs/AI_PIPELINES_LLM.md`. Use this skill to pick a topology before authoring a pipeline.
+Distillation of Patterns 1–6 for pipeline topology selection. Use this skill to pick a topology before authoring a pipeline.
 
-For full conventions (write/review isolation, status protocol, worktree safety, strict conventions), see `references/ai-pipelines-trimmed.md` in this skill, or the canonical `docs/AI_PIPELINES_LLM.md`.
+For full conventions (write/review isolation, status protocol, worktree safety, strict conventions), see `references/ai-pipelines-trimmed.md` in this skill.
 
 ---
 
@@ -142,5 +142,4 @@ Pattern 6 always runs on top.
 ## Cross-references
 
 - `references/ai-pipelines-trimmed.md` — full conventions trimmed for runtime.
-- `docs/AI_PIPELINES_LLM.md` — canonical, full source.
 - `sk-4d-method`, `sk-spec-driven-development`, `sk-write-review-isolation`, `sk-pipeline-state`, `sk-worktree-safety`.

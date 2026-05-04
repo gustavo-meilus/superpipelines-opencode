@@ -6,6 +6,7 @@ model: sonnet
 effort: high
 maxTurns: 40
 version: "2.0"
+permissionMode: plan
 skills:
   - sk-4d-method
   - sk-spec-driven-development

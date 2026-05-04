@@ -1,9 +1,6 @@
 ---
 name: running-a-pipeline
 description: Use when the user asks to run a pipeline, execute a workflow, list available pipelines, or invokes /superpipelines:run-pipeline. Reads all scope registries, lets the user pick a pipeline, then invokes its entry skill.
-skills:
-  - sk-pipeline-paths
-  - sk-pipeline-state
 ---
 
 # Running a Pipeline

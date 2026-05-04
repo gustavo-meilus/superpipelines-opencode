@@ -1,8 +1,6 @@
 ---
 name: updating-a-pipeline-step
 description: Use when the user wants to modify, change, or update an existing step within a named pipeline, or invokes /superpipelines:update-step. Reads current step, applies changes, re-validates edges with neighbors, audits the delta, and gates on human approval before writing to disk.
-skills:
-  - sk-pipeline-paths
 ---
 
 # Updating a Pipeline Step

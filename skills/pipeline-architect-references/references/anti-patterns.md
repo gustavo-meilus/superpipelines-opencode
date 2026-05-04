@@ -76,7 +76,7 @@ Catalog of common failure modes when designing pipelines and agents. Each entry:
 
 ## 9. Workflow-Skill Preload
 
-**Symptoms:** Agent frontmatter `skills: [brainstorming, writing-plans, executing-plans]`. Every agent startup injects ~3000 tokens of workflow content.
+**Symptoms:** Agent frontmatter `skills: [brainstorming, creating-a-pipeline, running-a-pipeline]`. Every agent startup injects ~3000 tokens of workflow content.
 
 **Fix:** `skills:` preloads ONLY shared `sk-*` method skills (≤100 lines each). Workflow skills are session-level lazy invocation, not pre-injection.
 
@@ -96,7 +96,7 @@ Catalog of common failure modes when designing pipelines and agents. Each entry:
 
 **Symptoms:** Agent uses `memory: project` to persist state across runs. State scattered across `.claude/memory/*` files.
 
-**Fix:** All pipeline state lives in `tmp/pipeline-state.json` per `STATE_MANAGEMENT: STRUCTURED_JSON`. Memory tool only for learned heuristics, never deterministic state.
+**Fix:** All pipeline state lives in `<scope-root>/superpipelines/temp/{P}/{runId}/pipeline-state.json` per `STATE_MANAGEMENT: STRUCTURED_JSON`. `memory: local` is allowed for learned heuristics. Memory tool must never be used for deterministic pipeline state.
 
 ## 13. Synchronous Iterative Loop
 
@@ -130,9 +130,9 @@ Catalog of common failure modes when designing pipelines and agents. Each entry:
 
 ## 18. Concurrent State Race
 
-**Symptoms:** Two pipelines run concurrently in same workspace; each overwrites the other's `pipeline-state.json`.
+**Symptoms:** Two pipelines run concurrently in same workspace; each overwrites the other's state.
 
-**Fix:** State file keyed by `pipeline_id` UUID. Orchestrator refuses to start if active state exists.
+**Fix:** Each named pipeline `{P}` gets its own directory under `superpipelines/temp/{P}/`. Within the same `{P}`, only one active run is allowed. Orchestrator refuses to start if active state exists.
 
 ## 19. Hardcoded Plugin Paths
 

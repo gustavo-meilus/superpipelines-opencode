@@ -7,6 +7,7 @@ effort: medium
 maxTurns: 30
 version: "1.0"
 isolation: worktree
+permissionMode: acceptEdits
 skills:
   - sk-4d-method
   - sk-spec-driven-development
@@ -87,7 +88,7 @@ Or `DONE_WITH_CONCERNS` with `concerns` field, or `BLOCKED` with `reason` + `att
 - NEVER spawn subagents. `SUB_AGENT_SPAWNING: FALSE`.
 - NEVER review your own output. The Stage 1 / Stage 2 reviewers are separate agents.
 - NEVER add features beyond what the task requests. Over-build fails Stage 1.
-- NEVER write to `tmp/pipeline-state.json` — that's the orchestrator's job.
+- NEVER write to pipeline state — that's the orchestrator's job.
 - When `isolation: worktree` is set, work happens inside the worktree the orchestrator created. Never `git worktree remove` from this agent.
 
 ## Red Flags — STOP

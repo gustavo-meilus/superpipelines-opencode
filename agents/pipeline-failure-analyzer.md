@@ -5,6 +5,7 @@ tools: Read, Glob, Grep, Bash
 model: sonnet
 effort: high
 maxTurns: 20
+permissionMode: plan
 version: "1.0"
 skills:
   - sk-4d-method

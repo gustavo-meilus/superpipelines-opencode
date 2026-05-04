@@ -83,7 +83,7 @@ git worktree remove "$WORKTREE_PATH"
 
 If `git commit` would create a meaningful change worth preserving permanently, prompt the user before `worktree remove`.
 
-**Why:** `git worktree remove` blindly deletes uncommitted work. The `WORKTREE_MERGE_REQUIRED: TRUE` invariant from `AI_PIPELINES_LLM.md` says successful changes MUST be explicitly committed and merged before destruction.
+**Why:** `git worktree remove` blindly deletes uncommitted work. The `WORKTREE_MERGE_REQUIRED: TRUE` invariant says successful changes MUST be explicitly committed and merged before destruction.
 
 ---
 
@@ -130,7 +130,7 @@ BRANCH=$(git branch --show-current)
 
 ## Cross-references
 
-- `docs/AI_PIPELINES_LLM.md` `<worktree_safety_protocol>` — canonical source.
+- `sk-pipeline-patterns` `references/ai-pipelines-trimmed.md` — full conventions reference.
 - `running-a-pipeline` — invokes this skill before parallel dispatch.
 - `finishing-a-development-branch` — final commit/merge stage.
 - `sk-pipeline-state` — `metadata.worktree_root` field.

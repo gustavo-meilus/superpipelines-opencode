@@ -33,7 +33,9 @@ escalate when:
 
 ```bash
 # 1. Update state
-STATE=$(cat tmp/pipeline-state.json | jq \
+TEMP_DIR="${SCOPE_ROOT}/superpipelines/temp/${PIPELINE_NAME}/${RUN_ID}"
+STATE_FILE="${TEMP_DIR}/pipeline-state.json"
+STATE=$(cat "$STATE_FILE" | jq \
   --arg reason "Pattern 3 iteration cap" \
   --arg last_failure "$LAST_FAILURE_SUMMARY" \
   '.status = "escalated"
@@ -41,8 +43,8 @@ STATE=$(cat tmp/pipeline-state.json | jq \
    | .metadata.last_failure = $last_failure
    | .metadata.iterations = '"$ITERATION_COUNT"'
    | .metadata.attempted_fixes = '"$ATTEMPTED_FIXES_JSON")
-echo "$STATE" > tmp/pipeline-state.json.tmp
-mv tmp/pipeline-state.json.tmp tmp/pipeline-state.json
+echo "$STATE" > "${STATE_FILE}.tmp"
+mv "${STATE_FILE}.tmp" "$STATE_FILE"
 
 # 2. Surface to user (no auto-resume)
 cat <<EOF
@@ -53,13 +55,13 @@ Iterations: ${ITERATION_COUNT}
 Last failure: ${LAST_FAILURE_SUMMARY}
 Attempted fixes: ${ATTEMPTED_FIXES}
 
-State preserved at $(realpath tmp/pipeline-state.json).
+State preserved at ${TEMP_DIR}/pipeline-state.json.
 
 Suggested next steps:
   - Review the diagnosis history in metadata.attempted_fixes
   - Re-architect the failing component
   - Run /superpipelines:audit-pipeline on the spec/tasks if specs were drifting
-  - When ready, restart with: rm tmp/pipeline-state.json && /superpipelines:run-pipeline
+  - When ready, restart with: rm -rf ${TEMP_DIR} && /superpipelines:run-pipeline
 EOF
 ```
 

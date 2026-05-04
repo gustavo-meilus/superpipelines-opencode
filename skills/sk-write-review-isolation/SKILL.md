@@ -7,7 +7,7 @@ user-invocable: false
 
 # Write/Review Isolation — Two-Stage Review
 
-`WRITE_REVIEW_ISOLATION: TRUE` is a non-negotiable invariant from `docs/AI_PIPELINES_LLM.md`. The agent that writes code never reviews it. Stage 1 gates Stage 2.
+`WRITE_REVIEW_ISOLATION: TRUE` is a non-negotiable invariant. The agent that writes code never reviews it. Stage 1 gates Stage 2.
 
 This skill defines how the rule is enforced in pipelines and what each stage must check.
 
@@ -136,7 +136,7 @@ QualityReviewer.review() → Stage 2 verdict
 
 ## Cross-references
 
-- `docs/AI_PIPELINES_LLM.md` `<write_review_isolation>` — canonical source.
+- `sk-pipeline-patterns` `references/ai-pipelines-trimmed.md` — full conventions reference.
 - `pipeline-spec-reviewer`, `pipeline-quality-reviewer` — agent definitions.
 - `running-a-pipeline` — invokes the loop.
 - `sk-rationalization-resistance` — tag formats and Red Flags conventions.

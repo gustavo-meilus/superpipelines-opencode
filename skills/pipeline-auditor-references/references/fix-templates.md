@@ -42,27 +42,34 @@ description: Use when working with Excel files, spreadsheets, or .xlsx data extr
 
 ## Fix 3 — `permissionMode` in frontmatter
 
-**Before:**
+**Symptom:** Missing `permissionMode` in agent frontmatter.
+
+**Action:** Add `permissionMode` based on the agent's role.
+
+- **Executors:** `permissionMode: acceptEdits`
+- **Reviewers/Architects/Auditors:** `permissionMode: plan`
+
+**Example (Executor):**
 ```yaml
 permissionMode: acceptEdits
 ```
 
-**After:** Remove the field entirely. Move equivalent permission to plugin `settings.json`:
-
-```json
-{
-  "permissions": { "allow": ["Bash(*)", "Edit(*)"] }
-}
+**Example (Reviewer):**
+```yaml
+permissionMode: plan
 ```
 
 ## Fix 4 — `memory: project` / `memory: local`
 
-**Before:**
-```yaml
-memory: project
-```
+**Symptom:** Agent uses `memory: project` (forbidden).
 
-**After:** Remove. Convert to `pipeline-state.json` writes per `sk-pipeline-state` schema.
+**Action:** Replace `memory: project` with `memory: local` (if persisting cross-run heuristics) or remove it.
+
+**Correct Usage:**
+- **Allowed:** `memory: local` (for workers/executors).
+- **Forbidden:** `memory: project`.
+
+**Wait:** If the agent needs to persist pipeline-specific state, use `sk-pipeline-state` to write to `pipeline-state.json` instead of relying on model memory.
 
 ## Fix 5 — Skill preload includes workflow skill
 
@@ -71,7 +78,7 @@ memory: project
 skills:
   - sk-4d-method
   - brainstorming
-  - executing-plans
+  - running-a-pipeline
 ```
 
 **After:**
@@ -80,7 +87,7 @@ skills:
   - sk-4d-method
 ```
 
-Workflow skills (`brainstorming`, `executing-plans`, etc.) are session-level lazy invocation, not pre-injection. Reference them in body text instead.
+Workflow skills (`brainstorming`, `running-a-pipeline`, `creating-a-pipeline`) are session-level lazy invocation, not pre-injection. Reference them in body text instead.
 
 ## Fix 6 — Reviewer agent has Write/Edit
 
@@ -116,7 +123,7 @@ Read ~/.claude/agents/code-reviewer.md
 
 **After:**
 ```markdown
-Read ${CLAUDE_PLUGIN_ROOT}/agents/code-reviewer.md
+Resolve path via `sk-pipeline-paths` using the appropriate scope (local/project/user). Avoid hardcoded absolute paths.
 ```
 
 ## Fix 9 — Missing capability contract

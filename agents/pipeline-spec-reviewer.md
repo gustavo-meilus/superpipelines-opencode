@@ -6,6 +6,7 @@ disallowedTools: Write, Edit, Bash
 model: sonnet
 effort: medium
 maxTurns: 15
+permissionMode: plan
 version: "1.0"
 skills:
   - sk-claude-code-conventions

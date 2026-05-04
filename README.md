@@ -21,7 +21,7 @@ Superpipelines gives Claude a complete framework for decomposing complex tasks i
 **With Superpipelines:**
 - Claude deconstructs your task into a precise spec, a plan, and an itemized task list — then asks for your approval before writing a single line of code.
 - A dedicated reviewer agent (that never touches the implementation) validates every task against the spec before it's committed.
-- Pipeline state persists to `tmp/pipeline-state.json`. Crash, resume, continue.
+- Pipeline state persists to a scope-aware temp directory (`<scope-root>/superpipelines/temp/{P}/{runId}/pipeline-state.json`). Crash, resume, continue.
 - Escalation triggers are hard-coded. When iteration caps hit, Claude stops and hands back to you — it cannot rationalize its way past the gates.
 
 ---
@@ -44,7 +44,7 @@ You: "Build a CSV ingestion pipeline that validates rows and posts results to Sl
 6. STAGE 1      — pipeline-spec-reviewer checks: Does it match the spec? Under-built = FAIL.
 7. STAGE 2      — pipeline-quality-reviewer checks: Is the code solid? (Only runs after Stage 1 passes.)
 8. COMMIT       — Passing tasks merge to the integration branch.
-9. DONE         — State marked completed. Worktrees cleaned. Summary surfaced.
+9. DONE         — State marked completed. Temp dir cleaned. Summary surfaced.
 ```
 
 The reviewer agents have `disallowedTools: Write, Edit, Bash`. They cannot modify what they review. This is enforced at the agent definition level, not by asking nicely.
@@ -81,12 +81,11 @@ claude plugin install github:gustavo-meilus/superpipelines
 | Command | What happens |
 |---------|--------------|
 | `/superpipelines:new-pipeline` | 4D intake → architect → spec/plan/tasks → human gate |
-| `/superpipelines:run-pipeline` | Orchestrate an existing `tasks.md` end-to-end |
-| `/superpipelines:audit-pipeline` | Audit agents/skills against `AI_PIPELINES_LLM.md` conventions |
-| `/superpipelines:new-agent` | Design a single subagent with `pipeline-architect` in AGENT mode |
-| `/superpipelines:new-skill` | Design a single `SKILL.md` with `skill-architect` |
-
----
+| `/superpipelines:run-pipeline` | Orchestrate an existing pipeline end-to-end |
+| `/superpipelines:new-step` | Add a new step to an existing named pipeline |
+| `/superpipelines:update-step` | Modify an existing step within a named pipeline |
+| `/superpipelines:delete-step` | Remove a step from a named pipeline with gap analysis |
+| `/superpipelines:audit-pipeline` | Audit agents/skills against the v2 compliance matrix |
 
 ---
 
@@ -96,7 +95,9 @@ claude plugin install github:gustavo-meilus/superpipelines
 
 **Escalation gates cannot be rationalized away.** `<HARD-GATE>` markers stop the workflow dead. The pattern 3 iteration cap is hard-coded at 3. "One more iteration should fix it" is explicitly listed as a Red Flag — STOP in the orchestration skill.
 
-**State is always writable.** If the session dies, `tmp/pipeline-state.json` preserves exactly where you were. On resume, in-progress phases reset to `pending` and re-run cleanly. Completed phases are not re-executed.
+**State is scope-aware and crash-safe.** Pipeline state persists to `<scope-root>/superpipelines/temp/{P}/{runId}/pipeline-state.json`. Each named pipeline is isolated. On resume, in-progress phases reset to `pending` and re-run cleanly. Completed phases are not re-executed. Temp dirs are deleted on DONE; preserved on escalation/failure for inspection.
+
+**Permission modes are per-agent.** Executors use `permissionMode: acceptEdits`, reviewers use `permissionMode: plan`. `bypassPermissions` requires inline justification. This is enforced in the agent frontmatter, not by convention.
 
 **Model selection is intentional.** Every agent runs on `claude-sonnet-4-6`. Scale comes from `effort: low | medium | high | xhigh | max` — not from switching to a larger model mid-pipeline.
 
@@ -112,33 +113,35 @@ superpipelines/
 │   ├── plugin.json           # Plugin manifest
 │   └── marketplace.json      # Marketplace listing
 ├── agents/
-│   ├── pipeline-architect    # Spec/plan/tasks generation (4 modes)
-│   ├── pipeline-auditor      # Convention compliance audit (read-only)
-│   ├── pipeline-task-executor     # Single-task implementation
-│   ├── pipeline-spec-reviewer     # Stage 1: spec compliance (no write tools)
-│   ├── pipeline-quality-reviewer  # Stage 2: code quality (no write tools)
-│   ├── pipeline-failure-analyzer  # Pattern 3 diagnosis + escalation
-│   └── skill-architect       # SKILL.md design (6 modes)
+│   ├── pipeline-architect         # Spec/plan/tasks + step management (permissionMode: plan)
+│   ├── pipeline-auditor           # Convention compliance audit (read-only, permissionMode: plan)
+│   ├── pipeline-task-executor     # Single-task implementation (permissionMode: acceptEdits)
+│   ├── pipeline-spec-reviewer     # Stage 1: spec compliance (permissionMode: plan, no write tools)
+│   ├── pipeline-quality-reviewer  # Stage 2: code quality (permissionMode: plan, no write tools)
+│   ├── pipeline-failure-analyzer  # Pattern 3 diagnosis + escalation (permissionMode: plan)
+│   └── skill-architect            # SKILL.md design (permissionMode: plan)
 ├── skills/
-│   ├── using-superpipelines/       # Bootstrap: routing rules, capability tiers
-│   ├── creating-a-pipeline/        # Workflow: 4D intake → architect → human gate
-│   ├── running-a-pipeline/         # Workflow: orchestrate tasks.md end-to-end
-│   ├── sk-pipeline-patterns/       # Pattern selection matrix (preloaded)
-│   ├── sk-pipeline-state/          # State schema + recovery rules (preloaded)
-│   ├── sk-worktree-safety/         # 4-step worktree protocol (preloaded)
-│   ├── sk-write-review-isolation/  # Stage 1/2 schemas + Red Flags (preloaded)
+│   ├── using-superpipelines/           # Bootstrap: routing rules, invariants
+│   ├── creating-a-pipeline/            # Workflow: 4D intake → architect → human gate
+│   ├── running-a-pipeline/             # Workflow: orchestrate pipeline end-to-end
+│   ├── adding-a-pipeline-step/         # Workflow: add step + topology + audit
+│   ├── updating-a-pipeline-step/       # Workflow: update step + re-validate edges
+│   ├── deleting-a-pipeline-step/       # Workflow: delete step + gap analysis + rewire
+│   ├── sk-pipeline-patterns/           # Pattern selection matrix (preloaded)
+│   ├── sk-pipeline-state/              # State schema + recovery rules (preloaded)
+│   ├── sk-pipeline-paths/              # Scope-aware path resolution (preloaded)
+│   ├── sk-worktree-safety/             # 4-step worktree protocol (preloaded)
+│   ├── sk-write-review-isolation/      # Stage 1/2 schemas + Red Flags (preloaded)
 │   ├── sk-rationalization-resistance/  # HARD-GATE conventions (preloaded)
-│   ├── sk-4d-method/               # 4D processing wrapper
-│   ├── sk-spec-driven-development/ # SDD 6-phase workflow
-│   ├── sk-claude-code-conventions/ # Model IDs, frontmatter, pairing patterns
-│   ├── *-references/               # Deep reference libraries (on-demand, no SKILL.md)
-│   └── brainstorming/              # Legacy: kept for open-ended exploration
-├── commands/                 # Slash command wrappers
+│   ├── sk-4d-method/                   # 4D processing wrapper
+│   ├── sk-spec-driven-development/     # SDD 6-phase workflow
+│   ├── sk-claude-code-conventions/     # Model IDs, frontmatter, pairing patterns
+│   ├── *-references/                   # Deep reference libraries (on-demand, no SKILL.md)
+│   └── brainstorming/                  # Open-ended design exploration
+├── commands/                     # Slash command wrappers
 ├── hooks/
-│   └── session-start         # SessionStart hook — injects using-superpipelines at session start
-├── docs/
-│   └── AI_PIPELINES_LLM.md   # Canonical pipeline conventions (full)
-└── settings.json             # autoMemoryEnabled: false, Bash(*) allow
+│   └── session-start             # SessionStart hook — injects bootstrap at session start
+└── settings.json                 # autoMemoryEnabled: false, Bash(*) allow
 ```
 
 ---
@@ -147,7 +150,7 @@ superpipelines/
 
 Issues and PRs welcome at [gustavo-meilus/superpipelines](https://github.com/gustavo-meilus/superpipelines).
 
-To add a new pattern or agent, run `/superpipelines:new-agent` or `/superpipelines:audit-pipeline` to validate your additions against the conventions before opening a PR.
+To add a new pattern or agent, run `/superpipelines:audit-pipeline` to validate your additions against the compliance matrix before opening a PR.
 
 ---
 
@@ -155,4 +158,4 @@ To add a new pattern or agent, run `/superpipelines:new-agent` or `/superpipelin
 
 MIT — see [`LICENSE`](./LICENSE).
 
-Built on pipeline conventions and skill-design patterns distilled from Anthropic's Skills Open Standard and the Superpowers project by Jesse Vincent.
+Built on pipeline conventions and skill-design patterns distilled from Anthropic's Skills Open Standard.

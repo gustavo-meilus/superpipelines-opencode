@@ -1,6 +1,6 @@
 # State Management — Pipeline-Runner Reference
 
-How `running-a-pipeline` writes and reads `tmp/pipeline-state.json`. Companion to `sk-pipeline-state` (which defines the schema).
+How `running-a-pipeline` writes and reads pipeline state. Companion to `sk-pipeline-state` (which defines the schema).
 
 ## Table of contents
 
@@ -19,10 +19,11 @@ How `running-a-pipeline` writes and reads `tmp/pipeline-state.json`. Companion t
 ## Read-on-startup flow
 
 ```
-1. Check for existing tmp/pipeline-state.json
-   ├── Missing → fresh start; proceed to "initialize new state"
-   ├── status: "running" AND started_at < 1h ago → live; refuse to start new
-   ├── status: "running" AND started_at > 1h ago → crashed; prompt user (resume/restart/abort)
+1. Resolve scope root via sk-pipeline-paths
+2. Check for existing state in <scope-root>/superpipelines/temp/{P}/
+   ├── No run dirs → fresh start; proceed to "initialize new state"
+   ├── Found run dir with status: "running" AND started_at < 1h ago → live; refuse to start new
+   ├── Found run dir with status: "running" AND started_at > 1h ago → crashed; prompt user (resume/restart/abort)
    ├── status: "completed" → "already done"; exit
    ├── status: "escalated" or "failed" → surface to human; do NOT auto-resume
    └── parse error → escalate to human; do NOT auto-resume
@@ -31,12 +32,19 @@ How `running-a-pipeline` writes and reads `tmp/pipeline-state.json`. Companion t
 ## Initialize new state
 
 ```bash
+PIPELINE_NAME="my-pipeline"
+SCOPE_ROOT=$(# resolved by sk-pipeline-paths)
+RUN_ID=$(uuidgen)
 PIPELINE_ID=$(uuidgen)
 NOW=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-mkdir -p tmp
-cat > tmp/pipeline-state.json.tmp <<EOF
+TEMP_DIR="${SCOPE_ROOT}/superpipelines/temp/${PIPELINE_NAME}/${RUN_ID}"
+mkdir -p "$TEMP_DIR"
+cat > "${TEMP_DIR}/pipeline-state.json.tmp" <<EOF
 {
   "pipeline_id": "${PIPELINE_ID}",
+  "pipeline_name": "${PIPELINE_NAME}",
+  "scope_root": "${SCOPE_ROOT}",
+  "run_id": "${RUN_ID}",
   "started_at": "${NOW}",
   "pattern": "${PATTERN}",
   "status": "running",
@@ -45,7 +53,7 @@ cat > tmp/pipeline-state.json.tmp <<EOF
   "metadata": {}
 }
 EOF
-mv tmp/pipeline-state.json.tmp tmp/pipeline-state.json
+mv "${TEMP_DIR}/pipeline-state.json.tmp" "${TEMP_DIR}/pipeline-state.json"
 ```
 
 ## Atomic write pattern
@@ -53,13 +61,15 @@ mv tmp/pipeline-state.json.tmp tmp/pipeline-state.json
 EVERY state update follows the write-temp-then-rename pattern:
 
 ```bash
+TEMP_DIR="${SCOPE_ROOT}/superpipelines/temp/${PIPELINE_NAME}/${RUN_ID}"
+STATE_FILE="${TEMP_DIR}/pipeline-state.json"
 # 1. Read current state
-STATE=$(cat tmp/pipeline-state.json)
+STATE=$(cat "$STATE_FILE")
 # 2. Modify (use jq for safety)
 NEW_STATE=$(echo "$STATE" | jq --arg phase "$PHASE" '.current_phase = ($phase | tonumber)')
 # 3. Write atomically
-echo "$NEW_STATE" > tmp/pipeline-state.json.tmp
-mv tmp/pipeline-state.json.tmp tmp/pipeline-state.json
+echo "$NEW_STATE" > "${STATE_FILE}.tmp"
+mv "${STATE_FILE}.tmp" "$STATE_FILE"
 ```
 
 ## Phase transitions
@@ -85,14 +95,14 @@ When user accepts "resume" prompt for crashed state:
 
 ## Concurrent pipeline detection
 
-If `tmp/pipeline-state.json` exists with `status: "running"` and `pipeline_id != $NEW_ID`:
+Each pipeline name `{P}` has its own directory under `superpipelines/temp/`. Multiple named pipelines can run concurrently. Within the same `{P}`, only one active run is allowed:
 
 ```
 echo "Active pipeline detected: $EXISTING_ID started $STARTED_AT"
-echo "Cannot start new pipeline. Options:"
+echo "Cannot start new run of '${PIPELINE_NAME}'. Options:"
 echo "  - Wait for active pipeline to finish"
-echo "  - Resume the active pipeline (claude /superpipelines:run-pipeline --resume)"
-echo "  - Abort the active pipeline (delete state file manually)"
+echo "  - Resume the active run (claude /superpipelines:run-pipeline --resume)"
+echo "  - Abort the active run (rm -rf ${TEMP_DIR})"
 exit 1
 ```
 
@@ -109,19 +119,21 @@ exit 1
 ## Cleanup on success
 
 ```bash
-# Pipeline completed — keep state for audit, but mark for archive
-NEW_STATE=$(cat tmp/pipeline-state.json | jq '.status = "completed" | .completed_at = now | todate')
-echo "$NEW_STATE" > tmp/pipeline-state.json.tmp
-mv tmp/pipeline-state.json.tmp tmp/pipeline-state.json
+TEMP_DIR="${SCOPE_ROOT}/superpipelines/temp/${PIPELINE_NAME}/${RUN_ID}"
+STATE_FILE="${TEMP_DIR}/pipeline-state.json"
+# Pipeline completed — mark status and delete temp dir
+NEW_STATE=$(cat "$STATE_FILE" | jq '.status = "completed" | .completed_at = now | todate')
+echo "$NEW_STATE" > "${STATE_FILE}.tmp"
+mv "${STATE_FILE}.tmp" "$STATE_FILE"
+# Temp dirs are deleted on DONE
+rm -rf "$TEMP_DIR"
 ```
-
-Optional archival: move to `tmp/archive/pipeline-state-${PIPELINE_ID}.json`.
 
 ## Cleanup on failure / escalation
 
-Do NOT delete the state file. Surface to user with the absolute path so they can inspect:
+Do NOT delete the temp directory. Surface to user with the absolute path so they can inspect:
 
 ```
-echo "Pipeline ESCALATED. State preserved at: $(realpath tmp/pipeline-state.json)"
+echo "Pipeline ESCALATED. State preserved at: ${TEMP_DIR}/pipeline-state.json"
 echo "Next steps documented in metadata.last_failure."
 ```

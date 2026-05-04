@@ -1,8 +1,6 @@
 ---
 name: creating-a-pipeline
 description: Use when the user asks to design a pipeline, build a workflow for X, plan multi-step feature work, or invokes /superpipelines:new-pipeline. Walks git preflight, scope selection, pattern selection, architect dispatch, pre-gate audit, and human approval to produce a runnable named pipeline bundle.
-skills:
-  - sk-pipeline-paths
 ---
 
 # Creating a Pipeline

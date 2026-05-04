@@ -43,4 +43,4 @@ This repo is the source of the `superpipelines` Claude Code plugin. It packages 
 
 ## Today's date
 
-2026-05-04 — current model IDs: `claude-sonnet-4-6`, `claude-opus-4-7`, `claude-haiku-4-5-20251001`.
+2026-05-04 — v1.0.1 — current model IDs: `claude-sonnet-4-6`, `claude-opus-4-7`, `claude-haiku-4-5-20251001`.

@@ -14,8 +14,9 @@ Findings classified into four severity tiers.
 ## SEV-0 examples
 
 - Subagent attempts to spawn children (`SUB_AGENT_SPAWNING: FALSE` violated).
-- `memory: project` or `memory: local` in agent frontmatter.
-- `permissionMode` set in agent frontmatter.
+- `memory: project` in agent frontmatter.
+- `permissionMode: bypassPermissions` without inline justification in agent body.
+- `memory: local` on a reviewer agent (reviewers must not persist heuristics).
 - Tool churn mid-session (skills list mutated, tools added/removed).
 - Missing required-field in plugin manifest.
 - Reviewer agent has `Write` or `Edit` enabled (write/review isolation broken).

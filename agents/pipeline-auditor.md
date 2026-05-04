@@ -7,6 +7,7 @@ model: sonnet
 effort: high
 maxTurns: 30
 version: "2.0"
+permissionMode: plan
 skills:
   - sk-4d-method
   - sk-claude-code-conventions

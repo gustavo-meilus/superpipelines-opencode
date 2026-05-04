@@ -70,7 +70,8 @@ Claude 4.6 can persist facts to local files. In pipelines:
 
 - `autoMemoryEnabled: false` (or `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1`) reclaims 658+ tokens per call.
 - Prefer `references/*.md` over the memory tool for deterministic rules; use memory only for learned heuristics.
-- **Never** use `memory: project` or `memory: local` in agent frontmatter for pipeline agents — state goes to `tmp/pipeline-state.json` (see `sk-pipeline-state`).
+- **Never** use `memory: project` in agent frontmatter — project memory is forbidden. `memory: local` is allowed for agents that persist learned heuristics.
+- All pipeline state goes to `<scope-root>/superpipelines/temp/{P}/{runId}/pipeline-state.json` (see `sk-pipeline-state`).
 
 ---
 
@@ -199,6 +200,6 @@ Never use `~/.claude/...` for plugin-relative paths — always use `${CLAUDE_PLU
 
 ## Cross-references
 
-- `docs/AI_PIPELINES_LLM.md` — canonical orchestration rules.
+- `sk-pipeline-state`, `sk-pipeline-paths` — state management and path resolution.
 - `sk-4d-method`, `sk-spec-driven-development`, `sk-pipeline-patterns`.
 - Anthropic docs: https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview, https://code.claude.com/docs/en/skills, https://code.claude.com/docs/en/sub-agents.

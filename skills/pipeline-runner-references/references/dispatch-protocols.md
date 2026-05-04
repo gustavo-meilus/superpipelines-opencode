@@ -23,8 +23,8 @@ Task(
   prompt="""
     Inputs:
       - task_text: <extracted from tasks.md>
-      - spec_path: ./spec.md
-      - plan_path: ./plan.md
+      - spec_path: {ROOT}/superpipelines/pipelines/{P}/spec.md
+      - plan_path: {ROOT}/superpipelines/pipelines/{P}/plan.md
       - project_context: <relevant files / commands>
 
     Output: emit one of DONE / DONE_WITH_CONCERNS / NEEDS_CONTEXT / BLOCKED with the agent's output schema.
@@ -121,7 +121,8 @@ for each task in tasks.md (respecting dependencies):
   commit changes; merge to integration branch
 
 # Phase 6 — reconcile
-update pipeline-state.json with all task outcomes
+update pipeline state (via sk-pipeline-state) with all task outcomes
+# Temp dirs are deleted on DONE; preserved on escalation/failure
 ```
 
 ## Status protocol handling

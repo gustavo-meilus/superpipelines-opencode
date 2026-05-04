@@ -112,6 +112,6 @@ Conventions:
 
 ## Cross-references
 
-- `docs/AI_PIPELINES_LLM.md` `<rationalization_resistance>` — canonical source.
+- `sk-pipeline-patterns` `references/ai-pipelines-trimmed.md` — full conventions reference.
 - `sk-pipeline-patterns` Pattern 3 escalation — example HARD-GATE usage.
 - `sk-write-review-isolation` — example EXTREMELY-IMPORTANT + Red Flags + Rationalization Table.

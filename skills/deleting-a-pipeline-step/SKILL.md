@@ -1,8 +1,6 @@
 ---
 name: deleting-a-pipeline-step
 description: Use when the user wants to remove or delete a step from an existing named pipeline, or invokes /superpipelines:delete-step. Performs gap analysis, optionally rewires edges, audits the delta, and gates on human approval before any deletion occurs.
-skills:
-  - sk-pipeline-paths
 ---
 
 # Deleting a Pipeline Step

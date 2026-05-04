@@ -1,8 +1,6 @@
 ---
 name: adding-a-pipeline-step
 description: Use when the user wants to add a new step, capability, or agent to an existing named pipeline, or invokes /superpipelines:new-step. Selects insertion point, designs the new component, mutates topology.json, audits the delta, and gates on human approval before writing to disk.
-skills:
-  - sk-pipeline-paths
 ---
 
 # Adding a Pipeline Step

@@ -7,7 +7,7 @@ user-invocable: false
 
 # Spec-Driven Development (SDD) — Reference
 
-Reference template for the SDD workflow used by `creating-a-pipeline` and `pipeline-architect`. Maps directly to Pattern 5 in `docs/AI_PIPELINES_LLM.md`.
+Reference template for the SDD workflow used by `creating-a-pipeline` and `pipeline-architect`. Maps directly to Pattern 5 in `sk-pipeline-patterns`.
 
 Trigger SDD when: building a new feature, refactoring a system, authoring a multi-step pipeline, or when the request is ambiguous and needs a contract before execution.
 
@@ -181,5 +181,5 @@ Update `pipeline-state.json` with completion status per task. Re-run `/analyze` 
 - `sk-4d-method` — every SDD phase runs through the 4D wrapper.
 - `sk-pipeline-state` — `pipeline-state.json` schema.
 - `sk-write-review-isolation` — how Stage 1/2 review applies inside `/implement`.
-- `docs/AI_PIPELINES_LLM.md` — Pattern 5 canonical definition.
+- `sk-pipeline-patterns` `references/ai-pipelines-trimmed.md` — Pattern 5 full conventions.
 - GitHub Spec Kit — https://github.com/github/spec-kit
