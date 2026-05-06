@@ -1,6 +1,7 @@
 import type { Plugin, PluginModule } from "@opencode-ai/plugin";
 import type { Message, Part } from "@opencode-ai/sdk";
 import fsSync from "fs";
+import os from "os";
 import path from "path";
 import { fileURLToPath } from "url";
 import { parse as yamlParse } from "yaml";
@@ -17,6 +18,16 @@ function extractFrontmatter(content: string) {
   if (!match) return null;
   return { frontmatterStr: match[1], body: match[2].trim() };
 }
+
+const BUILTIN_COMMANDS: Record<string, string> = {
+  "new-pipeline": "superpipelines:new-pipeline",
+  "run-pipeline": "superpipelines:run-pipeline",
+  "new-step": "superpipelines:new-step",
+  "update-step": "superpipelines:update-step",
+  "delete-step": "superpipelines:delete-step",
+  "audit-pipeline": "superpipelines:audit-pipeline",
+  "init-deep": "superpipelines:init-deep",
+};
 
 const serverPlugin: Plugin = async ({ project, directory, worktree }, options) => {
   const pluginRoot = path.resolve(__dirname, "..");
@@ -100,6 +111,86 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
             } catch (err) {
               console.error(`[superpipelines] Error parsing frontmatter for agent ${agentName}:`, err);
             }
+          }
+        }
+      }
+
+      config.command = config.command || {};
+
+      const commandsDir = path.join(pluginRoot, "commands");
+      if (fsSync.existsSync(commandsDir)) {
+        const cmdFiles = fsSync.readdirSync(commandsDir).filter((f: string) => f.endsWith(".md"));
+        for (const file of cmdFiles) {
+          const cmdName = file.replace(".md", "");
+          const cmdKey = BUILTIN_COMMANDS[cmdName];
+          if (!cmdKey) continue;
+          if (config.command[cmdKey]) continue;
+
+          const content = fsSync.readFileSync(path.join(commandsDir, file), "utf-8");
+          const extracted = extractFrontmatter(content);
+          if (!extracted) continue;
+
+          try {
+            const parsed = yamlParse(extracted.frontmatterStr);
+            const commandConfig: Record<string, unknown> = {
+              template: extracted.body,
+            };
+            if (parsed.description) commandConfig.description = parsed.description;
+            if (parsed.agent) commandConfig.agent = parsed.agent;
+            if (parsed.model) commandConfig.model = parsed.model;
+            if (parsed.subtask !== undefined) commandConfig.subtask = parsed.subtask;
+            if (parsed.argument_hint || parsed["argument-hint"]) {
+              commandConfig.argumentHint = parsed.argument_hint || parsed["argument-hint"];
+            }
+
+            config.command[cmdKey] = commandConfig;
+          } catch (err) {
+            console.error(`[superpipelines] Error parsing built-in command ${cmdName}:`, err);
+          }
+        }
+      }
+
+      const scopeRoots = [
+        path.join(directory, ".opencode"),
+        path.join(os.homedir(), ".opencode"),
+      ];
+      const reservedDirs = new Set(["pipelines", "temp"]);
+
+      for (const scopeRoot of scopeRoots) {
+        const spDir = path.join(scopeRoot, "superpipelines");
+        if (!fsSync.existsSync(spDir)) continue;
+
+        const entries = fsSync.readdirSync(spDir, { withFileTypes: true });
+        for (const entry of entries) {
+          if (!entry.isDirectory() || reservedDirs.has(entry.name)) continue;
+
+          const pipelineName = entry.name;
+          const commandFile = path.join(spDir, pipelineName, `${pipelineName}.md`);
+          if (!fsSync.existsSync(commandFile)) continue;
+
+          const content = fsSync.readFileSync(commandFile, "utf-8");
+          const extracted = extractFrontmatter(content);
+          if (!extracted) continue;
+
+          try {
+            const parsed = yamlParse(extracted.frontmatterStr);
+            const commandKey = `superpipelines:${pipelineName}`;
+            if (config.command[commandKey]) continue;
+
+            const commandConfig: Record<string, unknown> = {
+              template: extracted.body,
+            };
+            if (parsed.description) commandConfig.description = parsed.description;
+            if (parsed.agent) commandConfig.agent = parsed.agent;
+            if (parsed.model) commandConfig.model = parsed.model;
+            if (parsed.subtask !== undefined) commandConfig.subtask = parsed.subtask;
+            if (parsed.argument_hint || parsed["argument-hint"]) {
+              commandConfig.argumentHint = parsed.argument_hint || parsed["argument-hint"];
+            }
+
+            config.command[commandKey] = commandConfig;
+          } catch (err) {
+            console.error(`[superpipelines] Error parsing command for pipeline ${pipelineName}:`, err);
           }
         }
       }
