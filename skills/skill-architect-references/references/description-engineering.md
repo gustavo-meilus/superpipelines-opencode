@@ -10,9 +10,9 @@ Pattern: `Use when [specific triggering conditions and symptoms]`
 
 ## Why this matters
 
-Claude reads the description to decide whether to load the skill body. If the description summarizes the workflow, Claude treats the description as a shortcut and skips the body. The skill becomes documentation Claude never reads.
+opencode reads the description to decide whether to load the skill body. If the description summarizes the workflow, opencode treats the description as a shortcut and skips the body. The skill becomes documentation opencode never reads.
 
-A real failure: a description saying "dispatches subagent per task with code review between tasks" caused Claude to perform ONE review instead of the two-stage review specified in the skill body. Changing the description to triggering conditions only fixed the behavior without changing any skill content.
+A real failure: a description saying "dispatches subagent per task with code review between tasks" caused opencode to perform ONE review instead of the two-stage review specified in the skill body. Changing the description to triggering conditions only fixed the behavior without changing any skill content.
 
 ## Patterns
 

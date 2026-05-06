@@ -48,7 +48,7 @@ Each criterion: PASS / FAIL / PARTIAL / N/A with cited file:line evidence.
 | # | Criterion | PASS condition |
 |---|-----------|----------------|
 | 17 | Temp path convention | State and outputs stored at `{ROOT}/superpipelines/temp/{P}/{runId}/` — no `tmp/` or hardcoded absolute paths |
-| 18 | No hardcoded absolute paths in agent bodies | Agent bodies reference paths via a scope-root variable (`${SCOPE_ROOT}` or equivalent), never literal `/home/...` or `~/.claude/...` |
+| 18 | No hardcoded absolute paths in agent bodies | Agent bodies reference paths via a scope-root variable (`${SCOPE_ROOT}` or equivalent), never literal `/home/...` or `~/.opencode/...` |
 | 19 | Write/review isolation honored | Review-role agents (`*-spec-reviewer`, `*-quality-reviewer`) have `disallowedTools: Write, Edit, Bash` (or equivalent) in frontmatter |
 | 20 | Cleanup contract present in entry skill | Entry skill body explicitly: (a) writes `status: completed` to `pipeline-state.json` on success, (b) deletes `temp/{P}/{runId}/` on DONE, (c) preserves temp on ESCALATED/FAILED/BLOCKED |
 

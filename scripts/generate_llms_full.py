@@ -1,10 +1,10 @@
 import os
 
 def generate_llms_full():
-    root_dir = r"d:\Github\superpipelines"
+    root_dir = r"d:\Github\superpipelines-opencode"
     output_file = os.path.join(root_dir, "llms-full.txt")
     
-    core_files = ["README.md", "CLAUDE.md", "RELEASE-NOTES.md", "CHANGELOG.md"]
+    core_files = ["README.md", "OPENCODE.md", "RELEASE-NOTES.md", "CHANGELOG.md"]
     
     with open(output_file, "w", encoding="utf-8") as outfile:
         # Header

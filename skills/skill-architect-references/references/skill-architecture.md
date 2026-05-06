@@ -113,5 +113,5 @@ Reference files >100 lines must include a Table of Contents at the top.
 ## Cross-references
 
 - `description-engineering.md` — how to write a description that triggers correctly.
-- `claude-code-skill-spec.md` — full frontmatter field reference.
+- `opencode-skill-spec.md` — full frontmatter field reference.
 - `anti-patterns.md` — common authoring mistakes and fixes.

@@ -1,20 +1,16 @@
 ---
 name: pipeline-architect
 description: Use when designing a new multi-agent pipeline, generating spec/plan/tasks/topology artifacts, adding a step to an existing pipeline, updating a step, deleting a step, creating a single subagent definition, or diagnosing a pipeline topology failure.
-tools: Read, Write, Edit, Glob, Grep, Bash
-model: opus
+model: anthropic/claude-3-opus-20240229-4-20250514
 effort: medium
-maxTurns: 40
+steps: 40
 version: "2.0"
-permissionMode: plan
-skills:
-  - sk-4d-method
-  - sk-spec-driven-development
-  - sk-dynamic-routing
-  - sk-claude-code-conventions
-  - sk-pipeline-patterns
-  - sk-pipeline-paths
+permission:
+  edit: allow
+  bash: allow
 ---
+> **Required Skills:** sk-4d-method, sk-spec-driven-development, sk-dynamic-routing, sk-opencode-code-conventions, sk-pipeline-patterns, sk-pipeline-paths
+
 
 # Pipeline Architect — System Designer
 
@@ -76,14 +72,14 @@ The Pipeline Architect treats every component as a discrete software system with
 <invariants>
 - All agent bodies must declare a capability contract (Inputs / Output schema / Breaking change log) in the first 10 lines.
 - No agent body may exceed 150 lines.
-- Absolute paths are forbidden; resolve all paths via scope-aware variables or `${CLAUDE_PLUGIN_ROOT}`.
+- Absolute paths are forbidden; resolve all paths via scope-aware variables or `${OPENCODE_PLUGIN_ROOT}`.
 - `permissionMode: bypassPermissions` requires an inline justification comment.
 - `memory: project` is strictly forbidden in all agent frontmatter.
 </invariants>
 
 ## Reference Files
 
-- `${CLAUDE_PLUGIN_ROOT}/skills/pipeline-architect-references/references/topology-selection.md`
-- `${CLAUDE_PLUGIN_ROOT}/skills/pipeline-architect-references/references/agent-frontmatter-schema.md`
-- `${CLAUDE_PLUGIN_ROOT}/skills/pipeline-architect-references/references/sdd-artifacts.md`
-- `${CLAUDE_PLUGIN_ROOT}/skills/pipeline-architect-references/references/anti-patterns.md`
+- `${OPENCODE_PLUGIN_ROOT}/skills/pipeline-architect-references/references/topology-selection.md`
+- `${OPENCODE_PLUGIN_ROOT}/skills/pipeline-architect-references/references/agent-frontmatter-schema.md`
+- `${OPENCODE_PLUGIN_ROOT}/skills/pipeline-architect-references/references/sdd-artifacts.md`
+- `${OPENCODE_PLUGIN_ROOT}/skills/pipeline-architect-references/references/anti-patterns.md`

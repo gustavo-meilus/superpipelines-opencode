@@ -62,12 +62,24 @@ The framework selects the optimal pattern based on task complexity:
 
 ## Installation
 
-Install the Superpipelines plugin via Claude Code:
+Install the Superpipelines plugin via npm or locally:
 
 <installation>
 ```bash
-// Installation command
-claude plugin install github:gustavo-meilus/superpipelines
+# Clone the repository
+git clone https://github.com/gustavo-meilus/superpipelines-opencode.git
+cd superpipelines-opencode
+
+# Build the plugin
+npm install
+npm run build
+```
+
+Then, add the plugin to your `opencode.json`:
+```json
+{
+  "plugin": ["./superpipelines-opencode"]
+}
 ```
 </installation>
 
@@ -93,14 +105,16 @@ claude plugin install github:gustavo-meilus/superpipelines
 
 <file_structure>
 ```
-superpipelines/
-├── .claude-plugin/           # Plugin manifest and marketplace data
-├── agents/                   # Core agent definitions (Architect, Auditor, Executor, Reviewers)
-├── skills/                   # Shared skills (State, Paths, Patterns, Worktree Safety)
-│   ├── *-references/         # Deep reference libraries (On-demand loading)
-├── commands/                 # Slash command wrappers
-├── hooks/                    # SessionStart hooks for bootstrap injection
-└── settings.json             # Global plugin configuration
+superpipelines-opencode/
+├── package.json         # Plugin NPM package manifest
+├── src/                 # TypeScript source code for the OpenCode plugin
+├── dist/                # Compiled plugin code (run `npm run build`)
+├── .opencode/           # Plugin installation guides
+├── agents/              # Core agent definitions (Architect, Auditor, Executor, Reviewers)
+├── skills/              # Shared skills (State, Paths, Patterns, Worktree Safety)
+│   ├── *-references/    # Deep reference libraries (On-demand loading)
+├── commands/            # Slash command wrappers
+└── settings.json        # Global plugin configuration
 ```
 </file_structure>
 
@@ -113,11 +127,11 @@ Contributions are managed via issues and PRs at [gustavo-meilus/superpipelines](
 MIT — See [LICENSE](./LICENSE).
 
 
-# File: CLAUDE.md
+# File: OPENCODE.md
 ----------------------------------------
 # Superpipelines — Architecture and Authoring Reference
 
-> Canonical project reference for the Superpipelines Claude Code plugin. This document defines the architectural invariants, file layout rules, and authoring constraints required to maintain system integrity and LLM readability.
+> Canonical project reference for the Superpipelines OpenCode plugin. This document defines the architectural invariants, file layout rules, and authoring constraints required to maintain system integrity and LLM readability.
 
 <overview>
 Superpipelines implements a multi-agent orchestration framework where architecture is enforced through structural isolation and strict authoring rules. This reference serves as the ground truth for developers and agents operating within the repository.
@@ -128,8 +142,8 @@ Superpipelines implements a multi-agent orchestration framework where architectu
 <architecture_invariants>
 - `SUB_AGENT_SPAWNING: FALSE` — Subagents never spawn children; orchestration resides in top-level skills or the parent session.
 - `WRITE_REVIEW_ISOLATION: TRUE` — The agent generating code is structurally barred from reviewing it.
-- `MODEL_SELECTION: DYNAMIC_DEFAULT_SONNET` — Pipeline execution agents default to `claude-sonnet-4-6`. Planning and utility agents may utilize category-based dynamic routing (e.g., `deep-plan`, `quick-audit`).
-- `PERMISSION_MODE: PER_AGENT` — Agents declare explicit permission boundaries (e.g., `acceptEdits`, `plan`) in frontmatter.
+- `MODEL_SELECTION: DYNAMIC_DEFAULT_SONNET` — Pipeline execution agents default to `anthropic/claude-3-5-sonnet-20241022-4-20250514`. Planning and utility agents may utilize category-based dynamic routing (e.g., `deep-plan`, `quick-audit`).
+- `PERMISSION_MODE: PER_AGENT` — Agents declare explicit permission boundaries (e.g., `permission: { edit: allow }`) in frontmatter.
 - `STATE_MANAGEMENT: STRUCTURED_JSON` — State persists to `<scope-root>/superpipelines/temp/{P}/{runId}/pipeline-state.json`.
 - `MULTI_PIPELINE: TRUE` — Multiple named pipelines coexist in isolation per workspace.
 </architecture_invariants>
@@ -137,7 +151,7 @@ Superpipelines implements a multi-agent orchestration framework where architectu
 ## File-Layout Rules
 
 <file_rules>
-- **Manifests**: `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` are the only permitted files in the plugin directory.
+- **Manifests**: `opencode.json` and `.opencode/INSTALL.md` are the only permitted files in the plugin directory.
 - **Source Roots**: `agents/`, `skills/`, `commands/`, and `hooks/` reside at the repository root.
 - **Generated Artifacts**: Artifacts live under scope-dependent roots (`project`, `local`, or `user`) as resolved by `sk-pipeline-paths`.
 - **Reference Skills**: Companion reference skills (`*-references/`) omit `SKILL.md` to prevent preloading into system context.
@@ -154,215 +168,70 @@ Superpipelines implements a multi-agent orchestration framework where architectu
 </authoring_rules>
 
 <glossary>
-  <term name="Sonnet 4.6">The canonical model ID: `claude-sonnet-4-6`.</term>
+  <term name="Sonnet 4">The canonical model ID: `anthropic/claude-3-5-sonnet-20241022-4-20250514`.</term>
   <term name="Scope Root">The base directory for generated artifacts, variable by project configuration.</term>
 </glossary>
 
 ## Metadata
 
-- **Current Model IDs**: `claude-sonnet-4-6`, `claude-opus-4-7`, `claude-haiku-4-5-20251001`.
-- **Project Version**: v1.0.4
+- **Current Model IDs**: `anthropic/claude-3-5-sonnet-20241022`, `anthropic/claude-3-opus-20240229`, `anthropic/claude-3-5-haiku-20241022`.
+- **Project Version**: v1.0.0
 
 
 # File: RELEASE-NOTES.md
 ----------------------------------------
-# Superpipelines — Release Notes
+# Release Notes
 
-> Canonical record of versioned changes, feature additions, and removals for the Superpipelines framework. This document serves as the primary reference for tracking migration paths and architectural evolution.
+## v1.0.0 — OpenCode Migration (2026-05-05)
 
-<overview>
-Superpipelines release notes document the transition from legacy Superpowers-era infrastructure to the standalone v1.0.x architecture. Key milestones include the implementation of scope-aware deployment, multi-pipeline isolation, and the 20-criterion compliance matrix.
-</overview>
+Welcome to the initial release of **Superpipelines OpenCode** (`superpipelines-opencode` v1.0.0).
 
-## v1.0.4 — OMOA Integration & Hierarchical Context (2026-05-05)
+This repository is a dedicated, fully autonomous fork of the original [Superpipelines](https://github.com/gustavo-meilus/superpipelines) framework (v1.0.4), completely re-architected to run natively as an OpenCode plugin.
 
-This release integrates three major architectural enhancements inspired by the Oh My OpenAgent ecosystem, dramatically improving edit stability, context efficiency, and cost-to-performance ratios for specific agents.
+### Key Architectural Shifts
 
-<release_entry version="1.0.4" status="STABLE">
+#### 1. Native TypeScript Plugin
+Superpipelines is no longer a collection of static markdown files distributed via symlinks. It is now a compiled TypeScript module utilizing the official `@opencode-ai/plugin` SDK. It exports a compliant `PluginModule` structure, matching top-tier OpenCode plugins (e.g., `oh-my-openagent`).
 
-### Added
-- **Hashline Protocol**: Added `sk-hashline-protocol` skill and updated the `pipeline-task-executor` to enforce hash-anchored code modifications, preventing source code corruption from stale line edits.
-- **Hierarchical Context Command**: Added the `/superpipelines:init-deep` command and `sk-hierarchical-context` skill to map repository architecture into distributed `PIPELINE-CONTEXT.md` files, ensuring agents access lean, localized context without bloating global prompts.
-- **Scribius Formatting Enforcement**: Enforced strict Scribius v1 standards (H1-first, XML-anchored structured envelopes, third-person voice) on all generated `PIPELINE-CONTEXT.md` files.
-- **Dynamic Intent Routing**: Added `sk-dynamic-routing` to permit intent-based LLM selection. `pipeline-architect` now defaults to `claude-opus-4-7` (`deep-plan` category) and `pipeline-quality-reviewer` routes to `claude-haiku-4-5-20251001` (`quick-audit` category), while standard implementation workers remain bound to `claude-sonnet-4-6`.
+#### 2. Dynamic Tool Registration
+Users no longer need to manually copy `agents/` and `skills/` directories into their workspace. By simply adding the plugin URL or local path to `opencode.json`, the plugin automatically intercepts OpenCode's configuration lifecycle to dynamically register the bundled skills and agents.
 
-### Changed
-- **Architecture Invariant Updated**: `MODEL_SELECTION: SONNET_ONLY` updated to `MODEL_SELECTION: DYNAMIC_DEFAULT_SONNET` to support category-based routing.
-- **New Pipeline Preflight**: The `/superpipelines:new-pipeline` command now explicitly checks for a root context map and suggests `/superpipelines:init-deep` during the preflight phase.
+#### 3. Optimized Context Injection
+Following best practices, the plugin safely injects the core `using-superpipelines` orchestration documentation directly into the first user message using the `experimental.chat.messages.transform` hook. This guarantees strict compliance without suffering from system-prompt token bloat on every subsequent execution turn.
 
-</release_entry>
+#### 4. Environment Standardization
+All agents, scripts, and skills have been rigorously audited. Legacy references, paths (`.claude/`), ignore files (`.claudeignore`), and incompatible model aliases have been replaced with their OpenCode equivalents.
 
-## v1.0.3 — Adherence Cleanup (2026-05-04)
-
-This release ensures 100% adherence to the framework's core architectural standards. It resolves cosmetic and structural issues identified during a comprehensive audit, including stale marketplace metadata, corrupted agent definitions, and structural inconsistencies in the release history.
-
-<release_entry version="1.0.3" status="STABLE">
-
-### Added
-- **Adherence Audit Verified**: Confirmed 100% compliance with all 16 core architectural requirements (Git preflight, multi-pipeline isolation, scope-aware pathing, temp lifecycle).
-
-### Improved
-- **Marketplace Metadata**: Synchronized marketplace description with canonical plugin capabilities, removing stale documentation references.
-- **Structural Integrity**: Resolved file corruption in `skill-architect.md` and consolidated duplicate history headers in `RELEASE-NOTES.md`.
-
-</release_entry>
-
-## v1.0.2 — Scribius v1 & Standardized Architecture (2026-05-04)
-
-This release implements a repository-wide refactoring to the Scribius v1 documentation standard and finalizes the v2 scope-aware architecture. It introduces semantically anchored XML envelopes for machine-readability and master manifests for high-performance context retrieval.
-
-<release_entry version="1.0.2" status="STABLE">
-
-### Added
-- **Scribius v1 Standardization**: All 20+ core skills migrated to semantically anchored XML envelopes (`<overview>`, `<protocol>`, `<invariants>`, `<rationalization_table>`).
-- **AI-Ready Indexing**: Added `llms.txt` and `llms-full.txt` master manifests for optimized LLM context injection.
-- **Integrity Verification**: Verified 100% semantic alignment between pre-refactor baselines and standardized documentation via a multi-agent audit protocol.
-- **Automated Registry**: Added `generate_llms_full.py` script for periodic manifest updates.
-- **Scope-aware deployment**: Pipelines support `project`, `local`, and `user` scopes with path resolution via `sk-pipeline-paths`.
-- **Multi-pipeline support**: Multiple named pipelines coexist per workspace in isolated directories.
-- **Step management commands**: `/superpipelines:new-step`, `/superpipelines:update-step`, and `/superpipelines:delete-step` enable granular pipeline mutations.
-- **Compliance Matrix**: A 20-criterion audit system for layout, frontmatter, topology, and runtime safety.
-- **Local Memory**: Agents may utilize `memory: local` for persisting cross-run heuristics.
-
-### Improved
-- **Protocol Clarity**: Refined operational gates in `systematic-debugging`, `tdd`, and `verification-before-completion` for sharper agent adherence.
-- **Structural Voice**: Standardized all documentation to third-person impersonal voice to reinforce protocol objectivity.
-
-### Breaking changes
-- **State file path moved**: Pipeline state now lives at `<scope-root>/superpipelines/temp/{P}/{runId}/pipeline-state.json` instead of `tmp/pipeline-state.json`. There is no migration path — any in-progress pipelines from v1.0.0 must be restarted.
-- **State schema extended**: `pipeline-state.json` now requires `pipeline_name`, `scope_root`, and `run_id` fields.
-- **`.claudeignore` updated**: The ignore pattern changed from `tmp/pipeline-*` to `.claude/superpipelines/temp/`.
-- **Agent `permissionMode` now required**: All agents declare `permissionMode` in frontmatter (`acceptEdits` for executors, `plan` for reviewers/architects).
-
-### Removed
-- `docs/AI_PIPELINES_LLM.md` — Replaced by `ai-pipelines-trimmed.md` and agent-frontmatter-schema.
-- `docs/ai-pipelines-improvement-plan.md` — Legacy gap analysis.
-- `docs/superpowers-vs-ai-pipelines.md`, `docs/claude-plugins-complete-guide.md`, `docs/testing.md`.
-- `docs/windows/`, `docs/plans/`, `docs/superpowers/`, `docs/examples/` — Legacy directories.
-- `tests/` — Legacy Superpowers-era test suites.
-- Visual companion server scripts from `skills/brainstorming/`.
-
-</release_entry>
-
-## v1.0.0 — Initial Release (2026-05-03)
-
-<release_entry version="1.0.0" status="INITIAL">
-First standalone release of Superpipelines. Established the core framework with 7 agents, 6 execution patterns, and the spec-driven development (SDD) workflow.
-</release_entry>
+---
+*For a complete list of historical features carried over from the original framework (including Spec-Driven Development, Write/Review Isolation, and the 4D Intake method), please reference the [README.md](./README.md).*
 
 
 # File: CHANGELOG.md
 ----------------------------------------
 # Changelog
 
-## Distribution
+All notable changes to the `superpipelines-opencode` project will be documented in this file.
 
-Superpipelines is distributed via the GitHub-hosted marketplace at `gustavo-meilus/superpipelines`. Each entry below corresponds to a git tag of the same name on `main`.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-**Install (Claude Code):**
-
-```text
-/plugin marketplace add gustavo-meilus/superpipelines
-/plugin install superpipelines@superpipelines-marketplace
-```
-
-**Pin to a specific version:**
-
-```text
-/plugin install superpipelines@superpipelines-marketplace --version v1.0.2
-```
-
-## 1.0.4 — OMOA Integration & Hierarchical Context (2026-05-05)
-
-### Architecture & Agent Optimizations
-
-- **Hashline Editing Protocol** — Implemented `sk-hashline-protocol` to enforce content-hash validation prior to any atomic file mutation by `pipeline-task-executor`, eliminating stale-line corruption.
-- **Hierarchical Context Maps** — Introduced `/superpipelines:init-deep` and `sk-hierarchical-context` to generate token-efficient, distributed `PIPELINE-CONTEXT.md` files conforming strictly to Scribius v1 XML-anchored standards.
-- **Dynamic Model Routing** — Relaxed the strict `SONNET_ONLY` invariant to `DYNAMIC_DEFAULT_SONNET`, permitting specific agents (like `pipeline-architect` and `pipeline-quality-reviewer`) to dynamically route to Opus or Haiku based on their intent category (`deep-plan` vs `quick-audit`), optimizing reasoning and cost.
-
-## 1.0.3 — Adherence Cleanup (2026-05-04)
-
-### Documentation & Maintenance
-
-- **Adherence Audit** — Verified 100% compliance with the v1.0.2 specification.
-- **Marketplace Sync** — Updated marketplace description to remove stale references and align with plugin capabilities.
-- **Structural Integrity** — Removed corrupted lines in `skill-architect.md` and consolidated duplicate headers in `RELEASE-NOTES.md`.
-
-## 1.0.2 — Scribius v1 AI-Readiness (2026-05-04)
-
-### Documentation & AI-Readiness
-
-- **Scribius v1 Refactor** — Migrated all core workflow, foundation, and engineering skills to semantically anchored XML envelopes (`<protocol>`, `<invariants>`, `<rationalization_table>`).
-- **Master Manifests** — Added `llms.txt` (discovery index) and `llms-full.txt` (complete documentation suite) to the repository root.
-- **Automation** — Added `scripts/generate_llms_full.py` for periodic doc-suite synchronization.
-- **Integrity Verified** — Performed a multi-agent semantic audit confirming 100% information persistence between pre-refactor baselines and Scribius v1 versions.
-
-### Engineering Protocols
-
-- **Gate Enforcement** — Formalized operational gates in `systematic-debugging` (Root Cause), `tdd` (Red-Green), and `verification-before-completion` (Evidence-Before-Claim).
-- **Structural Voice** — Enforced third-person impersonal voice throughout all documentation to maintain architectural objectivity.
-
-## 1.0.2 — v2 Redesign
-
-### Architecture
-
-- **Scope-aware registry** — pipelines deploy to one of three scope roots (`project` → `<workspace>/.claude/`, `local` → `<workspace>/.claude/`, `user` → `~/.claude/`). Paths resolved by `sk-pipeline-paths`.
-- **Multi-pipeline isolation** — multiple named pipelines coexist per workspace, each in its own `{P}/` directory tree.
-- **State path migrated** — `<scope-root>/superpipelines/temp/{P}/{runId}/pipeline-state.json` replaces the legacy flat `tmp/pipeline-state.json`. State schema now includes `pipeline_name`, `scope_root`, and `run_id`.
-- **Temp dir lifecycle** — run directories are deleted on `DONE`; preserved on `ESCALATED / FAILED / BLOCKED` for inspection.
-
-### Commands
-
-- **New:** `/superpipelines:new-step` — add a step to an existing named pipeline.
-- **New:** `/superpipelines:update-step` — modify an existing step within a named pipeline.
-- **New:** `/superpipelines:delete-step` — remove a step with gap analysis and topology rewiring.
-- **Updated:** `/superpipelines:audit-pipeline` — rewritten with a 20-criterion compliance matrix across 4 bands (layout, frontmatter, topology, runtime safety).
-
-### Agent frontmatter
-
-- **`permissionMode`** now declared per-agent: `acceptEdits` for executors, `plan` for reviewers/architects/auditors. All 7 agents updated.
-- **`memory: local`** is now allowed for agents that persist learned heuristics. `memory: project` remains forbidden.
-- **`skills:` frontmatter** stripped from non-agent SKILL.md files (5 workflow skills cleaned).
-
-### Skills
-
-- **`sk-pipeline-paths`** — added `disable-model-invocation: true` and `user-invocable: false` for proper suppression.
-- **`sk-pipeline-state`** — complete rewrite for scope-aware multi-pipeline state management.
-- **`severity-classification.md`** — `permissionMode` removed from SEV-0 list; `memory: local` on executors now valid; `bypassPermissions` without justification added as SEV-0.
-- **`ai-pipelines-trimmed.md`** — `PERMISSION_MODE: PER_AGENT` replaces `NULL`; state management references v2 paths.
-- **`anti-patterns.md`** — concurrent state race fix updated for multi-pipeline isolation.
-- **`brainstorming`** — stripped ghost `writing-plans` references; terminal state is now user spec approval. Visual companion server and scripts removed.
-- **`systematic-debugging`** — stripped `superpowers:` namespace prefix from skill cross-references.
-- **`finishing-a-development-branch`** — caller references updated to point to `running-a-pipeline`.
-
-### Documentation cleanup
-
-- **Removed:** `docs/AI_PIPELINES_LLM.md`, `docs/ai-pipelines-improvement-plan.md`, `docs/superpowers-vs-ai-pipelines.md`, `docs/claude-plugins-complete-guide.md`, `docs/testing.md`, `docs/windows/`, `docs/plans/`, `docs/superpowers/`, `docs/examples/`.
-- **Removed:** `RELEASE-NOTES.md` (58KB of Superpowers-era history), `CHAT_LOG_04-05-2026.md`.
-- **Removed:** `tests/` directory (5 Superpowers-era test suites).
-- **Updated:** `README.md` — full rewrite for v2 architecture.
-- **Updated:** `.claudeignore` — `tmp/pipeline-*` replaced with `.claude/superpipelines/temp/`.
-- **Synced:** `package.json` version to `1.0.2`.
-
-## 1.0.0 — Initial release
-
-Superpipelines is a fresh plugin built from the ground up to design and run multi-agent AI pipelines.
+## 1.0.0 — Initial Release (2026-05-05)
 
 ### Added
+- **Forked Release**: Officially forked from [superpipelines v1.0.4](https://github.com/gustavo-meilus/superpipelines), which was originally designed for Claude Code.
+- **Native OpenCode TS Plugin**: Implemented a native TypeScript architecture (`src/index.ts`) utilizing the `@opencode-ai/plugin` SDK, replacing legacy bash hooks and static manifests.
+- **Dynamic Context Injection**: Utilizes `experimental.chat.messages.transform` to safely inject the `using-superpipelines` skill context into the first user message, eliminating redundant token bloat.
+- **Zero-Copy Config Registration**: Hooks into the OpenCode `config` lifecycle to dynamically register the bundled `skills/` and `agents/` directories without requiring the user to manually copy them into their workspace.
+- **TUI Command Interception**: Native TUI interception for `/superpipelines:*` slash commands, seamlessly redirecting the user to natural language orchestration within OpenCode.
+- **OpenCode Model Compatibility**: Fully migrated agent models to OpenCode ecosystem standards (e.g., `anthropic/claude-3-5-sonnet-20241022`).
 
-- Plugin manifest (`superpipelines` namespace) and marketplace entry.
-- Bootstrap skill `using-superpipelines` loaded via SessionStart hook on Claude Code.
-- Shared method skills (preloaded by orchestrator agents): `sk-4d-method`, `sk-spec-driven-development`, `sk-claude-code-conventions`, `sk-pipeline-patterns`, `sk-pipeline-state`, `sk-worktree-safety`, `sk-write-review-isolation`, `sk-rationalization-resistance`.
-- User-invocable workflow skills: `creating-a-pipeline`, `running-a-pipeline`.
-- Subagents: `pipeline-architect`, `pipeline-auditor`, `skill-architect`, `pipeline-task-executor`, `pipeline-spec-reviewer`, `pipeline-quality-reviewer`, `pipeline-failure-analyzer`.
-- Companion reference libraries (no `SKILL.md`, read on demand): `pipeline-architect-references/`, `pipeline-auditor-references/`, `skill-architect-references/`, `pipeline-runner-references/`.
-- Slash commands: `/superpipelines:new-pipeline`, `/superpipelines:run-pipeline`, `/superpipelines:audit-pipeline`.
-- Settings: `autoMemoryEnabled: false`, `Bash(*)` permission, `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1` env.
-- Curated retained skills: `brainstorming`, `finishing-a-development-branch`, `test-driven-development`, `systematic-debugging`, `verification-before-completion`.
+### Changed
+- Refactored `CLAUDE.md` to `OPENCODE.md` and comprehensively purged all Claude Code specific nomenclature.
+- Migrated legacy `isolation: worktree` agent parameters to prompt-enforced isolation via the `sk-worktree-safety` skill.
+- Replaced the `.claudeignore` with `.opencodeignore`.
 
 ### Removed
-
-Legacy Superpowers skills and components superseded by pipeline-specific equivalents.
+- Removed the `hooks/` directory and `.claude-plugin/` legacy infrastructure.
+- Removed legacy `plugin.json` and `marketplace.json` manifests in favor of `package.json` driven OpenCode configuration.
 
 
 # File: skills\adding-a-pipeline-step\SKILL.md
@@ -527,7 +396,7 @@ Brainstorming acts as the mandatory pre-flight phase for creative and design wor
 ## Reference Files
 - `creating-a-pipeline/SKILL.md` — Implementation workflow.
 - `sk-4d-method/SKILL.md` — Brief deconstruction.
-- `sk-claude-code-conventions/SKILL.md` — Design patterns.
+- `sk-opencode-conventions/SKILL.md` — Design patterns.
 - `visual-companion.md` — Detailed browser usage guide.
 
 
@@ -970,7 +839,7 @@ Catalog of common failure modes when designing pipelines and agents. Each entry:
 
 ## 7. Leaky Context
 
-**Symptoms:** Agent body references `CLAUDE.md`, parent system prompt, "as discussed earlier."
+**Symptoms:** Agent body references `OPENCODE.md`, parent system prompt, "as discussed earlier."
 
 **Fix:** Body is self-contained. Receives all context via inputs. Never references parent state.
 
@@ -1000,7 +869,7 @@ Catalog of common failure modes when designing pipelines and agents. Each entry:
 
 ## 12. Memory Leak
 
-**Symptoms:** Agent uses `memory: project` to persist state across runs. State scattered across `.claude/memory/*` files.
+**Symptoms:** Agent uses `memory: project` to persist state across runs. State scattered across `.opencode/memory/*` files.
 
 **Fix:** All pipeline state lives in `<scope-root>/superpipelines/temp/{P}/{runId}/pipeline-state.json` per `STATE_MANAGEMENT: STRUCTURED_JSON`. `memory: local` is allowed for learned heuristics. Memory tool must never be used for deterministic pipeline state.
 
@@ -1026,7 +895,7 @@ Catalog of common failure modes when designing pipelines and agents. Each entry:
 
 **Symptoms:** Agent uses `../../` paths to reference files outside its plugin/worktree.
 
-**Fix:** All paths relative and start with `./`. Use symlinks if cross-tree references are required. `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths.
+**Fix:** All paths relative and start with `./`. Use symlinks if cross-tree references are required. `${OPENCODE_PLUGIN_ROOT}` for plugin-relative paths.
 
 ## 17. Unqualified MCP Tool Names
 
@@ -1042,9 +911,9 @@ Catalog of common failure modes when designing pipelines and agents. Each entry:
 
 ## 19. Hardcoded Plugin Paths
 
-**Symptoms:** Agent body references `~/.claude/agents/...` or absolute paths.
+**Symptoms:** Agent body references `~/.opencode/agents/...` or absolute paths.
 
-**Fix:** `${CLAUDE_PLUGIN_ROOT}` for plugin-relative; `${CLAUDE_PLUGIN_DATA}` for persistent state; never `~/.claude/...`.
+**Fix:** `${OPENCODE_PLUGIN_ROOT}` for plugin-relative; `${OPENCODE_PLUGIN_DATA}` for persistent state; never `~/.opencode/...`.
 
 
 # File: skills\pipeline-architect-references\references\sdd-artifacts.md
@@ -1396,7 +1265,7 @@ Each criterion: PASS / FAIL / PARTIAL / N/A with cited file:line evidence.
 | # | Criterion | PASS condition |
 |---|-----------|----------------|
 | 17 | Temp path convention | State and outputs stored at `{ROOT}/superpipelines/temp/{P}/{runId}/` — no `tmp/` or hardcoded absolute paths |
-| 18 | No hardcoded absolute paths in agent bodies | Agent bodies reference paths via a scope-root variable (`${SCOPE_ROOT}` or equivalent), never literal `/home/...` or `~/.claude/...` |
+| 18 | No hardcoded absolute paths in agent bodies | Agent bodies reference paths via a scope-root variable (`${SCOPE_ROOT}` or equivalent), never literal `/home/...` or `~/.opencode/...` |
 | 19 | Write/review isolation honored | Review-role agents (`*-spec-reviewer`, `*-quality-reviewer`) have `disallowedTools: Write, Edit, Bash` (or equivalent) in frontmatter |
 | 20 | Cleanup contract present in entry skill | Entry skill body explicitly: (a) writes `status: completed` to `pipeline-state.json` on success, (b) deletes `temp/{P}/{runId}/` on DONE, (c) preserves temp on ESCALATED/FAILED/BLOCKED |
 
@@ -1535,7 +1404,7 @@ Loop bounded by `MAX_ITERATIONS: 3`. After 3 failures without measurable progres
 
 **Before:**
 ```markdown
-Read ~/.claude/agents/code-reviewer.md
+Read ~/.opencode/agents/code-reviewer.md
 ```
 
 **After:**
@@ -1614,7 +1483,7 @@ Findings classified into four severity tiers.
 - Missing concrete code example.
 - Unix path inconsistency (Windows backslashes used in body).
 - Inconsistent pronouns across sections.
-- Stale model IDs cited in examples (e.g., `claude-3-5-sonnet`).
+- Stale model IDs cited in examples (e.g., `opencode-3-5-sonnet`).
 
 ---
 
@@ -1764,7 +1633,7 @@ How `running-a-pipeline` dispatches workers and reviewers per pattern. Maps the 
 
 ## Table of contents
 
-1. Common dispatch shape (Claude Code)
+1. Common dispatch shape (OpenCode)
 2. Pattern 1 — Sequential
 3. Pattern 2 / 2b — Parallel Fan-Out
 4. Pattern 3 — Iterative Loop
@@ -1774,7 +1643,7 @@ How `running-a-pipeline` dispatches workers and reviewers per pattern. Maps the 
 
 ---
 
-## Common dispatch shape (Claude Code)
+## Common dispatch shape (OpenCode)
 
 ```
 Task(
@@ -2136,7 +2005,7 @@ Each pipeline name `{P}` has its own directory under `superpipelines/temp/`. Mul
 echo "Active pipeline detected: $EXISTING_ID started $STARTED_AT"
 echo "Cannot start new run of '${PIPELINE_NAME}'. Options:"
 echo "  - Wait for active pipeline to finish"
-echo "  - Resume the active run (claude /superpipelines:run-pipeline --resume)"
+echo "  - Resume the active run (opencode /superpipelines:run-pipeline --resume)"
 echo "  - Abort the active run (rm -rf ${TEMP_DIR})"
 exit 1
 ```
@@ -2334,24 +2203,193 @@ The 4D Method (Deconstruct, Diagnose, Develop, Deliver) ensures that every agent
 
 - `sk-pipeline-patterns/SKILL.md` — Pattern 6 definition.
 - `sk-spec-driven-development/SKILL.md` — SDD handoff rules.
-- `sk-claude-code-conventions/SKILL.md` — Scaling and model selection.
+- `sk-opencode-conventions/SKILL.md` — Scaling and model selection.
 
 
-# File: skills\sk-claude-code-conventions\SKILL.md
+# File: skills\sk-dynamic-routing\SKILL.md
 ----------------------------------------
 ---
-name: sk-claude-code-conventions
-description: Use when authoring or modifying agents, skills, hooks, or pipeline orchestration — covers Claude 4.6 model selection, adaptive thinking, prompt-cache discipline, frontmatter schemas, and progressive disclosure rules. Reference-only; preload via agent skills frontmatter.
+name: sk-dynamic-routing
+description: Use when determining the appropriate LLM for a specific pipeline stage. Defines category constraints for dynamic model routing, allowing specific utility and planning agents to diverge from the Sonnet default.
 disable-model-invocation: true
 user-invocable: false
 ---
 
-# Claude Code Conventions — 2026 Reference
+# Dynamic Model Routing — Intent-Based Capability Mapping
 
-> Canonical engineering standards for authoring agents, skills, hooks, and pipeline orchestration. Optimizes for Claude 4.6+ model selection, adaptive thinking, prompt-cache discipline, and progressive disclosure.
+> Provides the ruleset for dynamically assigning Large Language Models based on the task intent category. Trigger when architecting new pipelines or configuring subagents to ensure cost-efficiency and optimal reasoning paths.
 
 <overview>
-The Claude Code Conventions define the structural and behavioral invariants required for high-performance agentic systems. They prioritize cache stability, context efficiency, and deterministic routing to ensure that complex multi-agent pipelines remain reliable and scalable.
+While Superpipelines maintains `anthropic/claude-3-5-sonnet-20241022-4-6` as the baseline default for all implementation workers, certain specialized roles (e.g., fast audits, deep architectural planning, vision analysis) benefit from dynamic routing. This skill defines the permitted categories and fallback chains for those overrides.
+</overview>
+
+<glossary>
+  <term name="Category">An intent-based tag that dictates the model requirement (e.g., `quick-audit`, `deep-plan`).</term>
+  <term name="Fallback Chain">The sequence of alternative models if the primary is unavailable or rate-limited.</term>
+</glossary>
+
+## Category Mappings
+
+<categories_table>
+| Category | Primary Model | Fallback Chain | Use Case |
+| :--- | :--- | :--- | :--- |
+| **`default`** | `anthropic/claude-3-5-sonnet-20241022-4-6` | *None* | Implementation, general tasks, and task-execution. |
+| **`deep-plan`** | `anthropic/claude-3-opus-20240229-4-7` | `gpt-5.4` -> `sonnet-4-6` | High-stakes architectural planning (e.g., `pipeline-architect`). |
+| **`quick-audit`** | `anthropic/claude-3-5-haiku-20241022-4-5-20251001` | *None* | Fast, broad pattern matching and codebase grepping. |
+| **`visual`** | `gemini-3.1-pro` | `gpt-5.4` | Tasks requiring image processing, UI screenshots, or diagram analysis. |
+</categories_table>
+
+## Routing Protocol
+
+<protocol>
+### 1. EVALUATE INTENT
+- Determine the nature of the specific task or agent role.
+- If it is standard code implementation or a functional review, the category MUST be `default`.
+
+### 2. ASSIGN CATEGORY
+- If the role is exclusively planning, architecture, or deep conceptual alignment, assign `deep-plan`.
+- If the role is pure read-only utility (fast file searching, lint aggregation), assign `quick-audit`.
+- If the role requires interpreting screenshots, assign `visual`.
+
+### 3. CONFIGURATION OVERRIDE
+- When generating an agent or scaffold, set the `model:` field in the frontmatter according to the primary model of the selected category.
+- Add a comment or meta-tag noting the category intent for future auditing.
+</protocol>
+
+<invariants>
+- NEVER override `pipeline-task-executor` or `pipeline-spec-reviewer`; they MUST remain on `anthropic/claude-3-5-sonnet-20241022-4-6` (`default`).
+- NEVER route to a model not explicitly defined in the category mapping table.
+- Maintain `MODEL_SELECTION: DYNAMIC_DEFAULT_SONNET` adherence.
+</invariants>
+
+
+# File: skills\sk-hashline-protocol\SKILL.md
+----------------------------------------
+---
+name: sk-hashline-protocol
+description: Use whenever performing file mutations to prevent stale-line edits. Mandates appending content hashes to read lines and verifying those hashes before committing an edit operation to a worktree.
+disable-model-invocation: true
+user-invocable: false
+---
+
+# Hashline Protocol — Anchored Edit Verification
+
+> Enforces a hash-anchored modification protocol to prevent source code corruption. Invoked during the `DEVELOP` and `IMPLEMENT` phases to ensure code edits target verifiable content hashes rather than fragile, static line numbers.
+
+<overview>
+The Hashline Protocol ensures atomic mutation safety. By tagging every line read with a 16-character content identifier hash, the system guarantees that edits only occur if the underlying file state matches the expected state, eliminating stale-line and whitespace-drift errors.
+</overview>
+
+<glossary>
+  <term name="Content Identifier Hash">A 16-character string appended to a line representing its exact content state.</term>
+  <term name="Hashline Edit">A mutation operation referencing the hash rather than line number.</term>
+</glossary>
+
+## Protocol Execution
+
+<protocol>
+### 1. READ WITH HASHES
+- When reading target files, request the content to be annotated with line hashes.
+- Format expectation: `<line_number>#<HASH>| <content>`
+
+### 2. PREPARE THE EDIT
+- Identify the exact block of code to be modified.
+- Include the explicit `<HASH>` identifiers in your edit payload alongside the target content.
+
+### 3. VERIFICATION (PRE-WRITE)
+- The harness calculates the current hash of the target lines before writing.
+- If the current hash does NOT match the requested hash, the write operation is **REJECTED**.
+- In case of rejection, the agent must re-read the file to acquire fresh hashes and re-attempt the edit.
+
+### 4. COMMIT
+- If the hashes match, the mutation is committed to the isolated worktree for subsequent Stage 1 functional review.
+</protocol>
+
+<invariants>
+- NEVER target a file edit using static line numbers; always anchor to the Content Identifier Hash.
+- ALWAYS re-read the file upon a hash mismatch; never guess or synthesize the current state.
+- Ensure the edit is fully localized to the targeted hashes to prevent over-build or collateral mutations.
+</invariants>
+
+## Reference Files
+
+- `${OPENCODE_PLUGIN_ROOT}/skills/sk-worktree-safety/SKILL.md` — Isolated worktree principles.
+
+
+# File: skills\sk-hierarchical-context\SKILL.md
+----------------------------------------
+---
+name: sk-hierarchical-context
+description: Use when initiating or updating localized PIPELINE-CONTEXT.md files across a repository. Crawls the project to generate token-efficient context maps summarizing directory contents and architectural boundaries.
+disable-model-invocation: true
+user-invocable: false
+---
+
+# Hierarchical Context Maps — Distributed Architecture Context
+
+> Generates and maintains localized `PIPELINE-CONTEXT.md` files throughout the project tree. Trigger during the `/superpipelines:init-deep` command or during the PREFLIGHT phase of new pipeline creation to ensure agents have lean, relevant context without bloated global prompts.
+
+<overview>
+The Hierarchical Context system distributes architectural knowledge across the repository instead of centralizing it in a single massive file. By placing a `PIPELINE-CONTEXT.md` in relevant subdirectories, agents operating within that directory automatically acquire the necessary context for their specific scope, conserving tokens and improving reasoning focus.
+</overview>
+
+<glossary>
+  <term name="Context Map">A localized markdown file (`PIPELINE-CONTEXT.md`) describing the purpose and boundaries of its resident directory.</term>
+  <term name="Deep Initialization">The recursive process of generating context maps for all significant project directories.</term>
+</glossary>
+
+## Protocol Execution
+
+<protocol>
+### 1. DIRECTORY TRAVERSAL
+- Identify all significant architectural boundaries (e.g., `src/`, `components/`, `api/`, `utils/`).
+- Skip ignored directories (e.g., `node_modules/`, `.git/`, `dist/`).
+
+### 2. CONTEXT GENERATION
+For each significant directory, create a `PIPELINE-CONTEXT.md` adhering to strict LLM-readability standards (Scribius format):
+- **H1-First & Summary:** Begin with an H1 header (`# Directory Name`) followed immediately by a blockquote summary (`> `).
+- **Cache-Stable Ordering:** Place static context (purpose, constraints) before any volatile elements.
+- **XML-Anchored Content:** Wrap structured information in semantic XML envelopes:
+  - `<directory_purpose>`: A concise summary of what the directory does.
+  - `<architectural_constraints>`: Specific rules (e.g., "no database access in components").
+  - `<key_exports>`: Bulleted list of primary modules and their responsibilities.
+  - `<pipeline_relationship>`: How this directory interacts with the broader system.
+- **Voice & Tone:** Enforce third-person impersonal voice, positive scoping, and unambiguous noun anchors (never use "this" or "it" without a noun). Omit all preambles.
+
+### 3. ROOT CONTEXT INJECTION
+- Generate a root-level `PIPELINE-CONTEXT.md` that serves as the entry point, detailing the overall system architecture and linking to subdirectory context maps.
+
+### 4. MAINTENANCE
+- When files are significantly refactored during pipeline execution, flag the relevant `PIPELINE-CONTEXT.md` for a required update.
+</protocol>
+
+<invariants>
+- NEVER generate a single monolithic context file; always distribute context hierarchically.
+- ALWAYS respect `.gitignore` when traversing the repository.
+- Ensure context maps are concise and free of redundant code snippets (use summaries).
+- ALWAYS format `PIPELINE-CONTEXT.md` files according to Scribius standards (XML envelopes, H1-first, impersonal voice).
+</invariants>
+
+## Reference Files
+
+- `${OPENCODE_PLUGIN_ROOT}/skills/sk-pipeline-paths/SKILL.md` — Path resolution guidelines.
+
+
+# File: skills\sk-opencode-code-conventions\SKILL.md
+----------------------------------------
+---
+name: sk-opencode-conventions
+description: Use when authoring or modifying agents, skills, hooks, or pipeline orchestration — covers opencode 4.6 model selection, adaptive thinking, prompt-cache discipline, frontmatter schemas, and progressive disclosure rules. Reference-only; preload via agent skills frontmatter.
+disable-model-invocation: true
+user-invocable: false
+---
+
+# OpenCode Conventions — 2026 Reference
+
+> Canonical engineering standards for authoring agents, skills, hooks, and pipeline orchestration. Optimizes for opencode 4.6+ model selection, adaptive thinking, prompt-cache discipline, and progressive disclosure.
+
+<overview>
+The OpenCode Conventions define the structural and behavioral invariants required for high-performance agentic systems. They prioritize cache stability, context efficiency, and deterministic routing to ensure that complex multi-agent pipelines remain reliable and scalable.
 </overview>
 
 <glossary>
@@ -2365,9 +2403,9 @@ The Claude Code Conventions define the structural and behavioral invariants requ
 <model_tier_table>
 | Tier | Model ID | Application |
 | :--- | :--- | :--- |
-| **Workhorse** | `claude-sonnet-4-6` | Default for pipelines, agents, and skills. |
-| **Deep Reasoning** | `claude-opus-4-7` | High-complexity architecture or auditing tasks. |
-| **Triage/Batch** | `claude-haiku-4-5` | High-volume, low-latency classification. |
+| **Workhorse** | `anthropic/claude-3-5-sonnet-20241022-4-6` | Default for pipelines, agents, and skills. |
+| **Deep Reasoning** | `anthropic/claude-3-opus-20240229-4-7` | High-complexity architecture or auditing tasks. |
+| **Triage/Batch** | `anthropic/claude-3-5-haiku-20241022-4-5` | High-volume, low-latency classification. |
 </model_tier_table>
 
 <invariant>
@@ -2428,7 +2466,7 @@ skills: [sk-4d-method, sk-spec-driven-development]
 
 <invariants>
 - NEVER use `memory: project` in agent frontmatter.
-- Resolve all relative paths via `${CLAUDE_PLUGIN_ROOT}` or `${CLAUDE_PLUGIN_DATA}`.
+- Resolve all relative paths via `${OPENCODE_PLUGIN_ROOT}` or `${OPENCODE_PLUGIN_DATA}`.
 - All pipeline state must be persisted to the canonical `pipeline-state.json` location.
 </invariants>
 
@@ -2438,175 +2476,6 @@ skills: [sk-4d-method, sk-spec-driven-development]
 - `sk-pipeline-paths/SKILL.md` — Scope-aware path resolution.
 - `sk-4d-method/SKILL.md` — Per-invocation wrapper.
 - `sk-spec-driven-development/SKILL.md` — SDD protocol.
-
-
-# File: skills\sk-dynamic-routing\SKILL.md
-----------------------------------------
----
-name: sk-dynamic-routing
-description: Use when determining the appropriate LLM for a specific pipeline stage. Defines category constraints for dynamic model routing, allowing specific utility and planning agents to diverge from the Sonnet default.
-disable-model-invocation: true
-user-invocable: false
----
-
-# Dynamic Model Routing — Intent-Based Capability Mapping
-
-> Provides the ruleset for dynamically assigning Large Language Models based on the task intent category. Trigger when architecting new pipelines or configuring subagents to ensure cost-efficiency and optimal reasoning paths.
-
-<overview>
-While Superpipelines maintains `claude-sonnet-4-6` as the baseline default for all implementation workers, certain specialized roles (e.g., fast audits, deep architectural planning, vision analysis) benefit from dynamic routing. This skill defines the permitted categories and fallback chains for those overrides.
-</overview>
-
-<glossary>
-  <term name="Category">An intent-based tag that dictates the model requirement (e.g., `quick-audit`, `deep-plan`).</term>
-  <term name="Fallback Chain">The sequence of alternative models if the primary is unavailable or rate-limited.</term>
-</glossary>
-
-## Category Mappings
-
-<categories_table>
-| Category | Primary Model | Fallback Chain | Use Case |
-| :--- | :--- | :--- | :--- |
-| **`default`** | `claude-sonnet-4-6` | *None* | Implementation, general tasks, and task-execution. |
-| **`deep-plan`** | `claude-opus-4-7` | `gpt-5.4` -> `sonnet-4-6` | High-stakes architectural planning (e.g., `pipeline-architect`). |
-| **`quick-audit`** | `claude-haiku-4-5-20251001` | *None* | Fast, broad pattern matching and codebase grepping. |
-| **`visual`** | `gemini-3.1-pro` | `gpt-5.4` | Tasks requiring image processing, UI screenshots, or diagram analysis. |
-</categories_table>
-
-## Routing Protocol
-
-<protocol>
-### 1. EVALUATE INTENT
-- Determine the nature of the specific task or agent role.
-- If it is standard code implementation or a functional review, the category MUST be `default`.
-
-### 2. ASSIGN CATEGORY
-- If the role is exclusively planning, architecture, or deep conceptual alignment, assign `deep-plan`.
-- If the role is pure read-only utility (fast file searching, lint aggregation), assign `quick-audit`.
-- If the role requires interpreting screenshots, assign `visual`.
-
-### 3. CONFIGURATION OVERRIDE
-- When generating an agent or scaffold, set the `model:` field in the frontmatter according to the primary model of the selected category.
-- Add a comment or meta-tag noting the category intent for future auditing.
-</protocol>
-
-<invariants>
-- NEVER override `pipeline-task-executor` or `pipeline-spec-reviewer`; they MUST remain on `claude-sonnet-4-6` (`default`).
-- NEVER route to a model not explicitly defined in the category mapping table.
-- Maintain `MODEL_SELECTION: DYNAMIC_DEFAULT_SONNET` adherence.
-</invariants>
-
-
-# File: skills\sk-hashline-protocol\SKILL.md
-----------------------------------------
----
-name: sk-hashline-protocol
-description: Use whenever performing file mutations to prevent stale-line edits. Mandates appending content hashes to read lines and verifying those hashes before committing an edit operation to a worktree.
-disable-model-invocation: true
-user-invocable: false
----
-
-# Hashline Protocol — Anchored Edit Verification
-
-> Enforces a hash-anchored modification protocol to prevent source code corruption. Invoked during the `DEVELOP` and `IMPLEMENT` phases to ensure code edits target verifiable content hashes rather than fragile, static line numbers.
-
-<overview>
-The Hashline Protocol ensures atomic mutation safety. By tagging every line read with a 16-character content identifier hash, the system guarantees that edits only occur if the underlying file state matches the expected state, eliminating stale-line and whitespace-drift errors.
-</overview>
-
-<glossary>
-  <term name="Content Identifier Hash">A 16-character string appended to a line representing its exact content state.</term>
-  <term name="Hashline Edit">A mutation operation referencing the hash rather than line number.</term>
-</glossary>
-
-## Protocol Execution
-
-<protocol>
-### 1. READ WITH HASHES
-- When reading target files, request the content to be annotated with line hashes.
-- Format expectation: `<line_number>#<HASH>| <content>`
-
-### 2. PREPARE THE EDIT
-- Identify the exact block of code to be modified.
-- Include the explicit `<HASH>` identifiers in your edit payload alongside the target content.
-
-### 3. VERIFICATION (PRE-WRITE)
-- The harness calculates the current hash of the target lines before writing.
-- If the current hash does NOT match the requested hash, the write operation is **REJECTED**.
-- In case of rejection, the agent must re-read the file to acquire fresh hashes and re-attempt the edit.
-
-### 4. COMMIT
-- If the hashes match, the mutation is committed to the isolated worktree for subsequent Stage 1 functional review.
-</protocol>
-
-<invariants>
-- NEVER target a file edit using static line numbers; always anchor to the Content Identifier Hash.
-- ALWAYS re-read the file upon a hash mismatch; never guess or synthesize the current state.
-- Ensure the edit is fully localized to the targeted hashes to prevent over-build or collateral mutations.
-</invariants>
-
-## Reference Files
-
-- `${CLAUDE_PLUGIN_ROOT}/skills/sk-worktree-safety/SKILL.md` — Isolated worktree principles.
-
-
-# File: skills\sk-hierarchical-context\SKILL.md
-----------------------------------------
----
-name: sk-hierarchical-context
-description: Use when initiating or updating localized PIPELINE-CONTEXT.md files across a repository. Crawls the project to generate token-efficient context maps summarizing directory contents and architectural boundaries.
-disable-model-invocation: true
-user-invocable: false
----
-
-# Hierarchical Context Maps — Distributed Architecture Context
-
-> Generates and maintains localized `PIPELINE-CONTEXT.md` files throughout the project tree. Trigger during the `/superpipelines:init-deep` command or during the PREFLIGHT phase of new pipeline creation to ensure agents have lean, relevant context without bloated global prompts.
-
-<overview>
-The Hierarchical Context system distributes architectural knowledge across the repository instead of centralizing it in a single massive file. By placing a `PIPELINE-CONTEXT.md` in relevant subdirectories, agents operating within that directory automatically acquire the necessary context for their specific scope, conserving tokens and improving reasoning focus.
-</overview>
-
-<glossary>
-  <term name="Context Map">A localized markdown file (`PIPELINE-CONTEXT.md`) describing the purpose and boundaries of its resident directory.</term>
-  <term name="Deep Initialization">The recursive process of generating context maps for all significant project directories.</term>
-</glossary>
-
-## Protocol Execution
-
-<protocol>
-### 1. DIRECTORY TRAVERSAL
-- Identify all significant architectural boundaries (e.g., `src/`, `components/`, `api/`, `utils/`).
-- Skip ignored directories (e.g., `node_modules/`, `.git/`, `dist/`).
-
-### 2. CONTEXT GENERATION
-For each significant directory, create a `PIPELINE-CONTEXT.md` adhering to strict LLM-readability standards (Scribius format):
-- **H1-First & Summary:** Begin with an H1 header (`# Directory Name`) followed immediately by a blockquote summary (`> `).
-- **Cache-Stable Ordering:** Place static context (purpose, constraints) before any volatile elements.
-- **XML-Anchored Content:** Wrap structured information in semantic XML envelopes:
-  - `<directory_purpose>`: A concise summary of what the directory does.
-  - `<architectural_constraints>`: Specific rules (e.g., "no database access in components").
-  - `<key_exports>`: Bulleted list of primary modules and their responsibilities.
-  - `<pipeline_relationship>`: How this directory interacts with the broader system.
-- **Voice & Tone:** Enforce third-person impersonal voice, positive scoping, and unambiguous noun anchors (never use "this" or "it" without a noun). Omit all preambles.
-
-### 3. ROOT CONTEXT INJECTION
-- Generate a root-level `PIPELINE-CONTEXT.md` that serves as the entry point, detailing the overall system architecture and linking to subdirectory context maps.
-
-### 4. MAINTENANCE
-- When files are significantly refactored during pipeline execution, flag the relevant `PIPELINE-CONTEXT.md` for a required update.
-</protocol>
-
-<invariants>
-- NEVER generate a single monolithic context file; always distribute context hierarchically.
-- ALWAYS respect `.gitignore` when traversing the repository.
-- Ensure context maps are concise and free of redundant code snippets (use summaries).
-- ALWAYS format `PIPELINE-CONTEXT.md` files according to Scribius standards (XML envelopes, H1-first, impersonal voice).
-</invariants>
-
-## Reference Files
-
-- `${CLAUDE_PLUGIN_ROOT}/skills/sk-pipeline-paths/SKILL.md` — Path resolution guidelines.
 
 
 # File: skills\sk-pipeline-paths\SKILL.md
@@ -2627,7 +2496,7 @@ The Path Resolver enforces a canonical layout for the Superpipelines v2 architec
 </overview>
 
 <glossary>
-  <term name="Scope Root">The base directory (`.claude/` or `~/.claude/`) where artifacts are persisted.</term>
+  <term name="Scope Root">The base directory (`.opencode/` or `~/.opencode/`) where artifacts are persisted.</term>
   <term name="Pipeline Registry">A central `registry.json` file tracking all pipelines within a specific scope.</term>
   <term name="Staging Directory">A temporary `temp/{P}/edit-{ts}/` directory used for atomic mutations.</term>
 </glossary>
@@ -2637,13 +2506,13 @@ The Path Resolver enforces a canonical layout for the Superpipelines v2 architec
 <scope_roots_table>
 | Scope | Physical Root | Git Status | Persistence |
 | :--- | :--- | :--- | :--- |
-| **Project** | `<workspace>/.claude/` | Committed | Shared with the team. |
-| **Local** | `<workspace>/.claude/` | Ignored | Machine-specific/temporary. |
-| **User** | `~/.claude/` | External | Global across all workspaces. |
+| **Project** | `<workspace>/.opencode/` | Committed | Shared with the team. |
+| **Local** | `<workspace>/.opencode/` | Ignored | Machine-specific/temporary. |
+| **User** | `~/.opencode/` | External | Global across all workspaces. |
 </scope_roots_table>
 
 <invariant>
-`project` and `local` scopes share the same physical directory; the distinction is managed via `.gitignore` entries for `.claude/`.
+`project` and `local` scopes share the same physical directory; the distinction is managed via `.gitignore` entries for `.opencode/`.
 </invariant>
 
 ## Path Templates
@@ -2679,7 +2548,7 @@ The Path Resolver enforces a canonical layout for the Superpipelines v2 architec
 ## Reference Files
 
 - `sk-pipeline-state/SKILL.md` — State persistence schema.
-- `sk-claude-code-conventions/SKILL.md` — Frontmatter and directory rules.
+- `sk-opencode-code-conventions/SKILL.md` — Frontmatter and directory rules.
 
 
 # File: skills\sk-pipeline-patterns\SKILL.md
@@ -2780,7 +2649,7 @@ Is the task multi-step with dependencies?
 ----------------------------------------
 # AI Pipelines — Trimmed Runtime Reference
 
-> Canonical runtime reference for pipeline conventions. Cross-refs to `sk-claude-code-conventions` and `sk-*` skills carry the depth that this file omits.
+> Canonical runtime reference for pipeline conventions. Cross-refs to `sk-opencode-conventions` and `sk-*` skills carry the depth that this file omits.
 
 ## Table of contents
 
@@ -2951,13 +2820,13 @@ See `sk-rationalization-resistance` for tag conventions and authoring rules.
 - `MODEL_SELECTION: SONNET_ONLY` — every pipeline agent is `model: sonnet`. Scale via `effort: low | medium | high | xhigh | max`.
 - `PERMISSION_MODE: PER_AGENT` — each pipeline agent may declare `permissionMode: default | acceptEdits | plan | bypassPermissions`. Never use `bypassPermissions` without explicit user justification documented in the agent body.
 - `STATE_MANAGEMENT: STRUCTURED_JSON` — `<scope-root>/superpipelines/temp/{P}/{runId}/pipeline-state.json` only. No `memory: project`. `memory: local` is allowed for agents that persist learned heuristics.
-- `AUTO_MEMORY: DISABLED` — `autoMemoryEnabled: false` in settings; `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1` env var. Reclaims 658+ tokens.
+- `AUTO_MEMORY: DISABLED` — `autoMemoryEnabled: false` in settings; `OPENCODE_DISABLE_AUTO_MEMORY=1` env var. Reclaims 658+ tokens.
 - `BOUND_STDOUT: TRUE` — pipe long outputs through `tail -80` etc. before passing back.
 - `SCOPE_FILE_READS: TRUE` — Read specific line ranges over full files when possible.
 - `PASS_PATHS_NOT_CONTENT: TRUE` for large files. Exception: task text is content (extract once at orchestrator, pass extracted text to each worker — never tell the worker "find your task in tasks.md").
 - `MCP tool naming: ServerName:tool_name` — always fully qualified.
-- Path variables: `${CLAUDE_PLUGIN_ROOT}` (plugin dir, wipes on update), `${CLAUDE_PLUGIN_DATA}` (persists across updates), `${user_config.KEY}` (user config).
-- Description discipline: triggering conditions only, NEVER workflow summary. See `sk-claude-code-conventions`.
+- Path variables: `${OPENCODE_PLUGIN_ROOT}` (plugin dir, wipes on update), `${OPENCODE_PLUGIN_DATA}` (persists across updates), `${user_config.KEY}` (user config).
+- Description discipline: triggering conditions only, NEVER workflow summary. See `sk-opencode-conventions`.
 
 ---
 
@@ -2970,7 +2839,7 @@ See `sk-rationalization-resistance` for tag conventions and authoring rules.
 - `sk-worktree-safety` — 4-step protocol.
 - `sk-write-review-isolation` — Stage 1/2 output schemas.
 - `sk-rationalization-resistance` — tag conventions.
-- `sk-claude-code-conventions` — frontmatter schemas, model selection, prompt-cache discipline.
+- `sk-opencode-conventions` — frontmatter schemas, model selection, prompt-cache discipline.
 
 
 # File: skills\sk-pipeline-state\SKILL.md
@@ -2999,7 +2868,7 @@ Superpipelines utilize a structured JSON state to manage the lifecycle of multi-
 ## State Location
 
 <invariant>
-State must be persisted to `<scope-root>/superpipelines/temp/{P}/{runId}/pipeline-state.json`. Never store state within `${CLAUDE_PLUGIN_ROOT}`, as it is not persistent across updates.
+State must be persisted to `<scope-root>/superpipelines/temp/{P}/{runId}/pipeline-state.json`. Never store state within `${OPENCODE_PLUGIN_ROOT}`, as it is not persistent across updates.
 </invariant>
 
 ## Schema Definition
@@ -3254,10 +3123,10 @@ user-invocable: false
 
 # Worktree Safety Protocol — Isolated Execution
 
-> Defines the mandatory 4-step protocol (Ignore, Setup, Baseline, Commit) for creating, managing, and destroying git worktrees. Trigger when utilizing `isolation: worktree` or preparing parallel branches for pipeline tasks.
+> Defines the mandatory 4-step protocol (Ignore, Setup, Baseline, Commit) for creating, managing, and destroying git worktrees. Trigger explicitly to enforce prompt-driven isolation in OpenCode when preparing parallel branches for pipeline tasks.
 
 <overview>
-Worktrees provide critical isolation for parallel pipeline tasks, but improper handling risks data loss or workspace pollution. This protocol ensures that every worktree is properly ignored, initialized with a verified baseline, and committed before destruction to preserve all generated artifacts and findings.
+Worktrees provide critical isolation for parallel pipeline tasks, but improper handling risks data loss or workspace pollution. Since OpenCode lacks native `isolation: worktree`, this protocol ensures that every worktree is manually orchestrated: properly ignored, initialized with a verified baseline, and committed before destruction to preserve all generated artifacts and findings.
 </overview>
 
 <glossary>
@@ -3503,16 +3372,97 @@ Common authoring mistakes when designing SKILL.md files. Each entry: symptoms, f
 
 ## 15. Hardcoded plugin paths
 
-**Symptoms:** Skill body references `~/.claude/...` or `/usr/local/...`.
+**Symptoms:** Skill body references `~/.opencode/...` or `/usr/local/...`.
 
-**Fix:** Use `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths. Workspace-relative paths use `./` prefix.
+**Fix:** Use `${OPENCODE_PLUGIN_ROOT}` for plugin-relative paths. Workspace-relative paths use `./` prefix.
 
 
-# File: skills\skill-architect-references\references\claude-code-skill-spec.md
+# File: skills\skill-architect-references\references\description-engineering.md
 ----------------------------------------
-# Claude Code Skill Spec — Frontmatter Reference
+# Description Engineering — Skill-Architect Reference
 
-Full frontmatter field reference for SKILL.md files. Subset of `sk-claude-code-conventions` Section 5, expanded with usage notes.
+The description field is the most important text in any skill — it determines whether the skill is ever invoked. Get it wrong and the skill becomes documentation that's never read (silent failure, no error).
+
+## The rule
+
+**Description = ONLY triggering conditions. NEVER summarize the skill's process or workflow.**
+
+Pattern: `Use when [specific triggering conditions and symptoms]`
+
+## Why this matters
+
+opencode reads the description to decide whether to load the skill body. If the description summarizes the workflow, opencode treats the description as a shortcut and skips the body. The skill becomes documentation opencode never reads.
+
+A real failure: a description saying "dispatches subagent per task with code review between tasks" caused opencode to perform ONE review instead of the two-stage review specified in the skill body. Changing the description to triggering conditions only fixed the behavior without changing any skill content.
+
+## Patterns
+
+### ❌ WRONG — Summarizes workflow
+
+```yaml
+description: Processes Excel files by reading sheets, cleaning data, and generating charts. Use when working with spreadsheets.
+```
+
+### ❌ WRONG — Process detail in description
+
+```yaml
+description: Use for commit messages — analyze diff, extract intent, write conventional commit.
+```
+
+### ✅ CORRECT — Triggering conditions only
+
+```yaml
+description: Use when working with Excel files, spreadsheets, or .xlsx data extraction.
+```
+
+### ✅ CORRECT — Problem-symptom triggers
+
+```yaml
+description: Use when tests have race conditions, timing dependencies, or fail inconsistently.
+```
+
+## Authoring checklist
+
+- [ ] Starts with "Use when" or equivalent triggering verb.
+- [ ] Third person only ("Generates...", NOT "I generate" / "You can use").
+- [ ] No verbs describing the skill's internal process ("by reading", "after analyzing").
+- [ ] Includes the symptoms / contexts the user would describe.
+- [ ] Front-loads the most discriminating trigger.
+- [ ] ≤1024 chars (truncation at 1536 if `when_to_use` extends).
+- [ ] Trigger keywords match what users naturally say.
+
+## Counter under-triggering
+
+The most common failure is descriptions that are too narrow. Enumerate non-obvious triggers:
+
+```yaml
+# Narrow — only triggers on the obvious case
+description: Use when reviewing a PR.
+
+# Wider — covers obvious + non-obvious cases
+description: Use when reviewing a PR, auditing changed files, checking diffs against acceptance criteria, or before merging a feature branch.
+```
+
+## Test the description
+
+Before shipping, simulate routing:
+
+1. Take 3 task descriptions a user might give.
+2. For each, ask: would this description trigger on that task?
+3. Take 3 unrelated tasks. Ask: would this description NOT trigger? (False positives are as bad as false negatives.)
+
+## Red Flags — STOP
+
+- "I'll add the workflow steps so the user knows what the skill does" → STOP. The description is for routing, not user docs. Workflow goes in body.
+- "The description sounds vague, let me add detail" → distinguish detail-as-triggers (good) from detail-as-process (bad).
+- "I'll write it in second person so it feels more direct" → STOP. Third person only. Inconsistent POV breaks discovery.
+
+
+# File: skills\skill-architect-references\references\opencode-skill-spec.md
+----------------------------------------
+# OpenCode Skill Spec — Frontmatter Reference
+
+Full frontmatter field reference for SKILL.md files. Subset of `sk-opencode-conventions` Section 5, expanded with usage notes.
 
 ## Table of contents
 
@@ -3619,87 +3569,6 @@ paths:
 Skill activates only when context includes a file matching the glob.
 
 When in doubt, ship the minimal set — `name`, `description`, optional `disable-model-invocation` and `user-invocable`.
-
-
-# File: skills\skill-architect-references\references\description-engineering.md
-----------------------------------------
-# Description Engineering — Skill-Architect Reference
-
-The description field is the most important text in any skill — it determines whether the skill is ever invoked. Get it wrong and the skill becomes documentation that's never read (silent failure, no error).
-
-## The rule
-
-**Description = ONLY triggering conditions. NEVER summarize the skill's process or workflow.**
-
-Pattern: `Use when [specific triggering conditions and symptoms]`
-
-## Why this matters
-
-Claude reads the description to decide whether to load the skill body. If the description summarizes the workflow, Claude treats the description as a shortcut and skips the body. The skill becomes documentation Claude never reads.
-
-A real failure: a description saying "dispatches subagent per task with code review between tasks" caused Claude to perform ONE review instead of the two-stage review specified in the skill body. Changing the description to triggering conditions only fixed the behavior without changing any skill content.
-
-## Patterns
-
-### ❌ WRONG — Summarizes workflow
-
-```yaml
-description: Processes Excel files by reading sheets, cleaning data, and generating charts. Use when working with spreadsheets.
-```
-
-### ❌ WRONG — Process detail in description
-
-```yaml
-description: Use for commit messages — analyze diff, extract intent, write conventional commit.
-```
-
-### ✅ CORRECT — Triggering conditions only
-
-```yaml
-description: Use when working with Excel files, spreadsheets, or .xlsx data extraction.
-```
-
-### ✅ CORRECT — Problem-symptom triggers
-
-```yaml
-description: Use when tests have race conditions, timing dependencies, or fail inconsistently.
-```
-
-## Authoring checklist
-
-- [ ] Starts with "Use when" or equivalent triggering verb.
-- [ ] Third person only ("Generates...", NOT "I generate" / "You can use").
-- [ ] No verbs describing the skill's internal process ("by reading", "after analyzing").
-- [ ] Includes the symptoms / contexts the user would describe.
-- [ ] Front-loads the most discriminating trigger.
-- [ ] ≤1024 chars (truncation at 1536 if `when_to_use` extends).
-- [ ] Trigger keywords match what users naturally say.
-
-## Counter under-triggering
-
-The most common failure is descriptions that are too narrow. Enumerate non-obvious triggers:
-
-```yaml
-# Narrow — only triggers on the obvious case
-description: Use when reviewing a PR.
-
-# Wider — covers obvious + non-obvious cases
-description: Use when reviewing a PR, auditing changed files, checking diffs against acceptance criteria, or before merging a feature branch.
-```
-
-## Test the description
-
-Before shipping, simulate routing:
-
-1. Take 3 task descriptions a user might give.
-2. For each, ask: would this description trigger on that task?
-3. Take 3 unrelated tasks. Ask: would this description NOT trigger? (False positives are as bad as false negatives.)
-
-## Red Flags — STOP
-
-- "I'll add the workflow steps so the user knows what the skill does" → STOP. The description is for routing, not user docs. Workflow goes in body.
-- "The description sounds vague, let me add detail" → distinguish detail-as-triggers (good) from detail-as-process (bad).
-- "I'll write it in second person so it feels more direct" → STOP. Third person only. Inconsistent POV breaks discovery.
 
 
 # File: skills\skill-architect-references\references\skill-architecture.md
@@ -3819,7 +3688,7 @@ Reference files >100 lines must include a Table of Contents at the top.
 ## Cross-references
 
 - `description-engineering.md` — how to write a description that triggers correctly.
-- `claude-code-skill-spec.md` — full frontmatter field reference.
+- `opencode-skill-spec.md` — full frontmatter field reference.
 - `anti-patterns.md` — common authoring mistakes and fixes.
 
 
@@ -4814,7 +4683,7 @@ If a pipeline skill applies to the user's request, invoke it. Do not rationalize
 | `/audit-pipeline` | `pipeline-auditor` | Security/topology review. |
 | Ambiguous / Discovery phase | `sk-4d-method` | Intent deconstruction. |
 | Implementation / Task execution | `sk-spec-driven-development` | Contracted development. |
-| Authoring Agents or Skills | `sk-claude-code-conventions` | Format enforcement. |
+| Authoring Agents or Skills | `sk-opencode-conventions` | Format enforcement. |
 </routing_table>
 
 ## Core Pipeline Invariants
@@ -4901,7 +4770,7 @@ When to invoke which superpipelines skill or agent. Source of truth for the rout
 |----------|-------|
 | Ambiguous request needs structured processing | `sk-4d-method` |
 | Multi-step feature needs spec/plan/tasks | `sk-spec-driven-development` |
-| Authoring or modifying an agent or skill | `sk-claude-code-conventions` |
+| Authoring or modifying an agent or skill | `sk-opencode-conventions` |
 | Choosing an execution pattern (Sequential, Fan-Out, Iterative, Human-Gated, SDD) | `sk-pipeline-patterns` |
 | Resolving scope-aware artifact paths | `sk-pipeline-paths` |
 | Tracking pipeline state across iterations | `sk-pipeline-state` |

@@ -101,7 +101,7 @@ Each pipeline name `{P}` has its own directory under `superpipelines/temp/`. Mul
 echo "Active pipeline detected: $EXISTING_ID started $STARTED_AT"
 echo "Cannot start new run of '${PIPELINE_NAME}'. Options:"
 echo "  - Wait for active pipeline to finish"
-echo "  - Resume the active run (claude /superpipelines:run-pipeline --resume)"
+echo "  - Resume the active run (opencode /superpipelines:run-pipeline --resume)"
 echo "  - Abort the active run (rm -rf ${TEMP_DIR})"
 exit 1
 ```

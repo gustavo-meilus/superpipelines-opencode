@@ -10,7 +10,7 @@ user-invocable: false
 > Provides the ruleset for dynamically assigning Large Language Models based on the task intent category. Trigger when architecting new pipelines or configuring subagents to ensure cost-efficiency and optimal reasoning paths.
 
 <overview>
-While Superpipelines maintains `claude-sonnet-4-6` as the baseline default for all implementation workers, certain specialized roles (e.g., fast audits, deep architectural planning, vision analysis) benefit from dynamic routing. This skill defines the permitted categories and fallback chains for those overrides.
+While Superpipelines maintains `anthropic/claude-3-5-sonnet-20241022-4-6` as the baseline default for all implementation workers, certain specialized roles (e.g., fast audits, deep architectural planning, vision analysis) benefit from dynamic routing. This skill defines the permitted categories and fallback chains for those overrides.
 </overview>
 
 <glossary>
@@ -23,9 +23,9 @@ While Superpipelines maintains `claude-sonnet-4-6` as the baseline default for a
 <categories_table>
 | Category | Primary Model | Fallback Chain | Use Case |
 | :--- | :--- | :--- | :--- |
-| **`default`** | `claude-sonnet-4-6` | *None* | Implementation, general tasks, and task-execution. |
-| **`deep-plan`** | `claude-opus-4-7` | `gpt-5.4` -> `sonnet-4-6` | High-stakes architectural planning (e.g., `pipeline-architect`). |
-| **`quick-audit`** | `claude-haiku-4-5-20251001` | *None* | Fast, broad pattern matching and codebase grepping. |
+| **`default`** | `anthropic/claude-3-5-sonnet-20241022-4-6` | *None* | Implementation, general tasks, and task-execution. |
+| **`deep-plan`** | `anthropic/claude-3-opus-20240229-4-7` | `gpt-5.4` -> `sonnet-4-6` | High-stakes architectural planning (e.g., `pipeline-architect`). |
+| **`quick-audit`** | `anthropic/claude-3-5-haiku-20241022-4-5-20251001` | *None* | Fast, broad pattern matching and codebase grepping. |
 | **`visual`** | `gemini-3.1-pro` | `gpt-5.4` | Tasks requiring image processing, UI screenshots, or diagram analysis. |
 </categories_table>
 
@@ -47,7 +47,7 @@ While Superpipelines maintains `claude-sonnet-4-6` as the baseline default for a
 </protocol>
 
 <invariants>
-- NEVER override `pipeline-task-executor` or `pipeline-spec-reviewer`; they MUST remain on `claude-sonnet-4-6` (`default`).
+- NEVER override `pipeline-task-executor` or `pipeline-spec-reviewer`; they MUST remain on `anthropic/claude-3-5-sonnet-20241022-4-6` (`default`).
 - NEVER route to a model not explicitly defined in the category mapping table.
 - Maintain `MODEL_SELECTION: DYNAMIC_DEFAULT_SONNET` adherence.
 </invariants>

@@ -1,17 +1,16 @@
 ---
 name: pipeline-spec-reviewer
 description: Use as Stage 1 review after a pipeline-task-executor produces output — checks ONLY whether the output matches the spec exactly. Under-build AND over-build both FAIL. Stage 2 (code quality) cannot begin until this passes. Read-only; never edits.
-tools: Read, Glob, Grep
-disallowedTools: Write, Edit, Bash
-model: sonnet
+model: anthropic/claude-3-5-sonnet-20241022-4-20250514
 effort: medium
-maxTurns: 15
-permissionMode: plan
+steps: 15
 version: "1.0"
-skills:
-  - sk-claude-code-conventions
-  - sk-write-review-isolation
+permission:
+  edit: deny
+  bash: deny
 ---
+> **Required Skills:** sk-opencode-code-conventions, sk-write-review-isolation
+
 
 # Pipeline Spec Reviewer — Stage 1 Verification
 
@@ -72,5 +71,5 @@ Check every modified file for over-build:
 
 ## Reference Files
 
-- `${CLAUDE_PLUGIN_ROOT}/skills/sk-write-review-isolation/SKILL.md` — Isolation protocol.
-- `${CLAUDE_PLUGIN_ROOT}/skills/sk-claude-code-conventions/SKILL.md` — Formatting rules.
+- `${OPENCODE_PLUGIN_ROOT}/skills/sk-write-review-isolation/SKILL.md` — Isolation protocol.
+- `${OPENCODE_PLUGIN_ROOT}/skills/sk-opencode-conventions/SKILL.md` — Formatting rules.

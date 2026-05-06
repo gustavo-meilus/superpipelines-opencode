@@ -7,10 +7,10 @@ user-invocable: false
 
 # Worktree Safety Protocol — Isolated Execution
 
-> Defines the mandatory 4-step protocol (Ignore, Setup, Baseline, Commit) for creating, managing, and destroying git worktrees. Trigger when utilizing `isolation: worktree` or preparing parallel branches for pipeline tasks.
+> Defines the mandatory 4-step protocol (Ignore, Setup, Baseline, Commit) for creating, managing, and destroying git worktrees. Trigger explicitly to enforce prompt-driven isolation in OpenCode when preparing parallel branches for pipeline tasks.
 
 <overview>
-Worktrees provide critical isolation for parallel pipeline tasks, but improper handling risks data loss or workspace pollution. This protocol ensures that every worktree is properly ignored, initialized with a verified baseline, and committed before destruction to preserve all generated artifacts and findings.
+Worktrees provide critical isolation for parallel pipeline tasks, but improper handling risks data loss or workspace pollution. Since OpenCode lacks native `isolation: worktree`, this protocol ensures that every worktree is manually orchestrated: properly ignored, initialized with a verified baseline, and committed before destruction to preserve all generated artifacts and findings.
 </overview>
 
 <glossary>

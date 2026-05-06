@@ -22,7 +22,7 @@ Superpipelines utilize a structured JSON state to manage the lifecycle of multi-
 ## State Location
 
 <invariant>
-State must be persisted to `<scope-root>/superpipelines/temp/{P}/{runId}/pipeline-state.json`. Never store state within `${CLAUDE_PLUGIN_ROOT}`, as it is not persistent across updates.
+State must be persisted to `<scope-root>/superpipelines/temp/{P}/{runId}/pipeline-state.json`. Never store state within `${OPENCODE_PLUGIN_ROOT}`, as it is not persistent across updates.
 </invariant>
 
 ## Schema Definition

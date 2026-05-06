@@ -1,6 +1,6 @@
-# Claude Code Skill Spec — Frontmatter Reference
+# OpenCode Skill Spec — Frontmatter Reference
 
-Full frontmatter field reference for SKILL.md files. Subset of `sk-claude-code-conventions` Section 5, expanded with usage notes.
+Full frontmatter field reference for SKILL.md files. Subset of `sk-opencode-conventions` Section 5, expanded with usage notes.
 
 ## Table of contents
 

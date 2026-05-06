@@ -1,18 +1,16 @@
 ---
 name: pipeline-auditor
 description: Use when auditing existing pipeline bundles, agent files, or skills against superpipelines v2 layout, frontmatter, topology, and runtime-safety standards. Invoked automatically after new-pipeline, new-step, update-step, and delete-step. Produces severity-classified reports (SEV-0/1/2/3) with cited file:line evidence.
-tools: Read, Glob, Grep
-disallowedTools: Write, Edit, Bash
-model: sonnet
+model: anthropic/claude-3-5-sonnet-20241022-4-20250514
 effort: high
-maxTurns: 30
+steps: 30
 version: "2.0"
-permissionMode: plan
-skills:
-  - sk-4d-method
-  - sk-claude-code-conventions
-  - sk-pipeline-paths
+permission:
+  edit: deny
+  bash: deny
 ---
+> **Required Skills:** sk-4d-method, sk-opencode-code-conventions, sk-pipeline-paths
+
 
 # Pipeline Auditor — Standards Enforcement
 
@@ -76,8 +74,8 @@ The Auditor is strictly read-only; it cannot modify files. Remediation must be r
 
 ## Reference Files
 
-- `${CLAUDE_PLUGIN_ROOT}/skills/pipeline-auditor-references/references/compliance-matrix.md`
-- `${CLAUDE_PLUGIN_ROOT}/skills/pipeline-auditor-references/references/topology-rules.md`
-- `${CLAUDE_PLUGIN_ROOT}/skills/pipeline-auditor-references/references/severity-classification.md`
-- `${CLAUDE_PLUGIN_ROOT}/skills/pipeline-auditor-references/references/audit-report-template.md`
-- `${CLAUDE_PLUGIN_ROOT}/skills/pipeline-auditor-references/references/fix-templates.md`
+- `${OPENCODE_PLUGIN_ROOT}/skills/pipeline-auditor-references/references/compliance-matrix.md`
+- `${OPENCODE_PLUGIN_ROOT}/skills/pipeline-auditor-references/references/topology-rules.md`
+- `${OPENCODE_PLUGIN_ROOT}/skills/pipeline-auditor-references/references/severity-classification.md`
+- `${OPENCODE_PLUGIN_ROOT}/skills/pipeline-auditor-references/references/audit-report-template.md`
+- `${OPENCODE_PLUGIN_ROOT}/skills/pipeline-auditor-references/references/fix-templates.md`

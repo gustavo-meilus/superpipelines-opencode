@@ -77,4 +77,4 @@ The 4D Method (Deconstruct, Diagnose, Develop, Deliver) ensures that every agent
 
 - `sk-pipeline-patterns/SKILL.md` — Pattern 6 definition.
 - `sk-spec-driven-development/SKILL.md` — SDD handoff rules.
-- `sk-claude-code-conventions/SKILL.md` — Scaling and model selection.
+- `sk-opencode-conventions/SKILL.md` — Scaling and model selection.

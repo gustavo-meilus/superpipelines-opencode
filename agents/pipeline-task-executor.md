@@ -1,19 +1,16 @@
 ---
 name: pipeline-task-executor
 description: Use when implementing exactly ONE task from a tasks.md file as part of a Pattern 5 (SDD) parallel implementation phase, or when a single bounded implementation task needs a fresh-context worker. Receives extracted task text plus spec/plan paths; performs the task; self-verifies; emits terminal status.
-tools: Read, Write, Edit, Bash, Glob, Grep
-model: sonnet
+model: anthropic/claude-3-5-sonnet-20241022-4-20250514
 effort: medium
-maxTurns: 30
+steps: 30
 version: "1.0"
-isolation: worktree
-permissionMode: acceptEdits
-skills:
-  - sk-4d-method
-  - sk-spec-driven-development
-  - sk-claude-code-conventions
-  - sk-hashline-protocol
+permission:
+  edit: allow
+  bash: allow
 ---
+> **Required Skills:** sk-4d-method, sk-spec-driven-development, sk-opencode-code-conventions, sk-hashline-protocol
+
 
 # Pipeline Task Executor — Implementation Worker
 

@@ -1,16 +1,16 @@
 ---
-name: sk-claude-code-conventions
-description: Use when authoring or modifying agents, skills, hooks, or pipeline orchestration — covers Claude 4.6 model selection, adaptive thinking, prompt-cache discipline, frontmatter schemas, and progressive disclosure rules. Reference-only; preload via agent skills frontmatter.
+name: sk-opencode-conventions
+description: Use when authoring or modifying agents, skills, hooks, or pipeline orchestration — covers opencode 4.6 model selection, adaptive thinking, prompt-cache discipline, frontmatter schemas, and progressive disclosure rules. Reference-only; preload via agent skills frontmatter.
 disable-model-invocation: true
 user-invocable: false
 ---
 
-# Claude Code Conventions — 2026 Reference
+# OpenCode Conventions — 2026 Reference
 
-> Canonical engineering standards for authoring agents, skills, hooks, and pipeline orchestration. Optimizes for Claude 4.6+ model selection, adaptive thinking, prompt-cache discipline, and progressive disclosure.
+> Canonical engineering standards for authoring agents, skills, hooks, and pipeline orchestration. Optimizes for opencode 4.6+ model selection, adaptive thinking, prompt-cache discipline, and progressive disclosure.
 
 <overview>
-The Claude Code Conventions define the structural and behavioral invariants required for high-performance agentic systems. They prioritize cache stability, context efficiency, and deterministic routing to ensure that complex multi-agent pipelines remain reliable and scalable.
+The OpenCode Conventions define the structural and behavioral invariants required for high-performance agentic systems. They prioritize cache stability, context efficiency, and deterministic routing to ensure that complex multi-agent pipelines remain reliable and scalable.
 </overview>
 
 <glossary>
@@ -24,9 +24,9 @@ The Claude Code Conventions define the structural and behavioral invariants requ
 <model_tier_table>
 | Tier | Model ID | Application |
 | :--- | :--- | :--- |
-| **Workhorse** | `claude-sonnet-4-6` | Default for pipelines, agents, and skills. |
-| **Deep Reasoning** | `claude-opus-4-7` | High-complexity architecture or auditing tasks. |
-| **Triage/Batch** | `claude-haiku-4-5` | High-volume, low-latency classification. |
+| **Workhorse** | `anthropic/claude-3-5-sonnet-20241022-4-6` | Default for pipelines, agents, and skills. |
+| **Deep Reasoning** | `anthropic/claude-3-opus-20240229-4-7` | High-complexity architecture or auditing tasks. |
+| **Triage/Batch** | `anthropic/claude-3-5-haiku-20241022-4-5` | High-volume, low-latency classification. |
 </model_tier_table>
 
 <invariant>
@@ -87,7 +87,7 @@ skills: [sk-4d-method, sk-spec-driven-development]
 
 <invariants>
 - NEVER use `memory: project` in agent frontmatter.
-- Resolve all relative paths via `${CLAUDE_PLUGIN_ROOT}` or `${CLAUDE_PLUGIN_DATA}`.
+- Resolve all relative paths via `${OPENCODE_PLUGIN_ROOT}` or `${OPENCODE_PLUGIN_DATA}`.
 - All pipeline state must be persisted to the canonical `pipeline-state.json` location.
 </invariants>
 
