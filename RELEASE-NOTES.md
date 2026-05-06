@@ -1,6 +1,6 @@
 # Release Notes
 
-## v1.0.6 — TUI Plugin Target (2026-05-06)
+## v1.0.7 — (2026-05-06)
 
 Patch release fixing the **"Package has no TUI target to load in this app"** error.
 
