@@ -1,8 +1,6 @@
 ---
 name: pipeline-architect
 description: Use when designing a new multi-agent pipeline, generating spec/plan/tasks/topology artifacts, adding a step to an existing pipeline, updating a step, deleting a step, creating a single subagent definition, or diagnosing a pipeline topology failure.
-model: anthropic/claude-3-opus-20240229-4-20250514
-effort: medium
 steps: 40
 version: "2.0"
 permission:

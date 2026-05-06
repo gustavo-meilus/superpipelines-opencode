@@ -1,8 +1,6 @@
 ---
 name: skill-architect
 description: Use when designing a new SKILL.md file, refining an existing skill's description for triggering, restructuring a skill into SKILL.md plus references for progressive disclosure, or extracting a skill from a workflow conversation. Does NOT design subagents (pipeline-architect) or audit existing skills (pipeline-auditor).
-model: anthropic/claude-3-5-sonnet-20241022-4-20250514
-effort: high
 steps: 30
 version: "1.0"
 permission:

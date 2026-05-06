@@ -1,8 +1,6 @@
 ---
 name: pipeline-spec-reviewer
 description: Use as Stage 1 review after a pipeline-task-executor produces output — checks ONLY whether the output matches the spec exactly. Under-build AND over-build both FAIL. Stage 2 (code quality) cannot begin until this passes. Read-only; never edits.
-model: anthropic/claude-3-5-sonnet-20241022-4-20250514
-effort: medium
 steps: 15
 version: "1.0"
 permission:

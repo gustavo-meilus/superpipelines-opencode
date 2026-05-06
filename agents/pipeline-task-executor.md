@@ -1,8 +1,6 @@
 ---
 name: pipeline-task-executor
 description: Use when implementing exactly ONE task from a tasks.md file as part of a Pattern 5 (SDD) parallel implementation phase, or when a single bounded implementation task needs a fresh-context worker. Receives extracted task text plus spec/plan paths; performs the task; self-verifies; emits terminal status.
-model: anthropic/claude-3-5-sonnet-20241022-4-20250514
-effort: medium
 steps: 30
 version: "1.0"
 permission:

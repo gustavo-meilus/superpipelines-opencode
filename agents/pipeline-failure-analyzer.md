@@ -1,8 +1,6 @@
 ---
 name: pipeline-failure-analyzer
 description: Use during a Pattern 3 iterative loop after a tester reports failures, before dispatching a fixer — diagnoses whether failures are fixable bugs or architectural problems, detects "fixes reveal new failures in new locations" pattern, and decides whether to continue or escalate per Pattern 3 protocol.
-model: anthropic/claude-3-5-sonnet-20241022-4-20250514
-effort: high
 steps: 20
 version: "1.0"
 permission:
