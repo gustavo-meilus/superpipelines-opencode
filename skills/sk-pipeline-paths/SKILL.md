@@ -47,6 +47,7 @@ The Path Resolver enforces a canonical layout for the Superpipelines v2 architec
 | **Step Agent** | `agents/superpipelines/{P}/{agent-name}.md` |
 | **Pipeline State** | `superpipelines/temp/{P}/{runId}/pipeline-state.json` |
 | **Staged Edits** | `superpipelines/temp/{P}/edit-{ts}/` |
+| **Run Command** | `superpipelines/{P}/{P}.md` |
 </path_templates>
 
 ## Pipeline Name Constraints

@@ -58,9 +58,52 @@ The Pipeline Creation workflow guides an orchestrator from a raw user brief to a
   4. `<scope-root>/superpipelines/pipelines/{P}/topology.json`
   5. `<scope-root>/skills/superpipelines/{P}/run-{P}/SKILL.md` (entry skill, `user-invocable: true`)
   6. All step agents and skills under `<scope-root>/agents/superpipelines/{P}/` and `<scope-root>/skills/superpipelines/{P}/`
-  7. Updated `<scope-root>/superpipelines/registry.json`
+  7. `<scope-root>/superpipelines/{P}/{P}.md` (run command, see template below)
+  8. Updated `<scope-root>/superpipelines/registry.json`
 </HARD-GATE>
-- Confirm to the user: "Pipeline `{P}` scaffolded. Use `/superpipelines:run-pipeline` to execute it."
+- **Run Command Template**: The file at step 7 MUST follow this structure (replace `{P}` with the actual pipeline name and `{SCOPE_ROOT}` with the resolved absolute scope root path):
+  ```markdown
+  ---
+  description: Run the {P} pipeline
+  argument-hint: [optional: --resume]
+  subtask: true
+  ---
+
+  # Run {P} — Direct Execution
+
+  > Executes the **{P}** pipeline directly. Skips pipeline discovery and selection.
+
+  <args>
+  - **$ARGUMENTS**: Optional flags. Use `--resume` to resume an interrupted run.
+  </args>
+
+  <protocol>
+  ### 1. RESUME CHECK
+  - Check for existing run directories in `{SCOPE_ROOT}/superpipelines/temp/{P}/`.
+  - If `--resume` is active, present available `runId`s for selection.
+  - **IMPORTANT**: NEVER auto-resume an `escalated` or `failed` run without user confirmation.
+
+  ### 2. STATE INITIALIZATION
+  - Generate a new `runId` (format: `{P}-{YYYYMMDD-HHMMSS}`).
+  - Initialize `pipeline-state.json` using the atomic write protocol (write to `.tmp` then rename).
+
+  ### 3. ENTRY SKILL DISPATCH
+  - Invoke the pipeline's entry skill (`run-{P}`).
+  - Pass absolute paths to the scope root, state file, and topology.
+
+  ### 4. COMPLETION & CLEANUP
+  - Read final state from `pipeline-state.json`.
+  - **Status `completed`**: Delete the temporary run directory and summarize outputs.
+  - **Status `escalated/failed`**: PRESERVE the temporary directory and state path for debugging.
+  </protocol>
+
+  <invariants>
+  - ALWAYS initialize state before invoking the entry skill.
+  - NEVER auto-resume an escalated or failed run.
+  - All state updates must use the atomic write pattern.
+  </invariants>
+  ```
+- Confirm to the user: "Pipeline `{P}` scaffolded. Use `/superpipelines:{P}` to run it directly, or `/superpipelines:run-pipeline` to select from all pipelines."
 </protocol>
 
 <invariants>
