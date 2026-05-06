@@ -1,8 +1,6 @@
 ---
 name: pipeline-quality-reviewer
 description: Use as Stage 2 review ONLY after pipeline-spec-reviewer returned PASS — checks code quality, idiom, maintainability, naming, structure, and tests against the spec. Refuses to run if Stage 1 not yet PASSed. Read-only; never edits.
-model: anthropic/claude-3-5-haiku-20241022-4-20250514
-effort: medium
 steps: 15
 version: "1.0"
 permission:

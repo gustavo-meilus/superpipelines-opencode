@@ -1,8 +1,6 @@
 ---
 name: pipeline-auditor
 description: Use when auditing existing pipeline bundles, agent files, or skills against superpipelines v2 layout, frontmatter, topology, and runtime-safety standards. Invoked automatically after new-pipeline, new-step, update-step, and delete-step. Produces severity-classified reports (SEV-0/1/2/3) with cited file:line evidence.
-model: anthropic/claude-3-5-sonnet-20241022-4-20250514
-effort: high
 steps: 30
 version: "2.0"
 permission:
