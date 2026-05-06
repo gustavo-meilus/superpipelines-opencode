@@ -45,7 +45,6 @@ ${content}
     return _bootstrapCache;
   };
   return {
-    // Inject skills paths and dynamically construct/override agents
     config: async (config) => {
       _resolvedModels = config.superpipelines?.models || {
         default: "opencode/gemini-3.1-pro",
@@ -85,7 +84,6 @@ ${content}
         }
       }
     },
-    // Inject bootstrap into the first user message of each session
     "experimental.chat.messages.transform": async (input, output) => {
       const bootstrap = getBootstrapContent();
       if (!bootstrap || !output.messages.length) return;
@@ -110,6 +108,12 @@ ${content}
     }
   };
 };
+var SuperPipelines = {
+  id: "superpipelines",
+  server: serverPlugin
+};
+var index_default = SuperPipelines;
 export {
-  serverPlugin as SuperPipelines
+  SuperPipelines,
+  index_default as default
 };

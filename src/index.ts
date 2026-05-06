@@ -1,5 +1,4 @@
-import type { Plugin } from "@opencode-ai/plugin";
-import fs from "fs/promises";
+import type { Plugin, PluginModule } from "@opencode-ai/plugin";
 import fsSync from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -8,7 +7,6 @@ import { parse as yamlParse } from "yaml";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Module-level caches
 let _bootstrapCache: string | null | undefined = undefined;
 let _resolvedModels: any = null;
 
@@ -49,9 +47,7 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
   };
 
   return {
-    // Inject skills paths and dynamically construct/override agents
     config: async (config: any) => {
-      // Resolve user model preferences
       _resolvedModels = config.superpipelines?.models || {
         default: "opencode/gemini-3.1-pro",
         architect: "opencode/gemini-3.1-pro",
@@ -64,7 +60,6 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
         config.skills.paths.push(skillsDir);
       }
 
-      // Read agent MD files, parse them, override models, and register directly
       config.agents = config.agents || {};
       if (fsSync.existsSync(agentsDir)) {
         const agentFiles = fsSync.readdirSync(agentsDir).filter(f => f.endsWith(".md"));
@@ -96,7 +91,6 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
       }
     },
 
-    // Inject bootstrap into the first user message of each session
     "experimental.chat.messages.transform": async (input: any, output: any) => {
       const bootstrap = getBootstrapContent();
       if (!bootstrap || !output.messages.length) return;
@@ -104,7 +98,6 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
       const firstUser = output.messages.find((m: any) => m.info.role === "user");
       if (!firstUser || !firstUser.parts.length) return;
 
-      // Guard: skip if already injected
       if (firstUser.parts.some((p: any) => p.type === "text" && p.text.includes("EXTREMELY_IMPORTANT"))) return;
 
       const ref = firstUser.parts[0];
@@ -127,4 +120,10 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
   };
 };
 
-export { serverPlugin as SuperPipelines };
+const SuperPipelines: PluginModule = {
+  id: "superpipelines",
+  server: serverPlugin,
+};
+
+export default SuperPipelines;
+export { SuperPipelines };

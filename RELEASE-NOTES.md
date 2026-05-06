@@ -1,5 +1,17 @@
 # Release Notes
 
+## v1.0.1 — TUI Plugin Target (2026-05-06)
+
+Patch release fixing the **"Package has no TUI target to load in this app"** error.
+
+OpenCode plugins require two entry points: a **server** module (`.`) and a **TUI** module (`./tui`). The initial v1.0.0 release only exported the server module, causing the TUI loader to fail silently and the plugin to not activate.
+
+### What Changed
+
+- Added `src/tui.ts` — the TUI plugin entry point that registers slash commands and toast notifications.
+- Restructured `src/index.ts` — now exports a `PluginModule` (`{ id: "superpipelines", server }`) instead of a bare `Plugin` function.
+- Updated `package.json` — added `"./tui"` subpath export and updated build to compile both entry points.
+
 ## v1.0.0 — OpenCode Migration (2026-05-05)
 
 Welcome to the initial release of **Superpipelines OpenCode** (`superpipelines-opencode` v1.0.0).
