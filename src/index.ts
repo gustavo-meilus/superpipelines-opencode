@@ -79,40 +79,84 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
         config.skills.paths.push(skillsDir);
       }
 
+      const scopeRoots = [
+        path.join(directory, ".opencode"),
+        path.join(os.homedir(), ".opencode"),
+      ];
+
+      for (const scopeRoot of scopeRoots) {
+        const projectSkillsDir = path.join(scopeRoot, "skills");
+        if (fsSync.existsSync(projectSkillsDir)) {
+          if (!config.skills.paths.includes(projectSkillsDir)) {
+            config.skills.paths.push(projectSkillsDir);
+          }
+        }
+      }
+
       config.agent = config.agent || {};
+
+      const loadAgentFile = (filePath: string, agentName: string) => {
+        const content = fsSync.readFileSync(filePath, "utf-8");
+        const extracted = extractFrontmatter(content);
+        if (!extracted) return;
+
+        try {
+          const parsed = yamlParse(extracted.frontmatterStr);
+
+          let finalModel: string;
+          if (parsed.model) {
+            finalModel = String(parsed.model);
+          } else {
+            finalModel = _resolvedModels.default;
+            if (agentName.includes("architect")) {
+              finalModel = _resolvedModels.architect;
+            } else if (agentName.includes("reviewer")) {
+              finalModel = _resolvedModels.reviewer;
+            }
+          }
+
+          const { description, effort, steps, version, permission, ...rest } = parsed;
+          const agentConfig: Record<string, unknown> = {
+            model: finalModel,
+            prompt: extracted.body,
+          };
+          if (description) agentConfig.description = description;
+          if (effort) agentConfig.effort = effort;
+          if (steps) agentConfig.maxSteps = steps;
+          if (permission) agentConfig.permission = permission;
+
+          config.agent[agentName] = agentConfig;
+        } catch (err) {
+          console.error(`[superpipelines] Error parsing frontmatter for agent ${agentName}:`, err);
+        }
+      };
+
+      const scanAgentsDir = (dir: string) => {
+        if (!fsSync.existsSync(dir)) return;
+        const entries = fsSync.readdirSync(dir, { withFileTypes: true });
+        for (const entry of entries) {
+          const fullPath = path.join(dir, entry.name);
+          if (entry.isDirectory()) {
+            scanAgentsDir(fullPath);
+          } else if (entry.isFile() && entry.name.endsWith(".md")) {
+            const agentName = entry.name.replace(".md", "");
+            if (config.agent[agentName]) continue;
+            loadAgentFile(fullPath, agentName);
+          }
+        }
+      };
+
       if (fsSync.existsSync(agentsDir)) {
         const agentFiles = fsSync.readdirSync(agentsDir).filter((f: string) => f.endsWith(".md"));
         for (const file of agentFiles) {
           const agentName = file.replace(".md", "");
-          const content = fsSync.readFileSync(path.join(agentsDir, file), "utf-8");
-          const extracted = extractFrontmatter(content);
-          
-          if (extracted) {
-            try {
-              const parsed = yamlParse(extracted.frontmatterStr);
-              let finalModel = _resolvedModels.default;
-              if (agentName.includes("architect")) {
-                finalModel = _resolvedModels.architect;
-              } else if (agentName.includes("reviewer")) {
-                finalModel = _resolvedModels.reviewer;
-              }
-
-              const { description, effort, steps, version, permission, ...rest } = parsed;
-              const agentConfig: Record<string, unknown> = {
-                model: finalModel,
-                prompt: extracted.body,
-              };
-              if (description) agentConfig.description = description;
-              if (effort) agentConfig.effort = effort;
-              if (steps) agentConfig.maxSteps = steps;
-              if (permission) agentConfig.permission = permission;
-
-              config.agent[agentName] = agentConfig;
-            } catch (err) {
-              console.error(`[superpipelines] Error parsing frontmatter for agent ${agentName}:`, err);
-            }
-          }
+          loadAgentFile(path.join(agentsDir, file), agentName);
         }
+      }
+
+      for (const scopeRoot of scopeRoots) {
+        const projectAgentsDir = path.join(scopeRoot, "agents");
+        scanAgentsDir(projectAgentsDir);
       }
 
       config.command = config.command || {};
@@ -150,10 +194,6 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
         }
       }
 
-      const scopeRoots = [
-        path.join(directory, ".opencode"),
-        path.join(os.homedir(), ".opencode"),
-      ];
       const reservedDirs = new Set(["pipelines", "temp"]);
 
       for (const scopeRoot of scopeRoots) {
