@@ -30,7 +30,8 @@ The Pipeline Creation workflow guides an orchestrator from a raw user brief to a
 ### PHASE 2: BRIEF REFINEMENT (4D)
 - Apply the 4D Method to deconstruct core intent and constraints.
 - Acknowledge if the user requested a specific output format. If not specified, deduce an appropriate format based on the pipeline's goal (e.g., markdown files, code snippets, code files).
-- <HARD-GATE>If ≥3 critical slots are missing (goal, success criteria, scope, data), STOP and ask targeted questions.</HARD-GATE>
+- **Model Selection:** Explicitly ask the user for their **Model Preferences** for this pipeline. Explain that they can assign specific models to specific steps (e.g., a "deep" reasoning model like `opencode/gemini-3.1-pro` for complex generation, and a "fast" model like `opencode/gemini-3-flash` for reviews or simple formatting), OR they can rely on the workspace defaults.
+- <HARD-GATE>If ≥3 critical slots are missing (goal, success criteria, scope, data), or if the user hasn't confirmed their model preference strategy, STOP and ask targeted questions.</HARD-GATE>
 
 ### PHASE 3: PATTERN SELECTION
 - Select a topology pattern (Sequential, Parallel, Iterative, Gated, or Spec-Driven) using the `sk-pipeline-patterns` decision tree.
@@ -38,6 +39,7 @@ The Pipeline Creation workflow guides an orchestrator from a raw user brief to a
 
 ### PHASE 4: DESIGN & AUDIT LOOP
 - **Dispatch Architect**: Generate `spec.md`, `plan.md`, `tasks.md`, `topology.json`, and all step-specific agents/skills.
+- **Model Allocation Rule**: The Architect MUST embed the models selected by the user in Phase 2 into the YAML frontmatter of the generated `.md` agents. Heavy cognitive steps should receive the requested "deep" model, while lighter steps get the "medium" or "fast" models.
 - **Output Formatter Rule**: The Architect MUST append a specific `output-formatter` step as the final node in the topology, designed to transform the output into the deduced format and save it to the `<workspace-root>/output/` folder.
 - **Dispatch Auditor**: Review all generated files in DELTA mode.
 - <HARD-GATE>The `pipeline-auditor` MUST be dispatched after the architect. Do NOT present the human gate without audit results. If any SEV-0 or SEV-1 findings are returned, re-dispatch the Architect to remediate before proceeding.</HARD-GATE>

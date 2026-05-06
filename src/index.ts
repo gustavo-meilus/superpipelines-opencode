@@ -53,9 +53,9 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
     config: async (config: any) => {
       // Resolve user model preferences
       _resolvedModels = config.superpipelines?.models || {
-        default: "opencode-zen",
-        architect: "opencode-zen",
-        reviewer: "opencode-go"
+        default: "opencode/gemini-3.1-pro",
+        architect: "opencode/gemini-3.1-pro",
+        reviewer: "opencode/gemini-3-flash"
       };
 
       config.skills = config.skills || {};

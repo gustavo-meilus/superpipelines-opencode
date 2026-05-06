@@ -20,9 +20,9 @@ npm run build
   "plugin": ["./superpipelines-opencode"],
   "superpipelines": {
     "models": {
-      "default": "opencode-zen",
-      "architect": "opencode-zen",
-      "reviewer": "opencode-go"
+      "default": "opencode/gemini-3.1-pro",
+      "architect": "opencode/gemini-3.1-pro",
+      "reviewer": "opencode/gemini-3-flash"
     }
   }
 }
