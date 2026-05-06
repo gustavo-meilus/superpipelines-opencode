@@ -1,4 +1,4 @@
-import type { Plugin, PluginModule } from "@opencode-ai/plugin";
+import type { Plugin } from "@opencode-ai/plugin";
 import fs from "fs/promises";
 import fsSync from "fs";
 import path from "path";
@@ -127,9 +127,4 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
   };
 };
 
-const pluginModule: PluginModule = {
-  id: "superpipelines-opencode",
-  server: serverPlugin,
-};
-
-export default pluginModule;
+export { serverPlugin as SuperPipelines };

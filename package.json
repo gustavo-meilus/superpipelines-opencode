@@ -1,6 +1,7 @@
 {
   "name": "superpipelines-opencode",
   "version": "1.0.0",
+  "description": "Multi-agent AI orchestration framework with guaranteed spec compliance, write/review isolation, and full crash recovery",
   "type": "module",
   "main": "dist/index.js",
   "exports": {
@@ -8,8 +9,44 @@
       "import": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "agents",
+    "skills",
+    "commands",
+    "scripts",
+    ".opencode",
+    ".opencodeignore",
+    "settings.json",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm --clean"
+    "build": "tsup src/index.ts --format esm --clean",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gustavo-meilus/superpipelines-opencode.git"
+  },
+  "keywords": [
+    "opencode",
+    "plugin",
+    "multi-agent",
+    "orchestration",
+    "ai",
+    "pipeline",
+    "spec-driven-development"
+  ],
+  "author": "Gustavo Meilus",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gustavo-meilus/superpipelines-opencode/issues"
+  },
+  "homepage": "https://github.com/gustavo-meilus/superpipelines-opencode#readme",
+  "engines": {
+    "node": ">=18.0.0"
   },
   "devDependencies": {
     "@opencode-ai/plugin": "latest",
