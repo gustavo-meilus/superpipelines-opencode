@@ -1,18 +1,16 @@
 ---
 name: pipeline-quality-reviewer
 description: Use as Stage 2 review ONLY after pipeline-spec-reviewer returned PASS — checks code quality, idiom, maintainability, naming, structure, and tests against the spec. Refuses to run if Stage 1 not yet PASSed. Read-only; never edits.
-tools: Read, Glob, Grep
-disallowedTools: Write, Edit, Bash
-model: haiku
+model: anthropic/claude-3-5-haiku-20241022-4-20250514
 effort: medium
-maxTurns: 15
-permissionMode: plan
+steps: 15
 version: "1.0"
-skills:
-  - sk-claude-code-conventions
-  - sk-write-review-isolation
-  - sk-dynamic-routing
+permission:
+  edit: deny
+  bash: deny
 ---
+> **Required Skills:** sk-opencode-code-conventions, sk-write-review-isolation, sk-dynamic-routing
+
 
 # Pipeline Quality Reviewer — Stage 2 Audit
 
@@ -76,5 +74,5 @@ Evaluate every changed file across these dimensions:
 
 ## Reference Files
 
-- `${CLAUDE_PLUGIN_ROOT}/skills/sk-write-review-isolation/SKILL.md` — Isolation protocol.
-- `${CLAUDE_PLUGIN_ROOT}/skills/sk-claude-code-conventions/SKILL.md` — ID and style rules.
+- `${OPENCODE_PLUGIN_ROOT}/skills/sk-write-review-isolation/SKILL.md` — Isolation protocol.
+- `${OPENCODE_PLUGIN_ROOT}/skills/sk-opencode-conventions/SKILL.md` — ID and style rules.

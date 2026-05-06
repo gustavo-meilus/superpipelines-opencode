@@ -32,7 +32,7 @@ If a pipeline skill applies to the user's request, invoke it. Do not rationalize
 | `/audit-pipeline` | `pipeline-auditor` | Security/topology review. |
 | Ambiguous / Discovery phase | `sk-4d-method` | Intent deconstruction. |
 | Implementation / Task execution | `sk-spec-driven-development` | Contracted development. |
-| Authoring Agents or Skills | `sk-claude-code-conventions` | Format enforcement. |
+| Authoring Agents or Skills | `sk-opencode-conventions` | Format enforcement. |
 </routing_table>
 
 ## Core Pipeline Invariants

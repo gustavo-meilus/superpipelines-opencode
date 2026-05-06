@@ -52,4 +52,4 @@ For each significant directory, create a `PIPELINE-CONTEXT.md` adhering to stric
 
 ## Reference Files
 
-- `${CLAUDE_PLUGIN_ROOT}/skills/sk-pipeline-paths/SKILL.md` — Path resolution guidelines.
+- `${OPENCODE_PLUGIN_ROOT}/skills/sk-pipeline-paths/SKILL.md` — Path resolution guidelines.

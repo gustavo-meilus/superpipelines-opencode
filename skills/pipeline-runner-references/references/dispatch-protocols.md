@@ -4,7 +4,7 @@ How `running-a-pipeline` dispatches workers and reviewers per pattern. Maps the 
 
 ## Table of contents
 
-1. Common dispatch shape (Claude Code)
+1. Common dispatch shape (OpenCode)
 2. Pattern 1 — Sequential
 3. Pattern 2 / 2b — Parallel Fan-Out
 4. Pattern 3 — Iterative Loop
@@ -14,7 +14,7 @@ How `running-a-pipeline` dispatches workers and reviewers per pattern. Maps the 
 
 ---
 
-## Common dispatch shape (Claude Code)
+## Common dispatch shape (OpenCode)
 
 ```
 Task(

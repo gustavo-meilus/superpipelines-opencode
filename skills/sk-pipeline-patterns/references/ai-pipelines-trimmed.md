@@ -1,6 +1,6 @@
 # AI Pipelines — Trimmed Runtime Reference
 
-> Canonical runtime reference for pipeline conventions. Cross-refs to `sk-claude-code-conventions` and `sk-*` skills carry the depth that this file omits.
+> Canonical runtime reference for pipeline conventions. Cross-refs to `sk-opencode-conventions` and `sk-*` skills carry the depth that this file omits.
 
 ## Table of contents
 
@@ -171,13 +171,13 @@ See `sk-rationalization-resistance` for tag conventions and authoring rules.
 - `MODEL_SELECTION: SONNET_ONLY` — every pipeline agent is `model: sonnet`. Scale via `effort: low | medium | high | xhigh | max`.
 - `PERMISSION_MODE: PER_AGENT` — each pipeline agent may declare `permissionMode: default | acceptEdits | plan | bypassPermissions`. Never use `bypassPermissions` without explicit user justification documented in the agent body.
 - `STATE_MANAGEMENT: STRUCTURED_JSON` — `<scope-root>/superpipelines/temp/{P}/{runId}/pipeline-state.json` only. No `memory: project`. `memory: local` is allowed for agents that persist learned heuristics.
-- `AUTO_MEMORY: DISABLED` — `autoMemoryEnabled: false` in settings; `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1` env var. Reclaims 658+ tokens.
+- `AUTO_MEMORY: DISABLED` — `autoMemoryEnabled: false` in settings; `OPENCODE_DISABLE_AUTO_MEMORY=1` env var. Reclaims 658+ tokens.
 - `BOUND_STDOUT: TRUE` — pipe long outputs through `tail -80` etc. before passing back.
 - `SCOPE_FILE_READS: TRUE` — Read specific line ranges over full files when possible.
 - `PASS_PATHS_NOT_CONTENT: TRUE` for large files. Exception: task text is content (extract once at orchestrator, pass extracted text to each worker — never tell the worker "find your task in tasks.md").
 - `MCP tool naming: ServerName:tool_name` — always fully qualified.
-- Path variables: `${CLAUDE_PLUGIN_ROOT}` (plugin dir, wipes on update), `${CLAUDE_PLUGIN_DATA}` (persists across updates), `${user_config.KEY}` (user config).
-- Description discipline: triggering conditions only, NEVER workflow summary. See `sk-claude-code-conventions`.
+- Path variables: `${OPENCODE_PLUGIN_ROOT}` (plugin dir, wipes on update), `${OPENCODE_PLUGIN_DATA}` (persists across updates), `${user_config.KEY}` (user config).
+- Description discipline: triggering conditions only, NEVER workflow summary. See `sk-opencode-conventions`.
 
 ---
 
@@ -190,4 +190,4 @@ See `sk-rationalization-resistance` for tag conventions and authoring rules.
 - `sk-worktree-safety` — 4-step protocol.
 - `sk-write-review-isolation` — Stage 1/2 output schemas.
 - `sk-rationalization-resistance` — tag conventions.
-- `sk-claude-code-conventions` — frontmatter schemas, model selection, prompt-cache discipline.
+- `sk-opencode-conventions` — frontmatter schemas, model selection, prompt-cache discipline.

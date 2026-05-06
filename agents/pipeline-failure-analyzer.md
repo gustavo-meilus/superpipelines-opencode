@@ -1,17 +1,16 @@
 ---
 name: pipeline-failure-analyzer
 description: Use during a Pattern 3 iterative loop after a tester reports failures, before dispatching a fixer — diagnoses whether failures are fixable bugs or architectural problems, detects "fixes reveal new failures in new locations" pattern, and decides whether to continue or escalate per Pattern 3 protocol.
-tools: Read, Glob, Grep, Bash
-model: sonnet
+model: anthropic/claude-3-5-sonnet-20241022-4-20250514
 effort: high
-maxTurns: 20
-permissionMode: plan
+steps: 20
 version: "1.0"
-skills:
-  - sk-4d-method
-  - sk-pipeline-patterns
-  - sk-rationalization-resistance
+permission:
+  edit: deny
+  bash: allow
 ---
+> **Required Skills:** sk-4d-method, sk-pipeline-patterns, sk-rationalization-resistance
+
 
 # Pipeline Failure Analyzer — Iteration Controller
 
@@ -76,5 +75,5 @@ If not escalating, identify the smallest actionable unit of change.
 
 ## Reference Files
 
-- `${CLAUDE_PLUGIN_ROOT}/skills/sk-pipeline-patterns/SKILL.md` — Pattern 3 protocol.
-- `${CLAUDE_PLUGIN_ROOT}/skills/systematic-debugging/SKILL.md` — RCA methodology.
+- `${OPENCODE_PLUGIN_ROOT}/skills/sk-pipeline-patterns/SKILL.md` — Pattern 3 protocol.
+- `${OPENCODE_PLUGIN_ROOT}/skills/systematic-debugging/SKILL.md` — RCA methodology.

@@ -58,12 +58,41 @@ The framework selects the optimal pattern based on task complexity:
 
 ## Installation
 
-Install the Superpipelines plugin via Claude Code:
+Install the Superpipelines plugin via npm or locally:
 
 <installation>
 ```bash
-// Installation command
-claude plugin install github:gustavo-meilus/superpipelines
+# Clone the repository
+git clone https://github.com/gustavo-meilus/superpipelines-opencode.git
+cd superpipelines-opencode
+
+# Build the plugin
+npm install
+npm run build
+```
+
+Then, add the plugin to your `opencode.json`:
+```json
+{
+  "plugin": ["./superpipelines-opencode"]
+}
+```
+
+### Model Configuration
+
+By default, Superpipelines targets standard OpenCode models (`opencode-zen` and `opencode-go`). You can override the models used by both the plugin's native agents and any generated pipelines by adding a `superpipelines` block to your `opencode.json`:
+
+```json
+{
+  "plugin": ["./superpipelines-opencode"],
+  "superpipelines": {
+    "models": {
+      "default": "openai/gpt-4o",
+      "architect": "anthropic/claude-3-5-sonnet-latest",
+      "reviewer": "anthropic/claude-3-5-haiku-latest"
+    }
+  }
+}
 ```
 </installation>
 
@@ -89,14 +118,16 @@ claude plugin install github:gustavo-meilus/superpipelines
 
 <file_structure>
 ```
-superpipelines/
-├── .claude-plugin/           # Plugin manifest and marketplace data
-├── agents/                   # Core agent definitions (Architect, Auditor, Executor, Reviewers)
-├── skills/                   # Shared skills (State, Paths, Patterns, Worktree Safety)
-│   ├── *-references/         # Deep reference libraries (On-demand loading)
-├── commands/                 # Slash command wrappers
-├── hooks/                    # SessionStart hooks for bootstrap injection
-└── settings.json             # Global plugin configuration
+superpipelines-opencode/
+├── package.json         # Plugin NPM package manifest
+├── src/                 # TypeScript source code for the OpenCode plugin
+├── dist/                # Compiled plugin code (run `npm run build`)
+├── .opencode/           # Plugin installation guides
+├── agents/              # Core agent definitions (Architect, Auditor, Executor, Reviewers)
+├── skills/              # Shared skills (State, Paths, Patterns, Worktree Safety)
+│   ├── *-references/    # Deep reference libraries (On-demand loading)
+├── commands/            # Slash command wrappers
+└── settings.json        # Global plugin configuration
 ```
 </file_structure>
 

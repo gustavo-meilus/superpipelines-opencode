@@ -64,7 +64,7 @@ Catalog of common failure modes when designing pipelines and agents. Each entry:
 
 ## 7. Leaky Context
 
-**Symptoms:** Agent body references `CLAUDE.md`, parent system prompt, "as discussed earlier."
+**Symptoms:** Agent body references `OPENCODE.md`, parent system prompt, "as discussed earlier."
 
 **Fix:** Body is self-contained. Receives all context via inputs. Never references parent state.
 
@@ -94,7 +94,7 @@ Catalog of common failure modes when designing pipelines and agents. Each entry:
 
 ## 12. Memory Leak
 
-**Symptoms:** Agent uses `memory: project` to persist state across runs. State scattered across `.claude/memory/*` files.
+**Symptoms:** Agent uses `memory: project` to persist state across runs. State scattered across `.opencode/memory/*` files.
 
 **Fix:** All pipeline state lives in `<scope-root>/superpipelines/temp/{P}/{runId}/pipeline-state.json` per `STATE_MANAGEMENT: STRUCTURED_JSON`. `memory: local` is allowed for learned heuristics. Memory tool must never be used for deterministic pipeline state.
 
@@ -120,7 +120,7 @@ Catalog of common failure modes when designing pipelines and agents. Each entry:
 
 **Symptoms:** Agent uses `../../` paths to reference files outside its plugin/worktree.
 
-**Fix:** All paths relative and start with `./`. Use symlinks if cross-tree references are required. `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths.
+**Fix:** All paths relative and start with `./`. Use symlinks if cross-tree references are required. `${OPENCODE_PLUGIN_ROOT}` for plugin-relative paths.
 
 ## 17. Unqualified MCP Tool Names
 
@@ -136,6 +136,6 @@ Catalog of common failure modes when designing pipelines and agents. Each entry:
 
 ## 19. Hardcoded Plugin Paths
 
-**Symptoms:** Agent body references `~/.claude/agents/...` or absolute paths.
+**Symptoms:** Agent body references `~/.opencode/agents/...` or absolute paths.
 
-**Fix:** `${CLAUDE_PLUGIN_ROOT}` for plugin-relative; `${CLAUDE_PLUGIN_DATA}` for persistent state; never `~/.claude/...`.
+**Fix:** `${OPENCODE_PLUGIN_ROOT}` for plugin-relative; `${OPENCODE_PLUGIN_DATA}` for persistent state; never `~/.opencode/...`.

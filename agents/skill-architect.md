@@ -1,16 +1,16 @@
 ---
 name: skill-architect
 description: Use when designing a new SKILL.md file, refining an existing skill's description for triggering, restructuring a skill into SKILL.md plus references for progressive disclosure, or extracting a skill from a workflow conversation. Does NOT design subagents (pipeline-architect) or audit existing skills (pipeline-auditor).
-tools: Read, Write, Edit, Glob, Grep, Bash
-model: sonnet
+model: anthropic/claude-3-5-sonnet-20241022-4-20250514
 effort: high
-maxTurns: 30
+steps: 30
 version: "1.0"
-permissionMode: plan
-skills:
-  - sk-4d-method
-  - sk-claude-code-conventions
+permission:
+  edit: allow
+  bash: allow
 ---
+> **Required Skills:** sk-4d-method, sk-opencode-code-conventions
+
 
 # Skill Architect — Documentation & Skill Designer
 
@@ -72,7 +72,7 @@ The Skill Architect treats every skill as a precision instrument, scoped to a si
 
 ## Reference Files
 
-- `${CLAUDE_PLUGIN_ROOT}/skills/skill-architect-references/references/skill-architecture.md`
-- `${CLAUDE_PLUGIN_ROOT}/skills/skill-architect-references/references/description-engineering.md`
-- `${CLAUDE_PLUGIN_ROOT}/skills/skill-architect-references/references/claude-code-skill-spec.md`
-- `${CLAUDE_PLUGIN_ROOT}/skills/skill-architect-references/references/anti-patterns.md`
+- `${OPENCODE_PLUGIN_ROOT}/skills/skill-architect-references/references/skill-architecture.md`
+- `${OPENCODE_PLUGIN_ROOT}/skills/skill-architect-references/references/description-engineering.md`
+- `${OPENCODE_PLUGIN_ROOT}/skills/skill-architect-references/references/opencode-skill-spec.md`
+- `${OPENCODE_PLUGIN_ROOT}/skills/skill-architect-references/references/anti-patterns.md`

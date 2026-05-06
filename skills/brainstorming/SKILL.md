@@ -76,5 +76,5 @@ Brainstorming acts as the mandatory pre-flight phase for creative and design wor
 ## Reference Files
 - `creating-a-pipeline/SKILL.md` — Implementation workflow.
 - `sk-4d-method/SKILL.md` — Brief deconstruction.
-- `sk-claude-code-conventions/SKILL.md` — Design patterns.
+- `sk-opencode-conventions/SKILL.md` — Design patterns.
 - `visual-companion.md` — Detailed browser usage guide.

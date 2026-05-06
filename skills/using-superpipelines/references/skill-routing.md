@@ -44,7 +44,7 @@ When to invoke which superpipelines skill or agent. Source of truth for the rout
 |----------|-------|
 | Ambiguous request needs structured processing | `sk-4d-method` |
 | Multi-step feature needs spec/plan/tasks | `sk-spec-driven-development` |
-| Authoring or modifying an agent or skill | `sk-claude-code-conventions` |
+| Authoring or modifying an agent or skill | `sk-opencode-conventions` |
 | Choosing an execution pattern (Sequential, Fan-Out, Iterative, Human-Gated, SDD) | `sk-pipeline-patterns` |
 | Resolving scope-aware artifact paths | `sk-pipeline-paths` |
 | Tracking pipeline state across iterations | `sk-pipeline-state` |

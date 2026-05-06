@@ -10,29 +10,29 @@ Multi-agent AI pipelines with guaranteed spec compliance, write/review isolation
 - **Slash Command Integration**: Commands for creating, running, auditing, and mutating pipelines.
 
 ## Core Documentation
-- [README.md](file:///d:/Github/superpipelines/README.md): High-level overview and installation guide.
-- [CLAUDE.md](file:///d:/Github/superpipelines/CLAUDE.md): Architectural invariants and authoring rules.
-- [RELEASE-NOTES.md](file:///d:/Github/superpipelines/RELEASE-NOTES.md): Versioned feature history.
-- [CHANGELOG.md](file:///d:/Github/superpipelines/CHANGELOG.md): Granular record of changes.
+- [README.md](file:///d:/Github/superpipelines-opencode/README.md): High-level overview and installation guide.
+- [OPENCODE.md](file:///d:/Github/superpipelines-opencode/OPENCODE.md): Architectural invariants and authoring rules.
+- [RELEASE-NOTES.md](file:///d:/Github/superpipelines-opencode/RELEASE-NOTES.md): Versioned feature history.
+- [CHANGELOG.md](file:///d:/Github/superpipelines-opencode/CHANGELOG.md): Granular record of changes.
 
 ## Workflow Skills
-- [using-superpipelines](file:///d:/Github/superpipelines/skills/using-superpipelines/SKILL.md): Core orchestration and routing protocols.
-- [creating-a-pipeline](file:///d:/Github/superpipelines/skills/creating-a-pipeline/SKILL.md): End-to-end pipeline scaffolding.
-- [running-a-pipeline](file:///d:/Github/superpipelines/skills/running-a-pipeline/SKILL.md): Registry-driven execution launcher.
-- [adding-a-pipeline-step](file:///d:/Github/superpipelines/skills/adding-a-pipeline-step/SKILL.md): Topology mutation (Add).
-- [updating-a-pipeline-step](file:///d:/Github/superpipelines/skills/updating-a-pipeline-step/SKILL.md): topology mutation (Update).
-- [deleting-a-pipeline-step](file:///d:/Github/superpipelines/skills/deleting-a-pipeline-step/SKILL.md): Topology mutation (Delete).
+- [using-superpipelines](file:///d:/Github/superpipelines-opencode/skills/using-superpipelines/SKILL.md): Core orchestration and routing protocols.
+- [creating-a-pipeline](file:///d:/Github/superpipelines-opencode/skills/creating-a-pipeline/SKILL.md): End-to-end pipeline scaffolding.
+- [running-a-pipeline](file:///d:/Github/superpipelines-opencode/skills/running-a-pipeline/SKILL.md): Registry-driven execution launcher.
+- [adding-a-pipeline-step](file:///d:/Github/superpipelines-opencode/skills/adding-a-pipeline-step/SKILL.md): Topology mutation (Add).
+- [updating-a-pipeline-step](file:///d:/Github/superpipelines-opencode/skills/updating-a-pipeline-step/SKILL.md): topology mutation (Update).
+- [deleting-a-pipeline-step](file:///d:/Github/superpipelines-opencode/skills/deleting-a-pipeline-step/SKILL.md): Topology mutation (Delete).
 
 ## Foundational Skills
-- [sk-4d-method](file:///d:/Github/superpipelines/skills/sk-4d-method/SKILL.md): Deconstruction intake (Define, Diagnose, Design, Deliver).
-- [sk-spec-driven-development](file:///d:/Github/superpipelines/skills/sk-spec-driven-development/SKILL.md): Full SDD lifecycle.
-- [sk-write-review-isolation](file:///d:/Github/superpipelines/skills/sk-write-review-isolation/SKILL.md): Two-stage review protocol.
-- [sk-pipeline-paths](file:///d:/Github/superpipelines/skills/sk-pipeline-paths/SKILL.md): Scope-aware path resolution.
-- [sk-pipeline-state](file:///d:/Github/superpipelines/skills/sk-pipeline-state/SKILL.md): Atomic state management.
-- [sk-worktree-safety](file:///d:/Github/superpipelines/skills/sk-worktree-safety/SKILL.md): Isolated integration verification.
+- [sk-4d-method](file:///d:/Github/superpipelines-opencode/skills/sk-4d-method/SKILL.md): Deconstruction intake (Define, Diagnose, Design, Deliver).
+- [sk-spec-driven-development](file:///d:/Github/superpipelines-opencode/skills/sk-spec-driven-development/SKILL.md): Full SDD lifecycle.
+- [sk-write-review-isolation](file:///d:/Github/superpipelines-opencode/skills/sk-write-review-isolation/SKILL.md): Two-stage review protocol.
+- [sk-pipeline-paths](file:///d:/Github/superpipelines-opencode/skills/sk-pipeline-paths/SKILL.md): Scope-aware path resolution.
+- [sk-pipeline-state](file:///d:/Github/superpipelines-opencode/skills/sk-pipeline-state/SKILL.md): Atomic state management.
+- [sk-worktree-safety](file:///d:/Github/superpipelines-opencode/skills/sk-worktree-safety/SKILL.md): Isolated integration verification.
 
 ## Engineering Standards
-- [systematic-debugging](file:///d:/Github/superpipelines/skills/systematic-debugging/SKILL.md): Root cause protocol.
-- [test-driven-development](file:///d:/Github/superpipelines/skills/test-driven-development/SKILL.md): Red-Green-Refactor cycle.
-- [verification-before-completion](file:///d:/Github/superpipelines/skills/verification-before-completion/SKILL.md): Evidence-before-claim protocol.
-- [brainstorming](file:///d:/Github/superpipelines/skills/brainstorming/SKILL.md): Exploratory design workflow.
+- [systematic-debugging](file:///d:/Github/superpipelines-opencode/skills/systematic-debugging/SKILL.md): Root cause protocol.
+- [test-driven-development](file:///d:/Github/superpipelines-opencode/skills/test-driven-development/SKILL.md): Red-Green-Refactor cycle.
+- [verification-before-completion](file:///d:/Github/superpipelines-opencode/skills/verification-before-completion/SKILL.md): Evidence-before-claim protocol.
+- [brainstorming](file:///d:/Github/superpipelines-opencode/skills/brainstorming/SKILL.md): Exploratory design workflow.

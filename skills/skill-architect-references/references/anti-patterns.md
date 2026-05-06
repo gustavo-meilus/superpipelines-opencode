@@ -88,6 +88,6 @@ Common authoring mistakes when designing SKILL.md files. Each entry: symptoms, f
 
 ## 15. Hardcoded plugin paths
 
-**Symptoms:** Skill body references `~/.claude/...` or `/usr/local/...`.
+**Symptoms:** Skill body references `~/.opencode/...` or `/usr/local/...`.
 
-**Fix:** Use `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths. Workspace-relative paths use `./` prefix.
+**Fix:** Use `${OPENCODE_PLUGIN_ROOT}` for plugin-relative paths. Workspace-relative paths use `./` prefix.

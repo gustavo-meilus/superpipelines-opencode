@@ -118,7 +118,7 @@ Loop bounded by `MAX_ITERATIONS: 3`. After 3 failures without measurable progres
 
 **Before:**
 ```markdown
-Read ~/.claude/agents/code-reviewer.md
+Read ~/.opencode/agents/code-reviewer.md
 ```
 
 **After:**

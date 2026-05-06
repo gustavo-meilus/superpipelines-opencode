@@ -46,4 +46,4 @@ The Hashline Protocol ensures atomic mutation safety. By tagging every line read
 
 ## Reference Files
 
-- `${CLAUDE_PLUGIN_ROOT}/skills/sk-worktree-safety/SKILL.md` — Isolated worktree principles.
+- `${OPENCODE_PLUGIN_ROOT}/skills/sk-worktree-safety/SKILL.md` — Isolated worktree principles.

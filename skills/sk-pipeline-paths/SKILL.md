@@ -14,7 +14,7 @@ The Path Resolver enforces a canonical layout for the Superpipelines v2 architec
 </overview>
 
 <glossary>
-  <term name="Scope Root">The base directory (`.claude/` or `~/.claude/`) where artifacts are persisted.</term>
+  <term name="Scope Root">The base directory (`.opencode/` or `~/.opencode/`) where artifacts are persisted.</term>
   <term name="Pipeline Registry">A central `registry.json` file tracking all pipelines within a specific scope.</term>
   <term name="Staging Directory">A temporary `temp/{P}/edit-{ts}/` directory used for atomic mutations.</term>
 </glossary>
@@ -24,13 +24,13 @@ The Path Resolver enforces a canonical layout for the Superpipelines v2 architec
 <scope_roots_table>
 | Scope | Physical Root | Git Status | Persistence |
 | :--- | :--- | :--- | :--- |
-| **Project** | `<workspace>/.claude/` | Committed | Shared with the team. |
-| **Local** | `<workspace>/.claude/` | Ignored | Machine-specific/temporary. |
-| **User** | `~/.claude/` | External | Global across all workspaces. |
+| **Project** | `<workspace>/.opencode/` | Committed | Shared with the team. |
+| **Local** | `<workspace>/.opencode/` | Ignored | Machine-specific/temporary. |
+| **User** | `~/.opencode/` | External | Global across all workspaces. |
 </scope_roots_table>
 
 <invariant>
-`project` and `local` scopes share the same physical directory; the distinction is managed via `.gitignore` entries for `.claude/`.
+`project` and `local` scopes share the same physical directory; the distinction is managed via `.gitignore` entries for `.opencode/`.
 </invariant>
 
 ## Path Templates
@@ -66,4 +66,4 @@ The Path Resolver enforces a canonical layout for the Superpipelines v2 architec
 ## Reference Files
 
 - `sk-pipeline-state/SKILL.md` — State persistence schema.
-- `sk-claude-code-conventions/SKILL.md` — Frontmatter and directory rules.
+- `sk-opencode-code-conventions/SKILL.md` — Frontmatter and directory rules.

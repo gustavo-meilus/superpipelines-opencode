@@ -52,7 +52,7 @@ Findings classified into four severity tiers.
 - Missing concrete code example.
 - Unix path inconsistency (Windows backslashes used in body).
 - Inconsistent pronouns across sections.
-- Stale model IDs cited in examples (e.g., `claude-3-5-sonnet`).
+- Stale model IDs cited in examples (e.g., `opencode-3-5-sonnet`).
 
 ---
 

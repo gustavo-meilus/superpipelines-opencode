@@ -1,5 +1,22 @@
 {
-  "name": "superpipelines",
-  "version": "1.0.4",
-  "type": "module"
+  "name": "superpipelines-opencode",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --clean"
+  },
+  "devDependencies": {
+    "@opencode-ai/plugin": "latest",
+    "tsup": "latest",
+    "typescript": "latest"
+  },
+  "dependencies": {
+    "yaml": "^2.8.4"
+  }
 }
