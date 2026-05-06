@@ -4,6 +4,19 @@ All notable changes to the `superpipelines-opencode` project will be documented 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.9 — (2026-05-06)
+
+### Added
+- **Built-in Command Registration (`config.command`)**: The server plugin now auto-registers all built-in SuperPipelines commands (`superpipelines:new-pipeline`, `superpipelines:run-pipeline`, `superpipelines:new-step`, `superpipelines:update-step`, `superpipelines:delete-step`, `superpipelines:audit-pipeline`, `superpipelines:init-deep`) from `commands/*.md` files during the `config` lifecycle hook.
+- **Dynamic Pipeline Command Discovery**: User-created pipelines under `.opencode/superpipelines/{P}/{P}.md` are automatically discovered and registered as `superpipelines:{P}` commands at config time, enabling direct execution via `/superpipelines:{P}`.
+- **TUI Pipeline Command Discovery**: The TUI plugin now dynamically discovers pipeline commands from both project-level (`.opencode/superpipelines/`) and user-level (`~/.opencode/superpipelines/`) scope roots, displaying them as "Run: {P}" entries in the slash command palette.
+- **Manual Testing Guide (`TESTING.md`)**: Comprehensive 372-line manual testing document covering build verification, type-checking, config hook validation, TUI plugin testing, bootstrap injection verification, CRLF regression testing, and end-to-end scenario tests.
+
+### Changed
+- **TUI Slash Command Format**: Standardized all built-in TUI slash commands to use full `superpipelines:*` names (e.g., `/superpipelines:new-pipeline`) instead of short aliases (`/sp:new`), improving consistency with the command registration system.
+- **`creating-a-pipeline` Skill**: Updated Phase 5 to generate a per-pipeline run command file at `<scope-root>/superpipelines/{P}/{P}.md`, enabling direct pipeline execution. Updated user confirmation message to reference the new `/superpipelines:{P}` command.
+- **`sk-pipeline-paths` Skill**: Added "Run Command" path template (`superpipelines/{P}/{P}.md`) to the canonical path reference table.
+
 ## 1.0.8 — (2026-05-06)
 
 ### Added

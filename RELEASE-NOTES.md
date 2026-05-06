@@ -1,5 +1,28 @@
 # Release Notes
 
+## v1.0.9 — (2026-05-06)
+
+Feature release introducing **built-in command registration**, **dynamic pipeline discovery**, and a **comprehensive manual testing guide**.
+
+### What Changed
+
+#### Server Plugin — `config.command` Registration
+The `config` lifecycle hook now auto-registers two categories of commands:
+
+1. **Built-in commands** — All seven `commands/*.md` files are parsed and registered as `superpipelines:new-pipeline`, `superpipelines:run-pipeline`, `superpipelines:new-step`, `superpipelines:update-step`, `superpipelines:delete-step`, `superpipelines:audit-pipeline`, and `superpipelines:init-deep`.
+2. **Dynamic pipeline commands** — Any user-created pipeline at `.opencode/superpipelines/{P}/{P}.md` or `~/.opencode/superpipelines/{P}/{P}.md` is automatically discovered and registered as `superpipelines:{P}`.
+
+This means pipelines can now be executed directly via `/superpipelines:{P}` without going through the pipeline selection flow.
+
+#### TUI Plugin — Dynamic Command Discovery
+The TUI plugin now scans both project-level and user-level scope roots for pipeline directories and dynamically generates "Run: {P}" slash commands. Built-in commands have been standardized to use full `superpipelines:*` names (removing the `/sp:*` short aliases).
+
+#### `creating-a-pipeline` Skill — Run Command Generation
+Pipeline creation now produces a per-pipeline run command file at `<scope-root>/superpipelines/{P}/{P}.md`, enabling the direct execution pattern described above.
+
+#### Documentation
+Added `TESTING.md` — a 372-line manual testing guide covering build verification, type-checking, config hook validation, TUI testing, bootstrap injection, CRLF regression, and end-to-end scenarios.
+
 ## v1.0.8 — (2026-05-06)
 
 Patch release fixing the **"Package has no TUI target to load in this app"** error.

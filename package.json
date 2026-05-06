@@ -1,6 +1,6 @@
 {
   "name": "superpipelines-opencode",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Multi-agent AI orchestration framework with guaranteed spec compliance, write/review isolation, and full crash recovery",
   "type": "module",
   "main": "dist/index.js",
