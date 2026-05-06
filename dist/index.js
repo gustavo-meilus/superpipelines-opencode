@@ -110,11 +110,6 @@ ${content}
     }
   };
 };
-var pluginModule = {
-  id: "superpipelines-opencode",
-  server: serverPlugin
-};
-var index_default = pluginModule;
 export {
-  index_default as default
+  serverPlugin as SuperPipelines
 };
