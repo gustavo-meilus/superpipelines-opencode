@@ -48,9 +48,9 @@ ${content}
     // Inject skills paths and dynamically construct/override agents
     config: async (config) => {
       _resolvedModels = config.superpipelines?.models || {
-        default: "opencode-zen",
-        architect: "opencode-zen",
-        reviewer: "opencode-go"
+        default: "opencode/gemini-3.1-pro",
+        architect: "opencode/gemini-3.1-pro",
+        reviewer: "opencode/gemini-3-flash"
       };
       config.skills = config.skills || {};
       config.skills.paths = config.skills.paths || [];
