@@ -1,4 +1,5 @@
 import type { Plugin, PluginModule } from "@opencode-ai/plugin";
+import type { Message, Part } from "@opencode-ai/sdk";
 import fsSync from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -11,12 +12,13 @@ let _bootstrapCache: string | null | undefined = undefined;
 let _resolvedModels: any = null;
 
 function extractFrontmatter(content: string) {
-  const match = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+  const normalized = content.replace(/\r\n/g, "\n");
+  const match = normalized.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
   if (!match) return null;
   return { frontmatterStr: match[1], body: match[2].trim() };
 }
 
-const serverPlugin: Plugin = async ({ project, client, $, directory, worktree }) => {
+const serverPlugin: Plugin = async ({ project, directory, worktree }, options) => {
   const pluginRoot = path.resolve(__dirname, "..");
   const skillsDir = path.join(pluginRoot, "skills");
   const agentsDir = path.join(pluginRoot, "agents");
@@ -48,7 +50,13 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
 
   return {
     config: async (config: any) => {
-      _resolvedModels = config.superpipelines?.models || {
+      // config.agent (singular) is the Opencode Config key for agent definitions
+      // config.skills.paths is processed by OpenCode internally
+      // neither is exposed in the public SDK Config type yet
+      // Plugin options are passed via [plugin, options] tuple in config;
+      // fallback to config.superpipelines for backwards compatibility
+      const modelOptions = (options as any)?.models;
+      _resolvedModels = modelOptions || config.superpipelines?.models || {
         default: "opencode/gemini-3.1-pro",
         architect: "opencode/gemini-3.1-pro",
         reviewer: "opencode/gemini-3-flash"
@@ -60,9 +68,9 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
         config.skills.paths.push(skillsDir);
       }
 
-      config.agents = config.agents || {};
+      config.agent = config.agent || {};
       if (fsSync.existsSync(agentsDir)) {
-        const agentFiles = fsSync.readdirSync(agentsDir).filter(f => f.endsWith(".md"));
+        const agentFiles = fsSync.readdirSync(agentsDir).filter((f: string) => f.endsWith(".md"));
         for (const file of agentFiles) {
           const agentName = file.replace(".md", "");
           const content = fsSync.readFileSync(path.join(agentsDir, file), "utf-8");
@@ -78,11 +86,17 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
                 finalModel = _resolvedModels.reviewer;
               }
 
-              config.agents[agentName] = {
-                ...parsed,
+              const { description, effort, steps, version, permission, ...rest } = parsed;
+              const agentConfig: Record<string, unknown> = {
                 model: finalModel,
-                system: extracted.body
+                prompt: extracted.body,
               };
+              if (description) agentConfig.description = description;
+              if (effort) agentConfig.effort = effort;
+              if (steps) agentConfig.maxSteps = steps;
+              if (permission) agentConfig.permission = permission;
+
+              config.agent[agentName] = agentConfig;
             } catch (err) {
               console.error(`[superpipelines] Error parsing frontmatter for agent ${agentName}:`, err);
             }
@@ -91,31 +105,16 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
       }
     },
 
-    "experimental.chat.messages.transform": async (input: any, output: any) => {
+    "experimental.chat.messages.transform": async (_input: {}, output: { messages: { info: Message; parts: Part[] }[] }) => {
       const bootstrap = getBootstrapContent();
       if (!bootstrap || !output.messages.length) return;
       
-      const firstUser = output.messages.find((m: any) => m.info.role === "user");
+      const firstUser = output.messages.find((m) => m.info.role === "user");
       if (!firstUser || !firstUser.parts.length) return;
 
-      if (firstUser.parts.some((p: any) => p.type === "text" && p.text.includes("EXTREMELY_IMPORTANT"))) return;
+      if (firstUser.parts.some((p) => p.type === "text" && "text" in p && p.text.includes("EXTREMELY_IMPORTANT"))) return;
 
-      const ref = firstUser.parts[0];
-      firstUser.parts.unshift({ ...ref, type: "text", text: bootstrap });
-    },
-    
-    "tui.command.execute": async (input: any, output: any) => {
-      const cmd = input.command.trim();
-      if (cmd.startsWith("superpipelines:")) {
-        output.handled = true;
-        await client.app.log({
-          body: {
-            service: "superpipelines",
-            level: "warn",
-            message: `Slash commands (${cmd}) are intercepted. In OpenCode, invoke superpipelines features via natural language, e.g., 'run superpipelines architect to create a new pipeline'.`
-          }
-        });
-      }
+      firstUser.parts.unshift({ type: "text", text: bootstrap } as any);
     }
   };
 };

@@ -1,6 +1,6 @@
-import type { TuiPlugin } from "@opencode-ai/plugin/tui";
+import type { TuiPlugin, TuiPluginModule } from "@opencode-ai/plugin/tui";
 
-const SuperPipelinesTui: TuiPlugin = async (api, _options, _meta) => {
+const superPipelinesTui: TuiPlugin = async (api, _options, _meta) => {
   api.command.register(() => [
     {
       title: "SuperPipelines: New Pipeline",
@@ -54,5 +54,10 @@ const SuperPipelinesTui: TuiPlugin = async (api, _options, _meta) => {
   });
 };
 
+const SuperPipelinesTui: TuiPluginModule = {
+  id: "superpipelines",
+  tui: superPipelinesTui,
+};
+
 export default SuperPipelinesTui;
-export { SuperPipelinesTui };
+export { superPipelinesTui };

@@ -53,10 +53,12 @@
   },
   "devDependencies": {
     "@opencode-ai/plugin": "latest",
+    "@types/node": "25.6.0",
     "tsup": "latest",
     "typescript": "latest"
   },
   "dependencies": {
+    "@opencode-ai/sdk": "1.14.39",
     "yaml": "^2.8.4"
   }
 }

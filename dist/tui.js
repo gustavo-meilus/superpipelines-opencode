@@ -1,5 +1,5 @@
 // src/tui.ts
-var SuperPipelinesTui = async (api, _options, _meta) => {
+var superPipelinesTui = async (api, _options, _meta) => {
   api.command.register(() => [
     {
       title: "SuperPipelines: New Pipeline",
@@ -50,8 +50,12 @@ var SuperPipelinesTui = async (api, _options, _meta) => {
     });
   });
 };
+var SuperPipelinesTui = {
+  id: "superpipelines",
+  tui: superPipelinesTui
+};
 var tui_default = SuperPipelinesTui;
 export {
-  SuperPipelinesTui,
-  tui_default as default
+  tui_default as default,
+  superPipelinesTui
 };

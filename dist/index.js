@@ -8,11 +8,12 @@ var __dirname = path.dirname(__filename);
 var _bootstrapCache = void 0;
 var _resolvedModels = null;
 function extractFrontmatter(content) {
-  const match = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+  const normalized = content.replace(/\r\n/g, "\n");
+  const match = normalized.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
   if (!match) return null;
   return { frontmatterStr: match[1], body: match[2].trim() };
 }
-var serverPlugin = async ({ project, client, $, directory, worktree }) => {
+var serverPlugin = async ({ project, directory, worktree }, options) => {
   const pluginRoot = path.resolve(__dirname, "..");
   const skillsDir = path.join(pluginRoot, "skills");
   const agentsDir = path.join(pluginRoot, "agents");
@@ -46,7 +47,8 @@ ${content}
   };
   return {
     config: async (config) => {
-      _resolvedModels = config.superpipelines?.models || {
+      const modelOptions = options?.models;
+      _resolvedModels = modelOptions || config.superpipelines?.models || {
         default: "opencode/gemini-3.1-pro",
         architect: "opencode/gemini-3.1-pro",
         reviewer: "opencode/gemini-3-flash"
@@ -56,7 +58,7 @@ ${content}
       if (!config.skills.paths.includes(skillsDir)) {
         config.skills.paths.push(skillsDir);
       }
-      config.agents = config.agents || {};
+      config.agent = config.agent || {};
       if (fsSync.existsSync(agentsDir)) {
         const agentFiles = fsSync.readdirSync(agentsDir).filter((f) => f.endsWith(".md"));
         for (const file of agentFiles) {
@@ -72,11 +74,16 @@ ${content}
               } else if (agentName.includes("reviewer")) {
                 finalModel = _resolvedModels.reviewer;
               }
-              config.agents[agentName] = {
-                ...parsed,
+              const { description, effort, steps, version, permission, ...rest } = parsed;
+              const agentConfig = {
                 model: finalModel,
-                system: extracted.body
+                prompt: extracted.body
               };
+              if (description) agentConfig.description = description;
+              if (effort) agentConfig.effort = effort;
+              if (steps) agentConfig.maxSteps = steps;
+              if (permission) agentConfig.permission = permission;
+              config.agent[agentName] = agentConfig;
             } catch (err) {
               console.error(`[superpipelines] Error parsing frontmatter for agent ${agentName}:`, err);
             }
@@ -84,27 +91,13 @@ ${content}
         }
       }
     },
-    "experimental.chat.messages.transform": async (input, output) => {
+    "experimental.chat.messages.transform": async (_input, output) => {
       const bootstrap = getBootstrapContent();
       if (!bootstrap || !output.messages.length) return;
       const firstUser = output.messages.find((m) => m.info.role === "user");
       if (!firstUser || !firstUser.parts.length) return;
-      if (firstUser.parts.some((p) => p.type === "text" && p.text.includes("EXTREMELY_IMPORTANT"))) return;
-      const ref = firstUser.parts[0];
-      firstUser.parts.unshift({ ...ref, type: "text", text: bootstrap });
-    },
-    "tui.command.execute": async (input, output) => {
-      const cmd = input.command.trim();
-      if (cmd.startsWith("superpipelines:")) {
-        output.handled = true;
-        await client.app.log({
-          body: {
-            service: "superpipelines",
-            level: "warn",
-            message: `Slash commands (${cmd}) are intercepted. In OpenCode, invoke superpipelines features via natural language, e.g., 'run superpipelines architect to create a new pipeline'.`
-          }
-        });
-      }
+      if (firstUser.parts.some((p) => p.type === "text" && "text" in p && p.text.includes("EXTREMELY_IMPORTANT"))) return;
+      firstUser.parts.unshift({ type: "text", text: bootstrap });
     }
   };
 };
