@@ -150,9 +150,13 @@ superpipelines-opencode/
 ```
 </file_structure>
 
+## Related Projects
+
+- **[superpipelines](https://github.com/gustavo-meilus/superpipelines)** — The companion CLI service for managing Superpipelines runs, state, and schedules outside the OpenCode plugin context. This plugin (`superpipelines-opencode`) implements the OpenCode-side agent orchestration; the sibling project handles standalone execution, scheduling, and external integrations.
+
 ## Contributing
 
-Contributions are managed via issues and PRs at [gustavo-meilus/superpipelines](https://github.com/gustavo-meilus/superpipelines). Use `/superpipelines:audit-pipeline` to validate additions against the compliance matrix before submission.
+Contributions are managed via issues and PRs at [gustavo-meilus/superpipelines-opencode](https://github.com/gustavo-meilus/superpipelines-opencode). Use `/superpipelines:audit-pipeline` to validate additions against the compliance matrix before submission.
 
 ## License
 
