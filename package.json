@@ -1,5 +1,5 @@
 {
-  "name": "superpipelines-opencode",
+  "name": "superpipelines",
   "version": "1.0.10",
   "description": "Multi-agent AI orchestration framework with guaranteed spec compliance, write/review isolation, and full crash recovery",
   "type": "module",

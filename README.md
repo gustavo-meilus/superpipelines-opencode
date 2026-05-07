@@ -2,6 +2,9 @@
 
 > Multi-agent AI pipelines with guaranteed spec compliance, write/review isolation, and full crash recovery. Superpipelines enables complex task decomposition into coordinated subagents with automated verification and state persistence.
 
+[![npm version](https://img.shields.io/npm/v/superpipelines.svg)](https://www.npmjs.com/package/superpipelines)
+[![npm downloads](https://img.shields.io/npm/dm/superpipelines.svg)](https://www.npmjs.com/package/superpipelines)
+
 <overview>
 Superpipelines provides a framework for decomposing complex tasks into coordinated subagents. It enforces engineering best practices through separate author and reviewer roles, explicit handoffs, and mandatory human gates for high-stakes transitions. The system ensures that every output matches its specification before merging, reducing model hallucinations and providing a robust path for crash recovery.
 </overview>
@@ -60,7 +63,16 @@ The framework selects the optimal pattern based on task complexity:
 
 Install the Superpipelines plugin via npm or locally:
 
+> **Published on npm**: [`superpipelines`](https://www.npmjs.com/package/superpipelines)
+
 <installation>
+```bash
+# Install directly from npm
+npm install -g superpipelines
+```
+
+Or, clone and build locally:
+
 ```bash
 # Clone the repository
 git clone https://github.com/gustavo-meilus/superpipelines-opencode.git
@@ -74,9 +86,16 @@ npm run build
 Then, add the plugin to your `opencode.json`:
 ```json
 {
-  "plugin": ["./superpipelines-opencode"]
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": ["superpipelines"]
 }
 ```
+
+Plugins specified via npm are automatically installed at startup using Bun and cached in `~/.cache/opencode/node_modules/`.
+
+You can also place plugin source files directly in:
+- `.opencode/plugins/` — Project-level plugins
+- `~/.config/opencode/plugins/` — Global plugins
 
 ### Model Configuration
 
