@@ -20,9 +20,9 @@ npm run build
      "plugin": [
        ["file:///path/to/superpipelines-opencode/dist/index.js", {
          "models": {
-           "default": "opencode/gemini-3.1-pro",
-           "architect": "opencode/gemini-3.1-pro",
-           "reviewer": "opencode/gemini-3-flash"
+           "default": "opencode/big-pickle",
+           "architect": "opencode/big-pickle",
+           "reviewer": "opencode/big-pickle"
          }
        }]
      ]

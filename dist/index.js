@@ -59,9 +59,9 @@ ${content}
     config: async (config) => {
       const modelOptions = options?.models;
       _resolvedModels = modelOptions || config.superpipelines?.models || {
-        default: "opencode/gemini-3.1-pro",
-        architect: "opencode/gemini-3.1-pro",
-        reviewer: "opencode/gemini-3-flash"
+        default: "opencode/big-pickle",
+        architect: "opencode/big-pickle",
+        reviewer: "opencode/big-pickle"
       };
       config.skills = config.skills || {};
       config.skills.paths = config.skills.paths || [];

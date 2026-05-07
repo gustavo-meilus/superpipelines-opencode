@@ -68,9 +68,9 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
       // fallback to config.superpipelines for backwards compatibility
       const modelOptions = (options as any)?.models;
       _resolvedModels = modelOptions || config.superpipelines?.models || {
-        default: "opencode/gemini-3.1-pro",
-        architect: "opencode/gemini-3.1-pro",
-        reviewer: "opencode/gemini-3-flash"
+        default: "opencode/big-pickle",
+        architect: "opencode/big-pickle",
+        reviewer: "opencode/big-pickle"
       };
 
       config.skills = config.skills || {};

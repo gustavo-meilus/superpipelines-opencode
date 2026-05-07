@@ -2228,17 +2228,6 @@ While Superpipelines maintains `anthropic/claude-3-5-sonnet-20241022-4-6` as the
   <term name="Fallback Chain">The sequence of alternative models if the primary is unavailable or rate-limited.</term>
 </glossary>
 
-## Category Mappings
-
-<categories_table>
-| Category | Primary Model | Fallback Chain | Use Case |
-| :--- | :--- | :--- | :--- |
-| **`default`** | `anthropic/claude-3-5-sonnet-20241022-4-6` | *None* | Implementation, general tasks, and task-execution. |
-| **`deep-plan`** | `anthropic/claude-3-opus-20240229-4-7` | `gpt-5.4` -> `sonnet-4-6` | High-stakes architectural planning (e.g., `pipeline-architect`). |
-| **`quick-audit`** | `anthropic/claude-3-5-haiku-20241022-4-5-20251001` | *None* | Fast, broad pattern matching and codebase grepping. |
-| **`visual`** | `gemini-3.1-pro` | `gpt-5.4` | Tasks requiring image processing, UI screenshots, or diagram analysis. |
-</categories_table>
-
 ## Routing Protocol
 
 <protocol>

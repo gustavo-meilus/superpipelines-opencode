@@ -80,7 +80,7 @@ Then, add the plugin to your `opencode.json`:
 
 ### Model Configuration
 
-By default, Superpipelines targets standard OpenCode Zen models (`opencode/gemini-3.1-pro` and `opencode/gemini-3-flash`). You can override the models used by both the plugin's native agents and any generated pipelines by adding a `superpipelines` block to your `opencode.json`:
+By default, Superpipelines targets standard OpenCode Zen models (`opencode/big-pickle`). You can override the models used by both the plugin's native agents and any generated pipelines by adding a `superpipelines` block to your `opencode.json`:
 
 ```json
 {

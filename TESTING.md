@@ -43,9 +43,9 @@ Add to `.opencode/opencode.json` in your test project:
   "plugin": [
     ["file:///D:/Github/superpipelines-opencode/dist/index.js", {
       "models": {
-        "default": "opencode/gemini-3.1-pro",
-        "architect": "opencode/gemini-3.1-pro",
-        "reviewer": "opencode/gemini-3-flash"
+        "default": "opencode/big-pickle",
+        "architect": "opencode/big-pickle",
+        "reviewer": "opencode/big-pickle"
       }
     }],
     "file:///D:/Github/superpipelines-opencode/dist/tui.js"
@@ -64,9 +64,9 @@ Add to `~/.config/opencode/opencode.json`:
   "plugin": [
     ["file:///D:/Github/superpipelines-opencode/dist/index.js", {
       "models": {
-        "default": "opencode/gemini-3.1-pro",
-        "architect": "opencode/gemini-3.1-pro",
-        "reviewer": "opencode/gemini-3-flash"
+        "default": "opencode/big-pickle",
+        "architect": "opencode/big-pickle",
+        "reviewer": "opencode/big-pickle"
       }
     }],
     "file:///D:/Github/superpipelines-opencode/dist/tui.js"
@@ -81,9 +81,9 @@ Add to `~/.config/opencode/opencode.json`:
   "plugin": [
     ["superpipelines-opencode", {
       "models": {
-        "default": "opencode/gemini-3.1-pro",
-        "architect": "opencode/gemini-3.1-pro",
-        "reviewer": "opencode/gemini-3-flash"
+        "default": "opencode/big-pickle",
+        "architect": "opencode/big-pickle",
+        "reviewer": "opencode/big-pickle"
       }
     }]
   ]
@@ -118,13 +118,13 @@ Find `"agent"` in the output. All seven agents must be present with their resolv
 
 | Agent | Expected model |
 |---|---|
-| `pipeline-architect` | architect model (`opencode/gemini-3.1-pro`) |
-| `pipeline-auditor` | default model (`opencode/gemini-3.1-pro`) |
-| `pipeline-failure-analyzer` | default model (`opencode/gemini-3.1-pro`) |
-| `pipeline-quality-reviewer` | reviewer model (`opencode/gemini-3-flash`) |
-| `pipeline-spec-reviewer` | reviewer model (`opencode/gemini-3-flash`) |
-| `pipeline-task-executor` | default model (`opencode/gemini-3.1-pro`) |
-| `skill-architect` | architect model (`opencode/gemini-3.1-pro`) |
+| `pipeline-architect` | architect model (`opencode/big-pickle`) |
+| `pipeline-auditor` | default model (`opencode/big-pickle`) |
+| `pipeline-failure-analyzer` | default model (`opencode/big-pickle`) |
+| `pipeline-quality-reviewer` | reviewer model (`opencode/big-pickle`) |
+| `pipeline-spec-reviewer` | reviewer model (`opencode/big-pickle`) |
+| `pipeline-task-executor` | default model (`opencode/big-pickle`) |
+| `skill-architect` | architect model (`opencode/big-pickle`) |
 
 Each agent must have:
 
