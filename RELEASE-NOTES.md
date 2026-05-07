@@ -1,5 +1,23 @@
 # Release Notes
 
+## v1.0.10 — (2026-05-06)
+
+Maintenance release with **enhanced agent loading** and **default model standardization**.
+
+### What Changed
+
+#### Enhanced Agent Loading with Scope Root Support
+Improved agent loading and configuration management in `src/index.ts` to properly support scope root detection and agent file resolution across local, project, and user scopes. This ensures agents are correctly discovered and loaded regardless of where the pipeline is installed.
+
+#### Default Model Update
+Updated default models to use `opencode/big-pickle` across configuration files:
+- `.opencode/opencode.json` — Plugin configuration
+- `README.md` — Documentation examples
+- `TESTING.md` — Manual testing guide
+- `src/index.ts` — Source code defaults
+
+This standardizes all agent model references to use the `opencode/big-pickle` model by default.
+
 ## v1.0.9 — (2026-05-06)
 
 Feature release introducing **built-in command registration**, **dynamic pipeline discovery**, and a **comprehensive manual testing guide**.

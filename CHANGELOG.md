@@ -4,6 +4,14 @@ All notable changes to the `superpipelines-opencode` project will be documented 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.10 — (2026-05-06)
+
+### Added
+- **Enhanced Agent Loading with Scope Root Support**: Improved agent loading and configuration management to properly support scope root detection and agent file resolution across local, project, and user scopes.
+
+### Changed
+- **Default Model Update**: Updated default models to use `opencode/big-pickle` across all configuration files, including `.opencode/opencode.json`, `README.md`, `TESTING.md`, and source files.
+
 ## 1.0.9 — (2026-05-06)
 
 ### Added
