@@ -115,7 +115,7 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
             }
           }
 
-          const { description, effort, steps, version, permission, ...rest } = parsed;
+          const { description, effort, steps, version, permission, mode, hidden, ...rest } = parsed;
           const agentConfig: Record<string, unknown> = {
             model: finalModel,
             prompt: extracted.body,
@@ -124,6 +124,8 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
           if (effort) agentConfig.effort = effort;
           if (steps) agentConfig.maxSteps = steps;
           if (permission) agentConfig.permission = permission;
+          if (mode) agentConfig.mode = mode;
+          if (hidden !== undefined) agentConfig.hidden = hidden;
 
           config.agent[agentName] = agentConfig;
         } catch (err) {

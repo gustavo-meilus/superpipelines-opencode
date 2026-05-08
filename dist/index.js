@@ -98,7 +98,7 @@ ${content}
               finalModel = _resolvedModels.reviewer;
             }
           }
-          const { description, effort, steps, version, permission, ...rest } = parsed;
+          const { description, effort, steps, version, permission, mode, hidden, ...rest } = parsed;
           const agentConfig = {
             model: finalModel,
             prompt: extracted.body
@@ -107,6 +107,8 @@ ${content}
           if (effort) agentConfig.effort = effort;
           if (steps) agentConfig.maxSteps = steps;
           if (permission) agentConfig.permission = permission;
+          if (mode) agentConfig.mode = mode;
+          if (hidden !== void 0) agentConfig.hidden = hidden;
           config.agent[agentName] = agentConfig;
         } catch (err) {
           console.error(`[superpipelines] Error parsing frontmatter for agent ${agentName}:`, err);
