@@ -4,6 +4,12 @@ All notable changes to the `superpipelines-opencode` project will be documented 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.11 — (2026-05-07)
+
+### Added
+- **Subagent Configuration Properties**: Added `mode: subagent` and `hidden: true` frontmatter to all seven pipeline subagents (`pipeline-architect`, `pipeline-auditor`, `pipeline-failure-analyzer`, `pipeline-quality-reviewer`, `pipeline-spec-reviewer`, `pipeline-task-executor`, `skill-architect`) to mark them as internal subagents hidden from `@` autocomplete.
+- **Agent Frontmatter Schema**: Documented `mode` and `hidden` fields in the agent frontmatter schema reference and opencode conventions skill.
+
 ## 1.0.10 — (2026-05-06)
 
 ### Added

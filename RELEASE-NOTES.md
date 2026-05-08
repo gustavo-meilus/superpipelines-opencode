@@ -1,5 +1,18 @@
 # Release Notes
 
+## v1.0.11 — (2026-05-07)
+
+Maintenance release adding **`mode` and `hidden` frontmatter properties** to all pipeline subagent definitions.
+
+### What Changed
+
+#### Subagent Configuration Properties
+Added `mode: subagent` and `hidden: true` to the YAML frontmatter of all seven pipeline subagents. The `mode: subagent` property is required for `hidden` to take effect, and `hidden: true` removes these internal agents from the `@` autocomplete menu since they are only invoked programmatically via the Task tool.
+
+#### Documentation
+- Updated `skills/pipeline-architect-references/references/agent-frontmatter-schema.md` to document the new `mode` and `hidden` fields in the canonical frontmatter schema.
+- Updated `skills/sk-opencode-code-conventions/SKILL.md` to include `mode` and `hidden` in the frontmatter template example.
+
 ## v1.0.10 — (2026-05-06)
 
 Maintenance release with **enhanced agent loading** and **default model standardization**.
