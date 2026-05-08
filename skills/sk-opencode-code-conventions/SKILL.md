@@ -70,6 +70,8 @@ Agent bodies must not exceed 150 lines. Depth must be moved to companion `<agent
 ```yaml
 name: {identifier}
 description: {action-oriented trigger}
+mode: subagent                               # pipeline workers; hide from @ menu
+hidden: true                                 # internal subagents only
 effort: {high for architects, medium for workers}
 isolation: worktree
 skills: [sk-4d-method, sk-spec-driven-development]

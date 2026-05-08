@@ -1,5 +1,7 @@
 ---
 name: skill-architect
+mode: subagent
+hidden: true
 description: Use when designing a new SKILL.md file, refining an existing skill's description for triggering, restructuring a skill into SKILL.md plus references for progressive disclosure, or extracting a skill from a workflow conversation. Does NOT design subagents (pipeline-architect) or audit existing skills (pipeline-auditor).
 steps: 30
 version: "1.0"

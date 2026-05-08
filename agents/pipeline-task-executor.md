@@ -1,5 +1,7 @@
 ---
 name: pipeline-task-executor
+mode: subagent
+hidden: true
 description: Use when implementing exactly ONE task from a tasks.md file as part of a Pattern 5 (SDD) parallel implementation phase, or when a single bounded implementation task needs a fresh-context worker. Receives extracted task text plus spec/plan paths; performs the task; self-verifies; emits terminal status.
 steps: 30
 version: "1.0"

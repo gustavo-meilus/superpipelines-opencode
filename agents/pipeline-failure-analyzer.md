@@ -1,5 +1,7 @@
 ---
 name: pipeline-failure-analyzer
+mode: subagent
+hidden: true
 description: Use during a Pattern 3 iterative loop after a tester reports failures, before dispatching a fixer — diagnoses whether failures are fixable bugs or architectural problems, detects "fixes reveal new failures in new locations" pattern, and decides whether to continue or escalate per Pattern 3 protocol.
 steps: 20
 version: "1.0"

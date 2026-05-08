@@ -8,6 +8,8 @@ Canonical YAML frontmatter for pipeline subagents. Use this when generating new 
 ---
 name: lowercase-hyphens          # ≤64 chars, matches filename
 description: triggering conditions only — third person, ≤1024 chars
+mode: subagent                                # subagent for pipeline workers; omit for primary/all
+hidden: true                                  # hide from @ autocomplete; only applies to mode: subagent
 tools: Read, Write, Edit, Bash, Glob, Grep   # explicit allowlist
 disallowedTools: Write, Edit                 # explicit denylist (read-only agents)
 model: sonnet                                 # SONNET_ONLY default; non-sonnet requires user opt-in
@@ -32,6 +34,8 @@ isolation: worktree                           # Patterns 2/2b/3/5
 |-------|----------|-------|
 | `name` | yes | Lowercase + hyphens only. Matches filename (without `.md`). |
 | `description` | yes | Routing contract. Triggering conditions only. NEVER summarize workflow. Third person. |
+| `mode` | recommended | `subagent` for pipeline workers. Required if using `hidden: true`. |
+| `hidden` | recommended | `true` for internal subagents that should only be invoked via Task tool, not `@` autocomplete. Only applies when `mode: subagent`. |
 | `tools` | recommended | Minimal allowlist. Read-only agents: omit Write/Edit/Bash. |
 | `disallowedTools` | optional | Use to deny tools the agent must never call. Reviewers must deny Write/Edit/Bash. |
 | `model` | yes | `sonnet` by default. Non-sonnet: document user opt-in in Architect's Brief and agent body. |

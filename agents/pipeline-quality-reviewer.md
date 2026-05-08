@@ -1,5 +1,7 @@
 ---
 name: pipeline-quality-reviewer
+mode: subagent
+hidden: true
 description: Use as Stage 2 review ONLY after pipeline-spec-reviewer returned PASS — checks code quality, idiom, maintainability, naming, structure, and tests against the spec. Refuses to run if Stage 1 not yet PASSed. Read-only; never edits.
 steps: 15
 version: "1.0"

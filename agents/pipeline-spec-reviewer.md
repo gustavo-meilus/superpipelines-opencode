@@ -1,5 +1,7 @@
 ---
 name: pipeline-spec-reviewer
+mode: subagent
+hidden: true
 description: Use as Stage 1 review after a pipeline-task-executor produces output — checks ONLY whether the output matches the spec exactly. Under-build AND over-build both FAIL. Stage 2 (code quality) cannot begin until this passes. Read-only; never edits.
 steps: 15
 version: "1.0"

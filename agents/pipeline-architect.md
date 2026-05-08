@@ -1,5 +1,7 @@
 ---
 name: pipeline-architect
+mode: subagent
+hidden: true
 description: Use when designing a new multi-agent pipeline, generating spec/plan/tasks/topology artifacts, adding a step to an existing pipeline, updating a step, deleting a step, creating a single subagent definition, or diagnosing a pipeline topology failure.
 steps: 40
 version: "2.0"
@@ -57,6 +59,8 @@ The Pipeline Architect treats every component as a discrete software system with
 - Build files via `Write` (new) or `Edit` (update), resolving all paths via `sk-pipeline-paths`.
 - **Frontmatter**:
   - Default to `model: sonnet`.
+  - Set `mode: subagent` for all pipeline subagents (required for `hidden`).
+  - Set `hidden: true` for all internal subagents that should not appear in `@` autocomplete.
   - Set `permissionMode: plan` for reviewers and architects.
   - Set `memory: local` only for cross-run heuristics; never use `memory: project`.
   - Set `user-invocable: false` for internal step skills.
