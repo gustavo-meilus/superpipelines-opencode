@@ -1,5 +1,16 @@
 # Release Notes
 
+## v1.0.12 — (2026-05-07)
+
+Patch release fixing **agent `hidden` and `mode` frontmatter properties not being forwarded** to the OpenCode agent configuration.
+
+### What Changed
+
+#### Bug Fix — Frontmatter Forwarding
+The `loadAgentFile` function in `src/index.ts` was destructuring `mode` and `hidden` into a discard variable (`...rest`) instead of passing them through to the `agentConfig` object. This meant that `hidden: true` in agent frontmatter had no effect — subagents continued to appear in `@` autocomplete.
+
+The fix adds `mode` and `hidden` to the destructured properties and conditionally forwards them to the agent configuration, making `hidden: true` work correctly.
+
 ## v1.0.11 — (2026-05-07)
 
 Maintenance release adding **`mode` and `hidden` frontmatter properties** to all pipeline subagent definitions.

@@ -4,6 +4,11 @@ All notable changes to the `superpipelines-opencode` project will be documented 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.12 — (2026-05-07)
+
+### Fixed
+- **Agent `hidden` and `mode` Frontmatter Forwarding**: The plugin now reads and forwards `mode` and `hidden` properties from agent YAML frontmatter to the OpenCode agent config. Previously these fields were silently discarded by destructuring into `...rest`, causing subagents with `hidden: true` to still appear in `@` autocomplete.
+
 ## 1.0.11 — (2026-05-07)
 
 ### Added
