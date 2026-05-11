@@ -3,7 +3,7 @@ name: release-manager
 mode: subagent
 hidden: true
 description: Use when preparing a new software release — bumps version, updates changelog and release notes from git log, commits, tags, pushes, and creates a GitHub release. Automates the full npm/GitHub release workflow.
-model: opencode/big-pickle
+model: opencode/deepseek-v4-pro
 steps: 35
 version: "1.0"
 permission:

@@ -1,5 +1,36 @@
 # Release Notes
 
+## v1.2.0 — (2026-05-11)
+
+Major overhaul of the **`change-models`** command introducing pipeline-scoping, fast-path argument handling, and stronger guardrails against unintended model changes.
+
+### What Changed
+
+#### Phase 0: Pipeline Selection
+The `change-models` command now begins by reading the project's local registry and prompting the user to select which pipeline to modify. This replaces the previous flat scan of all agents across all scopes. Users can scope changes to a single pipeline or apply to all pipelines at once. Auto-selects if only one pipeline exists.
+
+#### `$ARGUMENTS` Fast-Path
+When invoked with command arguments (e.g., `/superpipelines:change-models all to opencode/big-pickle`), the tool enters a fast-path that minimizes interactivity:
+- Auto-scopes pipeline selection to "All pipelines" unless a specific pipeline is named
+- Auto-selects agents based on the instruction target (`all`, numeric ranges, or agent names)
+- Skips mode selection and parses arguments directly as a Mode C instruction
+- Still requires user confirmation before any writes
+
+#### HARD-GATE: No More Silent Assumptions
+A new HARD-GATE explicitly forbids inferring user intent from model preferences when the command is invoked without arguments. The tool must present three modes (A: Apply to All, B: Select Individually, C: Natural Language) to the user — never silently assume.
+
+#### Reduced Scope
+The `change-models` command no longer scans:
+- Built-in core agents from the plugin installation directory
+- User-scope directory (`~/.opencode/agents/superpipelines/`)
+Only project-scoped pipeline agents are discovered.
+
+#### Config Resolution
+Default model resolution now reads from the exact field path (`plugin[].models.default`) in `.opencode/opencode.json` instead of the previous plugin-default approach.
+
+#### Release Manager Model Update
+The `release-manager` agent's model was changed from `opencode/big-pickle` to `opencode/deepseek-v4-pro`.
+
 ## v1.1.0 — (2026-05-11)
 
 Release introducing **interactive model reassignment**, **plugin version stamping**, and **bootstrap version injection** — laying the groundwork for runtime retro-compatibility.

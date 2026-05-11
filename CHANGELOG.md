@@ -4,6 +4,23 @@ All notable changes to the `superpipelines-opencode` project will be documented 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.2.0 — (2026-05-11)
+
+### Added
+- **Phase 0: Pipeline Selection** — The `change-models` command now begins by reading the project's local registry and prompting the user to select which pipeline to modify. Auto-selects if only one pipeline exists. Includes an "All pipelines" option for bulk operations.
+- **`$ARGUMENTS` Fast-Path** — When command arguments are provided (e.g., `all to opencode/big-pickle`), the tool auto-scopes pipeline selection to "All pipelines", auto-selects agents from the instruction target, skips mode selection, and parses arguments as a Mode C instruction. Still gates on user confirmation before any writes.
+- **HARD-GATE for No-Arg Invocation** — When no arguments are provided, the tool must present three modes (A, B, C) to the user. Explicitly forbids inferring `$ARGUMENTS` from user model preferences, plugin configuration defaults, or any other source.
+- **Deferred Catalog Presentation** — The model catalog is now assembled in Phase 1 but only presented in Phase 3 (during mode selection), saving context and reducing cognitive load.
+- **Edge Case Handling** — Added graceful abort for empty registries and agent-less pipelines with user-facing messages.
+
+### Changed
+- **`skills/change-models/SKILL.md` — Major Overhaul**: Removed built-in core agent scanning (no longer accesses plugin installation directory). Removed user-scope scanning — only project-scoped pipeline agents are discovered. Config resolution now reads from the exact field path (`plugin[].models.default`) in `.opencode/opencode.json`. Renamed "Step numbers" to "Agent numbers (by table index)" throughout. Updated all Phase numbers (0-5 after renumbering). Purged all core agent references from examples and descriptions. Added new invariant, Red Flag, and rationalization entry for the preferences-as-intent fallacy.
+- **`.opencode/agents/release-manager.md`**: Agent model changed from `opencode/big-pickle` to `opencode/deepseek-v4-pro`.
+
+### Removed
+- **Built-in Core Agent Scanning**: The change-models command no longer scans the plugin installation directory for built-in core agents.
+- **User-Scope Agent Scanning**: Removed discovery of agents from `~/.opencode/agents/superpipelines/**/*.md`. Only project-scoped pipeline agents are now supported.
+
 ## 1.1.0 — (2026-05-11)
 
 ### Added
