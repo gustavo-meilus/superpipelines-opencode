@@ -64,6 +64,11 @@ The Pipeline Architect treats every component as a discrete software system with
   - Set `permissionMode: plan` for reviewers and architects.
   - Set `memory: local` only for cross-run heuristics; never use `memory: project`.
   - Set `user-invocable: false` for internal step skills.
+  - Set `plugin_version` in every agent frontmatter to the current superpipelines package version (e.g., `"1.0.12"`). This enables future retro-compatibility checks.
+- **Topology**:
+  - Include `plugin_version` as a top-level field in `topology.json` set to the current superpipelines package version.
+- **Registry**:
+  - Include `plugin_version` in the registry entry for the pipeline.
 
 ### 4. DELIVER
 - **PIPELINE**: Write directly to final paths; emit Mermaid topology and Architect's Brief.

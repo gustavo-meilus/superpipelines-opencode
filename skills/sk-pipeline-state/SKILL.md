@@ -32,6 +32,7 @@ State must be persisted to `<scope-root>/superpipelines/temp/{P}/{runId}/pipelin
 {
   "pipeline_id": "<uuid>",
   "pipeline_name": "<P>",
+  "plugin_version": "<semver>",
   "scope_root": "<absolute path>",
   "run_id": "<uuid>",
   "started_at": "<iso8601>",
@@ -52,6 +53,9 @@ State must be persisted to `<scope-root>/superpipelines/temp/{P}/{runId}/pipelin
 }
 ```
 </schema>
+
+**Field Notes:**
+- `plugin_version`: The version of the superpipelines plugin that created (or last modified) this pipeline. Set at initialization time from the bootstrap directive. Enables future retro-compatibility checks — if the major version differs from the current plugin version, an advisory warning is issued during resume.
 
 ## Atomic Write Protocol
 

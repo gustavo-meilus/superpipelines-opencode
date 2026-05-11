@@ -8,6 +8,7 @@ var __filename = fileURLToPath(import.meta.url);
 var __dirname = path.dirname(__filename);
 var _bootstrapCache = void 0;
 var _resolvedModels = null;
+var _pluginVersion = "0.0.0";
 function extractFrontmatter(content) {
   const normalized = content.replace(/\r\n/g, "\n");
   const match = normalized.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
@@ -21,12 +22,21 @@ var BUILTIN_COMMANDS = {
   "update-step": "superpipelines:update-step",
   "delete-step": "superpipelines:delete-step",
   "audit-pipeline": "superpipelines:audit-pipeline",
-  "init-deep": "superpipelines:init-deep"
+  "init-deep": "superpipelines:init-deep",
+  "change-models": "superpipelines:change-models"
 };
 var serverPlugin = async ({ project, directory, worktree }, options) => {
   const pluginRoot = path.resolve(__dirname, "..");
   const skillsDir = path.join(pluginRoot, "skills");
   const agentsDir = path.join(pluginRoot, "agents");
+  try {
+    const pkgPath = path.join(pluginRoot, "package.json");
+    if (fsSync.existsSync(pkgPath)) {
+      const pkg = JSON.parse(fsSync.readFileSync(pkgPath, "utf-8"));
+      if (pkg.version) _pluginVersion = pkg.version;
+    }
+  } catch {
+  }
   const getBootstrapContent = () => {
     if (_bootstrapCache !== void 0) return _bootstrapCache;
     const skillPath = path.join(skillsDir, "using-superpipelines", "SKILL.md");
@@ -44,11 +54,15 @@ The user has configured the following model preferences for Superpipelines:
 
 Whenever you act as the pipeline-architect to generate new agent definitions (e.g. \`pipeline-spec-reviewer.md\`), you MUST use these corresponding models in their YAML frontmatter instead of any default Anthropic models.
 `;
+    const versionDirective = `
+**SUPERPIPELINES PLUGIN VERSION:** \`${_pluginVersion}\`
+When creating or modifying pipeline artifacts (topology.json, registry.json, pipeline-state.json, agent frontmatter), you MUST stamp the current plugin version (\`${_pluginVersion}\`) into the \`plugin_version\` field. This enables future retro-compatibility checks.
+`;
     _bootstrapCache = `<EXTREMELY_IMPORTANT>
 You have superpipelines.
 
 ${modelsDirective}
-
+${versionDirective}
 **Below is the full content of your 'superpipelines:using-superpipelines' skill \u2014 your introduction to designing and running AI pipelines.**
 
 ${content}

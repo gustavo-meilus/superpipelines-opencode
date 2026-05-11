@@ -55,11 +55,11 @@ The Pipeline Creation workflow guides an orchestrator from a raw user brief to a
   1. `<scope-root>/superpipelines/pipelines/{P}/spec.md`
   2. `<scope-root>/superpipelines/pipelines/{P}/plan.md`
   3. `<scope-root>/superpipelines/pipelines/{P}/tasks.md`
-  4. `<scope-root>/superpipelines/pipelines/{P}/topology.json`
+  4. `<scope-root>/superpipelines/pipelines/{P}/topology.json` — MUST include `"plugin_version"` field set to the current superpipelines version.
   5. `<scope-root>/skills/superpipelines/{P}/run-{P}/SKILL.md` (entry skill, `user-invocable: true`)
-  6. All step agents and skills under `<scope-root>/agents/superpipelines/{P}/` and `<scope-root>/skills/superpipelines/{P}/`
+  6. All step agents and skills under `<scope-root>/agents/superpipelines/{P}/` and `<scope-root>/skills/superpipelines/{P}/` — each agent frontmatter MUST include `plugin_version` set to the current superpipelines version.
   7. `<scope-root>/superpipelines/{P}/{P}.md` (run command, see template below)
-  8. Updated `<scope-root>/superpipelines/registry.json`
+  8. Updated `<scope-root>/superpipelines/registry.json` — MUST include `"plugin_version"` field in the new entry.
 </HARD-GATE>
 - **Run Command Template**: The file at step 7 MUST follow this structure (replace `{P}` with the actual pipeline name and `{SCOPE_ROOT}` with the resolved absolute scope root path):
   ```markdown
@@ -111,6 +111,7 @@ The Pipeline Creation workflow guides an orchestrator from a raw user brief to a
 - NEVER generate the entry skill before human approval of the `tasks.md` and `topology.json`.
 - All internal step skills MUST be marked `user-invocable: false`.
 - Any modification to the design MUST trigger a re-audit for SEV-0/1 issues.
+- Every generated `topology.json`, `registry.json` entry, agent frontmatter, and `pipeline-state.json` MUST include a `plugin_version` field set to the current superpipelines package version. This enables future retro-compatibility checks.
 </invariants>
 
 ## Red Flags — STOP

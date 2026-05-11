@@ -4,6 +4,24 @@ All notable changes to the `superpipelines-opencode` project will be documented 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.1.0 — (2026-05-11)
+
+### Added
+- **New Command: `/superpipelines:change-models`** — Interactive model reassignment across pipeline agents and built-in core agents. Discovers available models from OpenCode Zen, OpenCode Go, and custom providers. Supports three modes: bulk apply, individual selection, and natural language instruction (e.g., "steps 1-3 to opencode Qwen 3.6 Plus"). Registered as `superpipelines:change-models` command and `change-models` skill.
+- **Plugin Version Stamping (`plugin_version`)** — Every pipeline artifact now includes a `plugin_version` field set to the current superpipelines package version. Enables future retro-compatibility checks. Stamped in `topology.json`, `registry.json` entries, `pipeline-state.json`, and agent YAML frontmatter. Updated on every mutation (create, add-step, update-step, delete-step). Advisory warning on major version mismatch when running a pipeline.
+- **Bootstrap Version Injection** — The plugin now injects the current package version into every conversation alongside model preferences, so skills and agents know the exact version at runtime.
+- **Model Catalog Reference** — Added `skills/change-models/references/model-catalog.md` — a curated static fallback catalog listing all OpenCode Zen (43 models), OpenCode Go (12 models), and common built-in/custom provider models for offline model discovery.
+
+### Changed
+- **Moved `release-manager` from plugin to project-level** — The `release-manager` agent is no longer shipped in the npm package (`agents/`). It now lives at `.opencode/agents/release-manager.md` as a project-level agent specific to this repository's release workflow.
+- **Updated pipeline mutation skills** — `creating-a-pipeline`, `adding-a-pipeline-step`, `updating-a-pipeline-step`, `deleting-a-pipeline-step`, `change-models`, `running-a-pipeline`, and `sk-pipeline-state` all now require `plugin_version` stamping.
+- **Updated audit references** — Added `plugin_version` requirements to `topology-rules.md`, `compliance-matrix.md`, `agent-frontmatter-schema.md`, and `pipeline-architect.md`.
+- **Updated routing table** — Added `change-models` entry to `skills/using-superpipelines/SKILL.md`.
+- **Updated `src/index.ts`** — Registers `change-models` command, injects plugin version into bootstrap content, reads version from `package.json`.
+
+### Removed
+- **`agents/release-manager.md`**: Removed from the plugin's `agents/` directory. Moved to `.opencode/agents/release-manager.md` (project-level).
+
 ## 1.0.12 — (2026-05-07)
 
 ### Fixed

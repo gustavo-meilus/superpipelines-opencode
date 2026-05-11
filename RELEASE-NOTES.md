@@ -1,5 +1,43 @@
 # Release Notes
 
+## v1.1.0 — (2026-05-11)
+
+Release introducing **interactive model reassignment**, **plugin version stamping**, and **bootstrap version injection** — laying the groundwork for runtime retro-compatibility.
+
+### What Changed
+
+#### New Command — `/superpipelines:change-models`
+A powerful interactive command for reassigning AI models across all pipeline agents. Discovers available models from OpenCode Zen (43 models), OpenCode Go (12 models), and custom providers. Supports three modes:
+- **Bulk apply**: Assign a single model to all agents at once
+- **Individual selection**: Hand-pick models per agent
+- **Natural language instruction**: e.g., "steps 1-3 to opencode Qwen 3.6 Plus"
+
+#### Plugin Version Stamping (`plugin_version`)
+Every pipeline artifact now carries a `plugin_version` field stamped with the current superpipelines version. This enables future retro-compatibility checks — a warning is issued on major version mismatch when running a pipeline. Stamped in:
+- `topology.json`
+- `registry.json` entries
+- `pipeline-state.json`
+- Agent YAML frontmatter
+
+Updated on every mutation operation (create, add-step, update-step, delete-step, change-models).
+
+#### Bootstrap Version Injection
+The plugin now injects its own version number into every conversation alongside model preferences, ensuring all skills and agents know the exact runtime version at all times.
+
+#### Model Catalog Reference
+Added a curated static fallback catalog at `skills/change-models/references/model-catalog.md` with 43 OpenCode Zen models, 12 OpenCode Go models, and common custom provider tables for offline model discovery.
+
+#### File Relocations
+- **`release-manager` moved to project-level** — No longer shipped in the npm package. Now at `.opencode/agents/release-manager.md` as a repository-specific project agent.
+
+#### Updated Pipeline Skills
+Seven pipeline mutation skills now enforce `plugin_version` stamping: `creating-a-pipeline`, `adding-a-pipeline-step`, `updating-a-pipeline-step`, `deleting-a-pipeline-step`, `change-models`, `running-a-pipeline`, and `sk-pipeline-state`.
+
+#### Documentation & References
+- Audit references updated with `plugin_version` requirements: `topology-rules.md`, `compliance-matrix.md`, `agent-frontmatter-schema.md`, `pipeline-architect.md`
+- Routing table updated in `skills/using-superpipelines/SKILL.md` with `change-models` entry
+- `src/index.ts` updated to register the `change-models` command and inject plugin version
+
 ## v1.0.12 — (2026-05-07)
 
 Patch release fixing **agent `hidden` and `mode` frontmatter properties not being forwarded** to the OpenCode agent configuration.

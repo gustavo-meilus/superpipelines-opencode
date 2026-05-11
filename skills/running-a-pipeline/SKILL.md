@@ -28,12 +28,13 @@ The Running a Pipeline workflow acts as the central orchestrator for pipeline ex
 ### PHASE 1: RESUME CHECK
 - Check for existing run directories in `{ROOT}/superpipelines/temp/{P}/`.
 - **Logic**: If runs exist, prompt the user to start new or resume.
+- **Version Compatibility Check**: Read `plugin_version` from the pipeline's `topology.json`. Compare the major version component with the current superpipelines plugin version. If the major versions differ, issue an **advisory warning** (not a hard block): *"This pipeline was created with superpipelines v{X.Y.Z} but the current version is v{A.B.C}. Major version differs — some features may not work as expected. Proceed with caution."* If only the minor/patch version differs, log an informational note.
 - <HARD-GATE>NEVER auto-resume an `escalated` or `failed` run. Surface the state path and require explicit user review first.</HARD-GATE>
 
 ### PHASE 2: STATE INITIALIZATION
 - Generate a new `runId` (format: `{P}-{YYYYMMDD-HHMMSS}`).
 - Initialize `pipeline-state.json` using the atomic write protocol (write to `.tmp` then rename).
-- **Invariants**: Must include `pipeline_id`, `started_at`, and the selected execution `pattern`.
+- **Invariants**: Must include `pipeline_id`, `started_at`, `plugin_version` (set to the current superpipelines version from the bootstrap directive), and the selected execution `pattern`.
 
 ### PHASE 3: ENTRY SKILL DISPATCH
 - Invoke the pipeline's entry skill (`run-{P}`).
@@ -51,6 +52,8 @@ The Running a Pipeline workflow acts as the central orchestrator for pipeline ex
 - ALWAYS preserve the temp directory on any status other than `completed`.
 - NEVER pass full file content to the entry skill; use absolute paths.
 - All state updates must utilize the atomic write pattern.
+- ALWAYS include `plugin_version` in `pipeline-state.json` at initialization time.
+- ALWAYS issue an advisory warning (not a hard block) when a pipeline's `plugin_version` has a different major version than the current plugin.
 </invariants>
 
 ## Red Flags — STOP

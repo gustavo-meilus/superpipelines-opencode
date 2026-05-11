@@ -11,6 +11,7 @@ const __dirname = path.dirname(__filename);
 
 let _bootstrapCache: string | null | undefined = undefined;
 let _resolvedModels: any = null;
+let _pluginVersion: string = "0.0.0";
 
 function extractFrontmatter(content: string) {
   const normalized = content.replace(/\r\n/g, "\n");
@@ -27,12 +28,24 @@ const BUILTIN_COMMANDS: Record<string, string> = {
   "delete-step": "superpipelines:delete-step",
   "audit-pipeline": "superpipelines:audit-pipeline",
   "init-deep": "superpipelines:init-deep",
+  "change-models": "superpipelines:change-models",
 };
 
 const serverPlugin: Plugin = async ({ project, directory, worktree }, options) => {
   const pluginRoot = path.resolve(__dirname, "..");
   const skillsDir = path.join(pluginRoot, "skills");
   const agentsDir = path.join(pluginRoot, "agents");
+
+  // Read plugin version from package.json
+  try {
+    const pkgPath = path.join(pluginRoot, "package.json");
+    if (fsSync.existsSync(pkgPath)) {
+      const pkg = JSON.parse(fsSync.readFileSync(pkgPath, "utf-8"));
+      if (pkg.version) _pluginVersion = pkg.version;
+    }
+  } catch {
+    // Fall back to default "0.0.0"
+  }
 
   const getBootstrapContent = () => {
     if (_bootstrapCache !== undefined) return _bootstrapCache;
@@ -55,7 +68,9 @@ The user has configured the following model preferences for Superpipelines:
 Whenever you act as the pipeline-architect to generate new agent definitions (e.g. \`pipeline-spec-reviewer.md\`), you MUST use these corresponding models in their YAML frontmatter instead of any default Anthropic models.
 `;
 
-    _bootstrapCache = `<EXTREMELY_IMPORTANT>\nYou have superpipelines.\n\n${modelsDirective}\n\n**Below is the full content of your 'superpipelines:using-superpipelines' skill — your introduction to designing and running AI pipelines.**\n\n${content}\n</EXTREMELY_IMPORTANT>`;
+    const versionDirective = `\n**SUPERPIPELINES PLUGIN VERSION:** \`${_pluginVersion}\`\nWhen creating or modifying pipeline artifacts (topology.json, registry.json, pipeline-state.json, agent frontmatter), you MUST stamp the current plugin version (\`${_pluginVersion}\`) into the \`plugin_version\` field. This enables future retro-compatibility checks.\n`;
+
+    _bootstrapCache = `<EXTREMELY_IMPORTANT>\nYou have superpipelines.\n\n${modelsDirective}\n${versionDirective}\n**Below is the full content of your 'superpipelines:using-superpipelines' skill — your introduction to designing and running AI pipelines.**\n\n${content}\n</EXTREMELY_IMPORTANT>`;
     return _bootstrapCache;
   };
 
