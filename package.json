@@ -1,6 +1,6 @@
 {
   "name": "superpipelines",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Multi-agent AI orchestration framework with guaranteed spec compliance, write/review isolation, and full crash recovery",
   "type": "module",
   "main": "dist/index.js",

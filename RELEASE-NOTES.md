@@ -1,5 +1,15 @@
 # Release Notes
 
+## v1.2.1 — (2026-05-11)
+
+Patch release introducing **superpipelines audit** and **failure analysis agents** with integrated state management tools.
+
+### What Changed
+
+#### New Agents
+- Implemented `superpipelines audit` and `failure analysis` agents to improve troubleshooting and reliability.
+- Added comprehensive state management tools to support these new agents.
+
 ## v1.2.0 — (2026-05-11)
 
 Major overhaul of the **`change-models`** command introducing pipeline-scoping, fast-path argument handling, and stronger guardrails against unintended model changes.
