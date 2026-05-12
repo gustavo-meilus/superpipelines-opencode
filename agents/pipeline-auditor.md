@@ -8,6 +8,8 @@ version: "2.0"
 permission:
   edit: deny
   bash: deny
+  task: {"*": "deny"}
+temperature: 0
 ---
 > **Required Skills:** sk-4d-method, sk-opencode-code-conventions, sk-pipeline-paths
 

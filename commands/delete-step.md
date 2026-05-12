@@ -1,6 +1,7 @@
 ---
 description: Delete a step from an existing pipeline — select pipeline, select step, perform gap analysis, optionally rewire, audit the delta, then gate on human approval before any deletion
 argument-hint: [optional: step name]
+agent: pipeline-architect
 ---
 
 # Delete Step — Command Reference

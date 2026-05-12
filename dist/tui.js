@@ -1,3 +1,5 @@
+import "./chunk-MLKGABMK.js";
+
 // src/tui.ts
 import fsSync from "fs";
 import os from "os";

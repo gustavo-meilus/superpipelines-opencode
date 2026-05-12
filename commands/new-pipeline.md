@@ -1,6 +1,7 @@
 ---
 description: Design and scaffold a new named multi-agent pipeline with git preflight, scope selection, pre-gate audit, and entry-skill generation
 argument-hint: [brief description of the pipeline]
+agent: pipeline-architect
 ---
 
 # New Pipeline — Command Reference

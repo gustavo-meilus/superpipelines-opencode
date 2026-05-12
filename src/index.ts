@@ -5,6 +5,7 @@ import os from "os";
 import path from "path";
 import { fileURLToPath } from "url";
 import { parse as yamlParse } from "yaml";
+import { superpipelines_read_registry, superpipelines_read_state, superpipelines_write_state } from "./tools.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -49,14 +50,6 @@ const serverPlugin: Plugin = async ({ project, directory, worktree }, options) =
 
   const getBootstrapContent = () => {
     if (_bootstrapCache !== undefined) return _bootstrapCache;
-
-    const skillPath = path.join(skillsDir, "using-superpipelines", "SKILL.md");
-    if (!fsSync.existsSync(skillPath)) {
-      _bootstrapCache = null;
-      return null;
-    }
-
-    const content = fsSync.readFileSync(skillPath, "utf-8");
     
     const modelsDirective = `
 **USER MODEL PREFERENCES (CRITICAL INSTRUCTION)**
@@ -70,7 +63,7 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
 
     const versionDirective = `\n**SUPERPIPELINES PLUGIN VERSION:** \`${_pluginVersion}\`\nWhen creating or modifying pipeline artifacts (topology.json, registry.json, pipeline-state.json, agent frontmatter), you MUST stamp the current plugin version (\`${_pluginVersion}\`) into the \`plugin_version\` field. This enables future retro-compatibility checks.\n`;
 
-    _bootstrapCache = `<EXTREMELY_IMPORTANT>\nYou have superpipelines.\n\n${modelsDirective}\n${versionDirective}\n**Below is the full content of your 'superpipelines:using-superpipelines' skill — your introduction to designing and running AI pipelines.**\n\n${content}\n</EXTREMELY_IMPORTANT>`;
+    _bootstrapCache = `<EXTREMELY_IMPORTANT>\nYou have superpipelines.\n\n${modelsDirective}\n${versionDirective}\n</EXTREMELY_IMPORTANT>`;
     return _bootstrapCache;
   };
 
@@ -92,6 +85,12 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
       config.skills.paths = config.skills.paths || [];
       if (!config.skills.paths.includes(skillsDir)) {
         config.skills.paths.push(skillsDir);
+      }
+
+      config.instructions = config.instructions || [];
+      const coreInstructionPath = path.join(skillsDir, "using-superpipelines", "SKILL.md");
+      if (!config.instructions.includes(coreInstructionPath)) {
+        config.instructions.push(coreInstructionPath);
       }
 
       const scopeRoots = [
@@ -130,7 +129,7 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
             }
           }
 
-          const { description, effort, steps, version, permission, mode, hidden, ...rest } = parsed;
+          const { description, effort, steps, version, permission, mode, hidden, temperature, top_p, ...rest } = parsed;
           const agentConfig: Record<string, unknown> = {
             model: finalModel,
             prompt: extracted.body,
@@ -141,6 +140,8 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
           if (permission) agentConfig.permission = permission;
           if (mode) agentConfig.mode = mode;
           if (hidden !== undefined) agentConfig.hidden = hidden;
+          if (temperature !== undefined) agentConfig.temperature = temperature;
+          if (top_p !== undefined) agentConfig.top_p = top_p;
 
           config.agent[agentName] = agentConfig;
         } catch (err) {
@@ -260,9 +261,34 @@ Whenever you act as the pipeline-architect to generate new agent definitions (e.
       const firstUser = output.messages.find((m) => m.info.role === "user");
       if (!firstUser || !firstUser.parts.length) return;
 
-      if (firstUser.parts.some((p) => p.type === "text" && "text" in p && p.text.includes("EXTREMELY_IMPORTANT"))) return;
+      const BOOTSTRAP_ID = "superpipelines-bootstrap-v1";
+      if (firstUser.parts.some((p: any) => p.metadata?.injected === BOOTSTRAP_ID)) return;
 
-      firstUser.parts.unshift({ type: "text", text: bootstrap } as any);
+      firstUser.parts.unshift({ 
+        type: "text", 
+        text: bootstrap,
+        metadata: { injected: BOOTSTRAP_ID } 
+      } as any);
+    },
+
+    tool: {
+      superpipelines_read_registry,
+      superpipelines_read_state,
+      superpipelines_write_state,
+    },
+
+    "tool.execute.before": async (input: any, _output: any) => {
+      const LEAF_AGENTS = [
+        "pipeline-task-executor", 
+        "pipeline-spec-reviewer", 
+        "pipeline-quality-reviewer", 
+        "pipeline-failure-analyzer", 
+        "pipeline-auditor"
+      ];
+      
+      if (input.tool === "task" && input.agent && LEAF_AGENTS.includes(input.agent)) {
+        throw new Error(`[Superpipelines Invariant] Leaf agent ${input.agent} is strictly forbidden from spawning subagents.`);
+      }
     }
   };
 };

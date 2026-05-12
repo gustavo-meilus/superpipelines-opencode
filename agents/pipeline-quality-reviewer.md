@@ -8,6 +8,8 @@ version: "1.0"
 permission:
   edit: deny
   bash: deny
+  task: {"*": "deny"}
+temperature: 0
 ---
 > **Required Skills:** sk-opencode-code-conventions, sk-write-review-isolation, sk-dynamic-routing
 

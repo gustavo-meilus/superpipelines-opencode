@@ -1,6 +1,7 @@
 ---
 description: Interactively change the LLM models assigned to pipeline step agents — discover available models from Zen, Go, and custom providers, select a change mode, apply and verify
 argument-hint: "[optional: natural language instruction, e.g. 'steps 1-3 to opencode Qwen 3.6 Plus, and 4 to 6 to opencode DeepSeek V4 Pro']"
+agent: pipeline-architect
 ---
 
 # Change Models — Command Reference

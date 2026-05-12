@@ -8,6 +8,7 @@ version: "1.0"
 permission:
   edit: allow
   bash: allow
+  task: {"*": "deny"}
 ---
 > **Required Skills:** sk-4d-method, sk-spec-driven-development, sk-opencode-code-conventions, sk-hashline-protocol
 

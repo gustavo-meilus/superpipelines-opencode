@@ -8,6 +8,7 @@ version: "1.0"
 permission:
   edit: deny
   bash: allow
+  task: {"*": "deny"}
 ---
 > **Required Skills:** sk-4d-method, sk-pipeline-patterns, sk-rationalization-resistance
 

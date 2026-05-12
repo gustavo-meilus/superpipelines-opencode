@@ -1,6 +1,7 @@
 ---
 description: Update an existing step in a pipeline — select pipeline, select step, apply changes, re-validate edges, audit the delta, then gate on human approval
 argument-hint: [description of changes to the step]
+agent: pipeline-architect
 ---
 
 # Update Step — Command Reference

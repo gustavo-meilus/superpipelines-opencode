@@ -1,6 +1,7 @@
 ---
 description: Audit one or all pipelines against layout, frontmatter, topology, and runtime-safety standards — produces a severity-classified report (SEV-0/1/2/3) with cited evidence
 argument-hint: [pipeline-name | --all | path/glob]
+agent: pipeline-auditor
 ---
 
 # Audit Pipeline — Command Reference

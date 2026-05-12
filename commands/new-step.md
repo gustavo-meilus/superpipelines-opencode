@@ -1,6 +1,7 @@
 ---
 description: Add a new step to an existing pipeline — select pipeline, choose insertion point, design component, audit the delta, then gate on human approval
 argument-hint: [description of the new step]
+agent: pipeline-architect
 ---
 
 # New Step — Command Reference
