@@ -12436,9 +12436,8 @@ import fsSync from "fs";
 import path from "path";
 import os from "os";
 var superpipelines_read_registry = tool({
-  name: "superpipelines:read-registry",
   description: "Reads all scope registries, merges them, and returns validated JSON",
-  parameters: external_exports.object({}),
+  args: {},
   execute: async (_args, { directory }) => {
     const registries = [];
     const scopeRoots = [
@@ -12456,16 +12455,15 @@ var superpipelines_read_registry = tool({
         }
       }
     }
-    return { registries };
+    return { output: JSON.stringify({ registries }) };
   }
 });
 var superpipelines_read_state = tool({
-  name: "superpipelines:read-state",
   description: "Reads a pipeline state file with path resolution and validation",
-  parameters: external_exports.object({
+  args: {
     pipelineName: external_exports.string(),
     scope: external_exports.enum(["local", "project", "user"]).optional()
-  }),
+  },
   execute: async ({ pipelineName, scope }, { directory }) => {
     let searchRoots = [
       path.join(directory, ".opencode"),
@@ -12477,7 +12475,8 @@ var superpipelines_read_state = tool({
       const statePath = path.join(root, "superpipelines", pipelineName, "pipeline-state.json");
       if (fsSync.existsSync(statePath)) {
         try {
-          return JSON.parse(fsSync.readFileSync(statePath, "utf-8"));
+          const content = fsSync.readFileSync(statePath, "utf-8");
+          return { output: content };
         } catch (e) {
           throw new Error(`Failed to parse state file at ${statePath}`);
         }
@@ -12487,14 +12486,13 @@ var superpipelines_read_state = tool({
   }
 });
 var superpipelines_write_state = tool({
-  name: "superpipelines:write-state",
   description: "Writes pipeline state atomically (tmp file + rename) with schema enforcement",
-  parameters: external_exports.object({
+  args: {
     pipelineName: external_exports.string(),
-    state: external_exports.record(external_exports.any()),
+    stateJson: external_exports.string(),
     scope: external_exports.enum(["local", "project", "user"]).optional()
-  }),
-  execute: async ({ pipelineName, state, scope }, { directory }) => {
+  },
+  execute: async ({ pipelineName, stateJson, scope }, { directory }) => {
     let targetRoot = path.join(directory, ".opencode");
     if (scope === "user") targetRoot = path.join(os.homedir(), ".opencode");
     const pipelineDir = path.join(targetRoot, "superpipelines", pipelineName);
@@ -12503,9 +12501,10 @@ var superpipelines_write_state = tool({
     }
     const statePath = path.join(pipelineDir, "pipeline-state.json");
     const tmpPath = statePath + ".tmp";
-    fsSync.writeFileSync(tmpPath, JSON.stringify(state, null, 2), "utf-8");
+    JSON.parse(stateJson);
+    fsSync.writeFileSync(tmpPath, stateJson, "utf-8");
     fsSync.renameSync(tmpPath, statePath);
-    return { success: true, path: statePath };
+    return { output: JSON.stringify({ success: true, path: statePath }) };
   }
 });
 

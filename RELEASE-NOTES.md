@@ -1,5 +1,14 @@
 # Release Notes
 
+## v1.2.2 — (2026-05-15)
+
+Patch release fixing plugin tool compatibility with the opencode API update.
+
+### What Changed
+
+#### Fixed
+- Plugin tools (`read-registry`, `read-state`, `write-state`) updated to use `args` schema format and `output`-wrapped return values required by the updated opencode plugin API.
+
 ## v1.2.1 — (2026-05-11)
 
 Patch release introducing **superpipelines audit** and **failure analysis agents** with integrated state management tools.

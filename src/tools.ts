@@ -5,16 +5,15 @@ import path from "path";
 import os from "os";
 
 export const superpipelines_read_registry = tool({
-  name: "superpipelines:read-registry",
   description: "Reads all scope registries, merges them, and returns validated JSON",
-  parameters: z.object({}),
+  args: {},
   execute: async (_args, { directory }) => {
     const registries: any[] = [];
     const scopeRoots = [
       path.join(directory, ".opencode"),
       path.join(os.homedir(), ".opencode"),
     ];
-    
+
     for (const root of scopeRoots) {
       const regPath = path.join(root, "superpipelines", "registry.json");
       if (fsSync.existsSync(regPath)) {
@@ -26,31 +25,31 @@ export const superpipelines_read_registry = tool({
         }
       }
     }
-    return { registries };
+    return { output: JSON.stringify({ registries }) };
   }
 });
 
 export const superpipelines_read_state = tool({
-  name: "superpipelines:read-state",
   description: "Reads a pipeline state file with path resolution and validation",
-  parameters: z.object({
+  args: {
     pipelineName: z.string(),
     scope: z.enum(["local", "project", "user"]).optional()
-  }),
+  },
   execute: async ({ pipelineName, scope }, { directory }) => {
     let searchRoots = [
-      path.join(directory, ".opencode"), 
+      path.join(directory, ".opencode"),
       path.join(os.homedir(), ".opencode")
     ];
-    
+
     if (scope === "user") searchRoots = [path.join(os.homedir(), ".opencode")];
     else if (scope === "project" || scope === "local") searchRoots = [path.join(directory, ".opencode")];
-    
+
     for (const root of searchRoots) {
       const statePath = path.join(root, "superpipelines", pipelineName, "pipeline-state.json");
       if (fsSync.existsSync(statePath)) {
         try {
-          return JSON.parse(fsSync.readFileSync(statePath, "utf-8"));
+          const content = fsSync.readFileSync(statePath, "utf-8");
+          return { output: content };
         } catch (e) {
           throw new Error(`Failed to parse state file at ${statePath}`);
         }
@@ -61,28 +60,30 @@ export const superpipelines_read_state = tool({
 });
 
 export const superpipelines_write_state = tool({
-  name: "superpipelines:write-state",
   description: "Writes pipeline state atomically (tmp file + rename) with schema enforcement",
-  parameters: z.object({
+  args: {
     pipelineName: z.string(),
-    state: z.record(z.any()),
+    stateJson: z.string(),
     scope: z.enum(["local", "project", "user"]).optional()
-  }),
-  execute: async ({ pipelineName, state, scope }, { directory }) => {
+  },
+  execute: async ({ pipelineName, stateJson, scope }, { directory }) => {
     let targetRoot = path.join(directory, ".opencode");
     if (scope === "user") targetRoot = path.join(os.homedir(), ".opencode");
-    
+
     const pipelineDir = path.join(targetRoot, "superpipelines", pipelineName);
     if (!fsSync.existsSync(pipelineDir)) {
       fsSync.mkdirSync(pipelineDir, { recursive: true });
     }
-    
+
     const statePath = path.join(pipelineDir, "pipeline-state.json");
     const tmpPath = statePath + ".tmp";
-    
-    fsSync.writeFileSync(tmpPath, JSON.stringify(state, null, 2), "utf-8");
+
+    // validate JSON before writing
+    JSON.parse(stateJson);
+
+    fsSync.writeFileSync(tmpPath, stateJson, "utf-8");
     fsSync.renameSync(tmpPath, statePath);
-    
-    return { success: true, path: statePath };
+
+    return { output: JSON.stringify({ success: true, path: statePath }) };
   }
 });
