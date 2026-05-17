@@ -34,20 +34,7 @@ Then open an OpenCode session and run `/superpipelines:new-pipeline`. From there
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    A([Task]) --> B[DECONSTRUCT\nIntake & Gaps]
-    B --> C[DIAGNOSE\nConstraints]
-    C --> D[DEVELOP\nArchitect Agent\nspec · plan · tasks]
-    D --> E{HARD GATE\nHuman Approval}
-    E --> F[IMPLEMENT\nWorker Agents\nin isolated worktrees]
-    F --> G[Stage 1\nSpec Reviewer]
-    G -->|Fail| F
-    G -->|Pass| H[Stage 2\nQuality Reviewer]
-    H -->|Fail| F
-    H -->|Pass| I[COMMIT\nIntegration Branch]
-    I --> J([DONE])
-```
+[![Architecture Diagram](https://mermaid.ink/img/Zmxvd2NoYXJ0IExSCiAgICBBKFtUYXNrXSkgLS0-IEJbREVDT05TVFJVQ1QKSW50YWtlICYgR2Fwc10KICAgIEIgLS0-IENbRElBR05PU0UKQ29uc3RyYWludHNdCiAgICBDIC0tPiBEW0RFVkVMT1AKQXJjaGl0ZWN0IEFnZW50CnNwZWMgwrcgcGxhbiDCtyB0YXNrc10KICAgIEQgLS0-IEV7SEFSRCBHQVRFCkh1bWFuIEFwcHJvdmFsfQogICAgRSAtLT4gRltJTVBMRU1FTlQKV29ya2VyIEFnZW50cwppbiBpc29sYXRlZCB3b3JrdHJlZXNdCiAgICBGIC0tPiBHW1N0YWdlIDEKU3BlYyBSZXZpZXdlcl0KICAgIEcgLS0-fEZhaWx8IEYKICAgIEcgLS0-fFBhc3N8IEhbU3RhZ2UgMgpRdWFsaXR5IFJldmlld2VyXQogICAgSCAtLT58RmFpbHwgRgogICAgSCAtLT58UGFzc3wgSVtDT01NSVQKSW50ZWdyYXRpb24gQnJhbmNoXQogICAgSSAtLT4gSihbRE9ORV0p)](https://mermaid.live/edit#base64:Zmxvd2NoYXJ0IExSCiAgICBBKFtUYXNrXSkgLS0-IEJbREVDT05TVFJVQ1QKSW50YWtlICYgR2Fwc10KICAgIEIgLS0-IENbRElBR05PU0UKQ29uc3RyYWludHNdCiAgICBDIC0tPiBEW0RFVkVMT1AKQXJjaGl0ZWN0IEFnZW50CnNwZWMgwrcgcGxhbiDCtyB0YXNrc10KICAgIEQgLS0-IEV7SEFSRCBHQVRFCkh1bWFuIEFwcHJvdmFsfQogICAgRSAtLT4gRltJTVBMRU1FTlQKV29ya2VyIEFnZW50cwppbiBpc29sYXRlZCB3b3JrdHJlZXNdCiAgICBGIC0tPiBHW1N0YWdlIDEKU3BlYyBSZXZpZXdlcl0KICAgIEcgLS0-fEZhaWx8IEYKICAgIEcgLS0-fFBhc3N8IEhbU3RhZ2UgMgpRdWFsaXR5IFJldmlld2VyXQogICAgSCAtLT58RmFpbHwgRgogICAgSCAtLT58UGFzc3wgSVtDT01NSVQKSW50ZWdyYXRpb24gQnJhbmNoXQogICAgSSAtLT4gSihbRE9ORV0p)
 
 Reviewer agents run with `disallowedTools: Write, Edit, Bash`. They cannot rationalize their way into fixing code; they can only pass or fail it.
 
