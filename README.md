@@ -1,89 +1,26 @@
-# Superpipelines — Multi-Agent Orchestration Framework
+# Superpipelines — Multi-Agent Orchestration for OpenCode
 
-> Multi-agent AI pipelines with guaranteed spec compliance, write/review isolation, and full crash recovery. Superpipelines enables complex task decomposition into coordinated subagents with automated verification and state persistence.
+Superpipelines transforms OpenCode from a chaotic generator into a disciplined engineering team. It enforces isolated code reviews, prevents infinite loops, and ensures you never lose state to a mid-generation crash via persistent JSON state files.
 
 [![npm version](https://img.shields.io/npm/v/superpipelines.svg)](https://www.npmjs.com/package/superpipelines)
 [![npm downloads](https://img.shields.io/npm/dm/superpipelines.svg)](https://www.npmjs.com/package/superpipelines)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![CI](https://github.com/gustavo-meilus/superpipelines-opencode/actions/workflows/ci.yml/badge.svg)](https://github.com/gustavo-meilus/superpipelines-opencode/actions/workflows/ci.yml)
 
-<overview>
-Superpipelines provides a framework for decomposing complex tasks into coordinated subagents. It enforces engineering best practices through separate author and reviewer roles, explicit handoffs, and mandatory human gates for high-stakes transitions. The system ensures that every output matches its specification before merging, reducing model hallucinations and providing a robust path for crash recovery.
-</overview>
+[![Star History Chart](https://api.star-history.com/svg?repos=gustavo-meilus/superpipelines-opencode&type=Date)](https://star-history.com/#gustavo-meilus/superpipelines-opencode&Date)
 
-<glossary>
-  <term name="pipeline">A coordinated sequence of agent-driven tasks that transform a high-level goal into a verified implementation.</term>
-  <term name="write/review isolation">The structural separation of implementation and verification, where the reviewer agent lacks modification permissions.</term>
-  <term name="hard gate">A mandatory pause in execution requiring explicit human approval to proceed.</term>
-</glossary>
+---
 
-## Capabilities
+## Quick Start
 
-Users achieve the following outcomes when utilizing Superpipelines:
+Get running in under a minute:
 
-- **Deconstruction**: Tasks are decomposed into a precise specification, implementation plan, and itemized task list before execution.
-- **Structural Review**: Dedicated reviewer agents validate every task against the specification before commitment.
-- **State Persistence**: Pipeline state persists to scope-aware temporary directories, allowing for crash recovery and session resumption.
-- **Escalation Guards**: Hard-coded iteration caps and human gates prevent model rationalization and infinite loops.
-
-## Execution Workflow
-
-Superpipelines executes tasks through a structured lifecycle:
-
-<workflow>
-1. **DECONSTRUCT**: The system identifies gaps, ambiguities, and constraints through targeted intake.
-2. **DIAGNOSE**: Environmental and architectural constraints are surfaced before code generation.
-3. **DEVELOP**: The `pipeline-architect` generates the `spec.md`, `plan.md`, and `tasks.md`.
-4. **HARD GATE**: Execution pauses for human review and approval of the specification.
-5. **IMPLEMENT**: Worker agents execute tasks in isolated git worktrees.
-6. **STAGE 1**: `pipeline-spec-reviewer` validates output against the specification.
-7. **STAGE 2**: `pipeline-quality-reviewer` performs a code quality audit (only after Stage 1 passes).
-8. **COMMIT**: Passing tasks merge to the integration branch.
-9. **DONE**: Temporary state is cleaned and a completion summary is surfaced.
-</workflow>
-
-<invariant>
-Reviewer agents operate with `disallowedTools: Write, Edit, Bash`, ensuring they cannot modify the code they are tasked with validating.
-</invariant>
-
-## Execution Patterns
-
-The framework selects the optimal pattern based on task complexity:
-
-<pattern_matrix>
-| Pattern | Shape | Use Case |
-| :--- | :--- | :--- |
-| **1 — Sequential** | A → B → C | Ordered phases with hard data dependencies. |
-| **2 — Parallel Fan-Out** | A → [B, C, D] → Merger | Independent branches that merge upon completion. |
-| **3 — Iterative Loop** | Implement → Test → Fix | Test-driven repair with a hard escalation cap of 3 iterations. |
-| **4 — Human-Gated** | Agent → Gate → Agent | High-stakes stages requiring manual approval. |
-| **5 — Spec-Driven Dev** | Spec → Tasks → 2-Stage Review | Full SDD with worktrees per task. |
-| **6 — 4D Wrapper** | 4D Intake → Pattern | Wraps any pattern with structured deconstruction. |
-</pattern_matrix>
-
-## Installation
-
-Install the Superpipelines plugin via npm or locally:
-
-> **Published on npm**: [`superpipelines`](https://www.npmjs.com/package/superpipelines)
-
-<installation>
+**1. Install**
 ```bash
-# Install directly from npm
 npm install -g superpipelines
 ```
 
-Or, clone and build locally:
-
-```bash
-# Clone the repository
-git clone https://github.com/gustavo-meilus/superpipelines-opencode.git
-cd superpipelines-opencode
-
-# Build the plugin
-npm install
-npm run build
-```
-
-Then, add the plugin to your `opencode.json`:
+**2. Configure** — add to your `opencode.json`:
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
@@ -91,19 +28,103 @@ Then, add the plugin to your `opencode.json`:
 }
 ```
 
-Plugins specified via npm are automatically installed at startup using Bun and cached in `~/.cache/opencode/node_modules/`.
+**3. Run**
+```
+/superpipelines:new-pipeline
+```
 
-You can also place plugin source files directly in:
+That's it. Superpipelines will guide you through structured intake, generate a spec, wait for your approval, then execute with full review isolation and crash recovery.
+
+---
+
+## Architecture
+
+```mermaid
+flowchart LR
+    A([Task]) --> B[DECONSTRUCT\nIntake & Gaps]
+    B --> C[DIAGNOSE\nConstraints]
+    C --> D[DEVELOP\nArchitect Agent\nspec · plan · tasks]
+    D --> E{HARD GATE\nHuman Approval}
+    E --> F[IMPLEMENT\nWorker Agents\nin isolated worktrees]
+    F --> G[Stage 1\nSpec Reviewer]
+    G -->|Fail| F
+    G -->|Pass| H[Stage 2\nQuality Reviewer]
+    H -->|Fail| F
+    H -->|Pass| I[COMMIT\nIntegration Branch]
+    I --> J([DONE])
+```
+
+> Reviewer agents run with `disallowedTools: Write, Edit, Bash` — they cannot rationalize their way into "fixing" code; they can only pass or fail it.
+
+---
+
+## Execution Patterns
+
+The framework selects the optimal pattern based on task complexity:
+
+| Pattern | Shape | Use Case |
+| :--- | :--- | :--- |
+| **1 — Sequential** | `A → B → C` | Ordered phases with hard data dependencies |
+| **2 — Parallel Fan-Out** | `A → [B, C, D] → Merge` | Independent branches that merge upon completion |
+| **3 — Iterative Loop** | `Implement → Test → Fix` | Test-driven repair with a hard cap of 3 iterations |
+| **4 — Human-Gated** | `Agent → Gate → Agent` | High-stakes stages requiring manual approval |
+| **5 — Spec-Driven Dev** | `Spec → Tasks → 2-Stage Review` | Full SDD with isolated worktrees per task |
+| **6 — 4D Wrapper** | `4D Intake → Any Pattern` | Wraps any pattern with structured deconstruction |
+
+---
+
+## Capabilities
+
+- **Deconstruction**: Tasks are decomposed into a precise specification, implementation plan, and itemized task list before a single line of code is written.
+- **Write/Review Isolation**: Dedicated reviewer agents validate every task against the spec — they hold no write permissions, so they cannot rationalize changes.
+- **State Persistence**: Pipeline state persists to scope-aware temp directories, enabling full crash recovery and mid-session resumption.
+- **Escalation Guards**: Hard-coded iteration caps and mandatory human gates prevent model hallucination spirals and infinite loops.
+
+---
+
+## Slash Commands
+
+| Command | Function |
+| :--- | :--- |
+| `/superpipelines:new-pipeline` | Initiates 4D intake and generates pipeline artifacts |
+| `/superpipelines:run-pipeline` | Orchestrates an existing pipeline end-to-end |
+| `/superpipelines:new-step` | Adds a new step to an existing named pipeline |
+| `/superpipelines:update-step` | Modifies an existing step within a named pipeline |
+| `/superpipelines:delete-step` | Removes a step from a named pipeline with gap analysis |
+| `/superpipelines:audit-pipeline` | Audits agents and skills against the v2 compliance matrix |
+
+---
+
+## Installation
+
+> **Published on npm**: [`superpipelines`](https://www.npmjs.com/package/superpipelines)
+
+```bash
+# Install globally from npm
+npm install -g superpipelines
+```
+
+Or clone and build locally:
+
+```bash
+git clone https://github.com/gustavo-meilus/superpipelines-opencode.git
+cd superpipelines-opencode
+npm install
+npm run build
+```
+
+Plugins specified via npm are automatically installed at startup using Bun and cached in `~/.cache/opencode/node_modules/`. You can also place plugin source files directly in:
+
 - `.opencode/plugins/` — Project-level plugins
 - `~/.config/opencode/plugins/` — Global plugins
 
 ### Model Configuration
 
-By default, Superpipelines targets standard OpenCode Zen models (`opencode/big-pickle`). You can override the models used by both the plugin's native agents and any generated pipelines by adding a `superpipelines` block to your `opencode.json`:
+By default, Superpipelines targets standard OpenCode Zen models (`opencode/big-pickle`). Override via your `opencode.json`:
 
 ```json
 {
-  "plugin": ["./superpipelines-opencode"],
+  "plugin": ["superpipelines"],
   "superpipelines": {
     "models": {
       "default": "openai/gpt-4o",
@@ -113,29 +134,11 @@ By default, Superpipelines targets standard OpenCode Zen models (`opencode/big-p
   }
 }
 ```
-</installation>
 
-## Slash Commands
-
-| Command | Function |
-| :--- | :--- |
-| `/superpipelines:new-pipeline` | Initiates 4D intake and generates pipeline artifacts. |
-| `/superpipelines:run-pipeline` | Orchestrates an existing pipeline end-to-end. |
-| `/superpipelines:new-step` | Adds a new step to an existing named pipeline. |
-| `/superpipelines:update-step` | Modifies an existing step within a named pipeline. |
-| `/superpipelines:delete-step` | Removes a step from a named pipeline with gap analysis. |
-| `/superpipelines:audit-pipeline` | Audits agents and skills against the v2 compliance matrix. |
-
-## Design Principles
-
-- **Structural Isolation**: Permission boundaries are enforced at the agent definition level. Reviewers cannot rationalize their way into "fixing" code; they can only fail it.
-- **Scope-Aware State**: Pipeline state persists to `<scope-root>/superpipelines/temp/{P}/{runId}/pipeline-state.json`. Resumption resets in-progress phases while preserving completed work.
-- **Permission Granularity**: Every agent declares a `permissionMode` (e.g., `acceptEdits`, `plan`). Bypassing permissions requires explicit, documented justification.
-- **Progressive Disclosure**: High-density reference documentation resides in companion `*-references/` directories and is loaded on demand to minimize context bloat.
+---
 
 ## Repository Layout
 
-<file_structure>
 ```
 superpipelines-opencode/
 ├── package.json         # Plugin NPM package manifest
@@ -144,15 +147,25 @@ superpipelines-opencode/
 ├── .opencode/           # Plugin installation guides
 ├── agents/              # Core agent definitions (Architect, Auditor, Executor, Reviewers)
 ├── skills/              # Shared skills (State, Paths, Patterns, Worktree Safety)
-│   ├── *-references/    # Deep reference libraries (On-demand loading)
+│   └── *-references/    # Deep reference libraries (on-demand loading)
 ├── commands/            # Slash command wrappers
 └── settings.json        # Global plugin configuration
 ```
-</file_structure>
+
+---
+
+## Design Principles
+
+- **Structural Isolation**: Permission boundaries are enforced at the agent definition level. Reviewers cannot rationalize their way into "fixing" code; they can only fail it.
+- **Scope-Aware State**: Pipeline state persists to `<scope-root>/superpipelines/temp/{P}/{runId}/pipeline-state.json`. Resumption resets in-progress phases while preserving completed work.
+- **Permission Granularity**: Every agent declares a `permissionMode` (e.g., `acceptEdits`, `plan`). Bypassing permissions requires explicit, documented justification.
+- **Progressive Disclosure**: High-density reference documentation resides in companion `*-references/` directories and is loaded on demand to minimize context bloat.
+
+---
 
 ## Related Projects
 
-- **[superpipelines](https://github.com/gustavo-meilus/superpipelines)** — The companion CLI service for managing Superpipelines runs, state, and schedules outside the OpenCode plugin context. This plugin (`superpipelines-opencode`) implements the OpenCode-side agent orchestration; the sibling project handles standalone execution, scheduling, and external integrations.
+- **[superpipelines](https://github.com/gustavo-meilus/superpipelines)** — The companion CLI service for managing Superpipelines runs, state, and schedules outside the OpenCode plugin context.
 
 ## Contributing
 
